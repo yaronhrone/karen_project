@@ -1,0 +1,63 @@
+server:
+  port: 9000
+
+#spring:
+#  datasource:
+#    url: jdbc:mysql://sql7.freemysqlhosting.net:3306/sql7720011?serverTimezone=UTC
+#    username: sql7720011
+#    password: pPPT6eYTl8
+#    driver-class-name: com.mysql.cj.jdbc.Driver
+#  jpa:
+#    database-platform: org.hibernate.dialect.MySQL8Dialect
+#    hibernate:
+#      ddl-auto: update
+#    show-sql: true
+#  main:
+#    allow-circular-references: true
+
+# In JSON format
+#  {
+#    "server": {
+#      "port": 9000
+#    },
+#    "spring": {
+#      "datasource": {
+#        "url": "jdbc:mysql://sql7.freemysqlhosting.net:3306/sql7720011?serverTimezone=UTC",
+#        "username": "sql7720011",
+#        "password": "pPPT6eYTl8",
+#        "driver-class-name": "com.mysql.cj.jdbc.Driver"
+#      },
+#      "jpa": {
+#        "database-platform": "org.hibernate.dialect.MySQL8Dialect",
+#        "hibernate": {
+#          "ddl-auto": "update"
+#        },
+#        "show-sql": true
+#      },
+#      "main": {
+#        "allow-circular-references": true
+#      }
+#    }
+#  }
+
+
+
+# Optional commented out H2 configuration
+spring:
+  main:
+    allow-circular-references: true
+  datasource:
+    url: jdbc:h2:mem:mydb
+    username: sa
+    password: password
+    driverClassName: org.h2.Driver
+  jpa:
+    spring.jpa.database-platform: org.hibernate.dialect.H2Dialect
+  h2:
+    console:
+      enabled: true
+jwt:
+  secret: your_secret_key
+
+
+
