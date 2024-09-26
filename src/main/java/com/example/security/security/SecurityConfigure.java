@@ -30,22 +30,25 @@ public class SecurityConfigure implements WebMvcConfigurer {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-                .csrf(csrf -> csrf.disable())
+                .csrf(csrf -> csrf.disable()) // Disable CSRF for stateless sessions
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/authenticate", "/user/register", "/user/search/**", "/user/all-users",
-                                "/item/search/**", "/item/all-items", "/item/all-favorites", "/order/all-orders",
-                                "/h2-console/**").permitAll()
-                        .anyRequest().authenticated()
+                        .requestMatchers("/authenticate", "/users/register", "/users/search/**", "/users/all-users",
+                                "/h2-console/**").permitAll() // Public endpoints
+                        .anyRequest().authenticated() // Require authentication for all other requests
                 )
-                .sessionManagement(sess -> sess.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
+                .sessionManagement(sess -> sess.sessionCreationPolicy(SessionCreationPolicy.STATELESS)); // Stateless session management
 
-        // Add JWT Filter
+        // Allow frame options for H2 console with the new API
+        http.headers(headers -> headers
+                .frameOptions(frameOptions -> frameOptions.sameOrigin())); // Allow same-origin frames
+
+        // Add JWT Filter before UsernamePasswordAuthenticationFilter
         http.addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
     }
 
-    // Password encoder bean
+    // Password encoder bean for hashing passwords
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
@@ -70,13 +73,14 @@ public class SecurityConfigure implements WebMvcConfigurer {
     @Override
     public void addCorsMappings(CorsRegistry registry) {
         registry.addMapping("/**")
-                .allowedMethods("GET", "POST", "PUT", "DELETE")
-                .allowedOrigins("*")
+                .allowedMethods("GET", "POST", "PUT", "DELETE") // Allowed HTTP methods
+                .allowedOrigins("*") // Change to specific domains in production
                 .allowedHeaders("*")
                 .allowCredentials(false)
                 .maxAge(-1);
     }
 }
+
 
 
 

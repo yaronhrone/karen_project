@@ -6,7 +6,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 
-
 import java.util.List;
 
 @Repository
@@ -17,8 +16,8 @@ public class UserRepository {
 
     public CustomUser register(CustomUser user) {
         try {
-            String sql = String.format("INSERT INTO %s (first_name, last_name, email, phone, address, username, password) VALUES (?,?,?,?,?,?,?)", USERS_TABLE);
-            jdbcTemplate.update(sql, user.getFirstName(), user.getLastName(), user.getEmail(), user.getPhone(), user.getAddress(), user.getUsername(), user.getPassword());
+            String sql = String.format("INSERT INTO %s (first_name, last_name, email, phone, address, username, password, role) VALUES (?,?,?,?,?,?,?,?)", USERS_TABLE);
+            jdbcTemplate.update(sql, user.getFirstName(), user.getLastName(), user.getEmail(), user.getPhone(), user.getAddress(), user.getUsername(), user.getPassword(), user.getRole().name());
             CustomUser registeredUser = getUserByUsername(user.getUsername());
             registeredUser.setPassword("******");
             return registeredUser;
@@ -83,4 +82,16 @@ public class UserRepository {
             return null;
         }
     }
+
+    public CustomUser updateUser(CustomUser user) {
+        try {
+            String sql = String.format("UPDATE %s SET first_name = ?, last_name = ?, email = ?, phone = ?, address = ?, username = ?, password = ?, role = ? WHERE id = ?", USERS_TABLE);
+            jdbcTemplate.update(sql, user.getFirstName(), user.getLastName(), user.getEmail(), user.getPhone(), user.getAddress(), user.getUsername(), user.getPassword(), user.getRole().name(), user.getId());
+            return getUserById(user.getId());
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+            return null;
+        }
+    }
 }
+

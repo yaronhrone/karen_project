@@ -13,4 +13,5 @@ public class AuthenticationResponse implements Serializable {
     public String getJwt() {
         return jwt;
     }
+
 }

@@ -1,20 +1,26 @@
 package com.example.security.service;
 
 import com.example.security.model.CustomUser;
+import com.example.security.model.Role;
 import com.example.security.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+
 import java.util.List;
 
 @Service
-public class UserService  {
+public class UserService {
 
     @Autowired
     private UserRepository userRepository;
 
+    @Autowired
+    private PasswordEncoder passwordEncoder;
+
     public CustomUser register(CustomUser user) {
         if (user.getFirstName() == null || user.getLastName() == null || user.getEmail() == null || user.getAddress() == null
-        || user.getUsername() == null || user.getPassword() == null) {
+                || user.getUsername() == null || user.getPassword() == null) {
             System.out.println("User not created, first name, last name, email, address, username and password are required");
             return null;
         }
@@ -24,6 +30,11 @@ public class UserService  {
             System.out.println("This email or username already exists in the system");
             return null;
         }
+        user.setPassword(passwordEncoder.encode(user.getPassword()));
+
+        System.out.println("Encoded password: " + user.getPassword()); // Log the encoded password
+
+        user.setRole(Role.USER);
         return userRepository.register(user);
     }
 
@@ -65,4 +76,15 @@ public class UserService  {
     public List<CustomUser> getAllUsers() {
         return userRepository.getAllUsers();
     }
+
+    public CustomUser updateUser(CustomUser updatedUser) {
+        // Implement update logic for the logged-in user
+        return userRepository.updateUser(updatedUser);
+    }
+
+    public CustomUser updateAnotherUser(CustomUser updatedUser) {
+        // Implement update logic for another user (admin)
+        return userRepository.updateUser(updatedUser);
+    }
 }
+

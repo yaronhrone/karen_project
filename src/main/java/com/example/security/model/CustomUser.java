@@ -13,10 +13,14 @@ public class CustomUser {
     private String address;
 
     private String username;
-
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private String password;
+    private Role role;
 
-    public CustomUser(Integer id, String firstName, String lastName, String email, String phone, String address, String username, String password) {
+    public CustomUser() {
+    }
+
+    public CustomUser(Integer id, String firstName, String lastName, String email, String phone, String address, String username, String password, Role role) {
         this.id = id;
         this.firstName = firstName;
         this.lastName = lastName;
@@ -25,10 +29,15 @@ public class CustomUser {
         this.address = address;
         this.username = username;
         this.password = password;
+        this.role = role;
     }
 
     public Integer getId() {
         return id;
+    }
+
+    public void setId(Integer id) {
+        this.id = id;
     }
 
     public String getFirstName() {
@@ -85,5 +94,13 @@ public class CustomUser {
 
     public void setPassword(String password) {
         this.password = password;
+    }
+
+    public Role getRole() {
+        return role;
+    }
+
+    public void setRole(Role role) {
+        this.role = role;
     }
 }
