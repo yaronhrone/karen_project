@@ -4,10 +4,15 @@ import com.example.security.model.CustomUser;
 import com.example.security.model.Role;
 import com.example.security.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.Collection;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 public class UserService {
@@ -34,7 +39,9 @@ public class UserService {
 
         System.out.println("Encoded password: " + user.getPassword()); // Log the encoded password
 
-        user.setRole(Role.USER);
+        if (user.getRole() == null) {
+            user.setRole(Role.USER);
+        }
         return userRepository.register(user);
     }
 
@@ -86,5 +93,13 @@ public class UserService {
         // Implement update logic for another user (admin)
         return userRepository.updateUser(updatedUser);
     }
+
+    // In UserService.java or a utility class
+    public Collection<? extends GrantedAuthority> getAuthoritiesFromRoles(Set<Role> roles) {
+        return roles.stream()
+                .map(role -> new SimpleGrantedAuthority("ROLE_" + role.name())) // Matches the expected format
+                .collect(Collectors.toList());
+    }
+
 }
 

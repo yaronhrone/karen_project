@@ -34,16 +34,16 @@ public class SecurityConfigure implements WebMvcConfigurer {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/authenticate", "/users/register", "/users/search/**", "/users/all-users",
                                 "/h2-console/**").permitAll() // Public endpoints
+                        .requestMatchers("/users/**").hasAuthority("USER")
+                        .requestMatchers("/admin/**").hasAuthority("ADMIN") // Admin-only routes
                         .anyRequest().authenticated() // Require authentication for all other requests
                 )
-                .sessionManagement(sess -> sess.sessionCreationPolicy(SessionCreationPolicy.STATELESS)); // Stateless session management
+                .sessionManagement(sess -> sess.sessionCreationPolicy(SessionCreationPolicy.STATELESS)) // Stateless session management
+                .addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class);
 
         // Allow frame options for H2 console with the new API
         http.headers(headers -> headers
                 .frameOptions(frameOptions -> frameOptions.sameOrigin())); // Allow same-origin frames
-
-        // Add JWT Filter before UsernamePasswordAuthenticationFilter
-        http.addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
     }

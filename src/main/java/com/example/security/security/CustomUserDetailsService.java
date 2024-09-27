@@ -3,10 +3,15 @@ package com.example.security.security;
 import com.example.security.model.CustomUser;
 import com.example.security.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Service
 public class CustomUserDetailsService implements UserDetailsService {
@@ -18,18 +23,20 @@ public class CustomUserDetailsService implements UserDetailsService {
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         CustomUser user = userService.getUserByUsername(username);
         if (user == null) {
-            throw new UsernameNotFoundException("The user with this username does not exist");
+            throw new UsernameNotFoundException("User not found");
         }
 
-        System.out.println("Loaded user password: " + user.getPassword()); // Debugging log
+        // Log the retrieved user
+        System.out.println("Retrieved user: " + user.getUsername() + " with roles: " + user.getRole().name());
 
-        // Instead of withDefaultPasswordEncoder(), use the PasswordEncoder
-        return org.springframework.security.core.userdetails.User
-                .withUsername(user.getUsername())
-                .password(user.getPassword()) // Keep the encoded password as is
-                .roles(user.getRole().name())
-                .build();
+        // Convert user roles to GrantedAuthorities
+        List<GrantedAuthority> authorities = new ArrayList<>();
+        authorities.add(new SimpleGrantedAuthority(user.getRole().name())); // Assuming role is enum
+
+        // Return user details with authorities
+        return new org.springframework.security.core.userdetails.User(user.getUsername(), user.getPassword(), authorities);
     }
+
 }
 
 

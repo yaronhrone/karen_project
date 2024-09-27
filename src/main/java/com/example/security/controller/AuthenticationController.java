@@ -19,11 +19,8 @@ public class AuthenticationController {
     public ResponseEntity<?> createAuthenticationToken(@RequestBody AuthenticationRequest authenticationRequest) throws Exception {
         try {
             AuthenticationResponse authResponse = authenticationService.createAuthenticationToken(authenticationRequest);
-            String token = authResponse.getJwt();
-
             return ResponseEntity.ok()
-                    .header("Authorization", "Bearer " + token)
-                    .body("Authenticated");
+                    .body(authResponse);
         } catch (Exception exception) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Incorrect Username Or Password");
         }
