@@ -81,17 +81,5 @@ public class UserService {
         return userRepository.updateUser(username, updatedUser);
     }
 
-    public CustomUser updateAnotherUser(String username, CustomUser updatedUser) {
-        // Implement update logic for another user (admin)
-        return userRepository.updateUser(username, updatedUser);
-    }
-
-    // In UserService.java or a utility class
-    public Collection<? extends GrantedAuthority> getAuthoritiesFromRoles(Set<Role> roles) {
-        return roles.stream()
-                .map(role -> new SimpleGrantedAuthority("ROLE_" + role.name())) // Matches the expected format
-                .collect(Collectors.toList());
-    }
-
 }
 

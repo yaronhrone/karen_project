@@ -26,15 +26,6 @@ public class UserController {
         return new ResponseEntity<>(createdUser, HttpStatus.CREATED);
     }
 
-    @PreAuthorize("hasRole('USER') or hasRole('ADMIN')") // Change: Ensure correct roles
-    @DeleteMapping
-    public ResponseEntity<String> deleteUser(@RequestHeader(value = "Authorization") String token) {
-        String jwtToken = token.substring(7);
-        String username = jwtUtil.extractUsername(jwtToken);
-        String result = userService.deleteUser(username);
-        return ResponseEntity.ok(result);
-    }
-
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
     @GetMapping
     public ResponseEntity<CustomUser> getUserByUsername(@RequestHeader(value = "Authorization") String token) {
@@ -44,8 +35,7 @@ public class UserController {
         return ResponseEntity.ok(user);
     }
 
-
-    @PreAuthorize("hasRole('USER') or hasRole('ADMIN')") // Change: Ensure correct roles
+    @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
     @PutMapping
     public ResponseEntity<CustomUser> updateUser(@RequestHeader(value = "Authorization") String token, @RequestBody CustomUser updatedUser) {
         String jwtToken = token.substring(7);
@@ -53,6 +43,16 @@ public class UserController {
         CustomUser user = userService.updateUser(username, updatedUser);
         return ResponseEntity.ok(user);
     }
+
+    @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
+    @DeleteMapping
+    public ResponseEntity<String> deleteUser(@RequestHeader(value = "Authorization") String token) {
+        String jwtToken = token.substring(7);
+        String username = jwtUtil.extractUsername(jwtToken);
+        String result = userService.deleteUser(username);
+        return ResponseEntity.ok(result);
+    }
 }
+
 
 
