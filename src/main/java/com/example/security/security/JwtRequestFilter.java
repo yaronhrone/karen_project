@@ -43,7 +43,7 @@ public class JwtRequestFilter extends OncePerRequestFilter {
             jwt = authorizationHeader.substring(BEARER_PREFIX.length());
 
             try {
-            username = jwtUtil.extractUsername(jwt);
+                username = jwtUtil.extractUsername(jwt);
             } catch (ExpiredJwtException e) {
                 // Token is expired
                 response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);

@@ -12,6 +12,7 @@ import java.util.List;
 public class UserRepository {
     @Autowired
     private JdbcTemplate jdbcTemplate;
+
     private static final String USERS_TABLE = "users";
 
     public CustomUser register(CustomUser user) {
@@ -35,7 +36,6 @@ public class UserRepository {
             return e.getMessage();
         }
     }
-
 
     public CustomUser getUserByUsername(String username) {
         try {
@@ -81,4 +81,3 @@ public class UserRepository {
         }
     }
 }
-

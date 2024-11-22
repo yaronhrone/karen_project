@@ -20,3 +20,4 @@ public class UserMapper implements RowMapper<CustomUser> {
                 Role.valueOf( rs.getString("role")));
     }
 }
+
