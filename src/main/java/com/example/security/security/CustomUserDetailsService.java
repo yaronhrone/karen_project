@@ -8,6 +8,7 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.core.userdetails.User;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -34,7 +35,7 @@ public class CustomUserDetailsService implements UserDetailsService {
         authorities.add(new SimpleGrantedAuthority(user.getRole().name())); // Assuming role is enum
 
         // Return user details with authorities
-        return new org.springframework.security.core.userdetails.User(user.getUsername(), user.getPassword(), authorities);
+        return new User(user.getUsername(), user.getPassword(), authorities);
     }
 
 }

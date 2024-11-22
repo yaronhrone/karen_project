@@ -19,7 +19,6 @@ public class UserRepository {
             String sql = String.format("INSERT INTO %s (first_name, last_name, email, phone, address, username, password, role) VALUES (?,?,?,?,?,?,?,?)", USERS_TABLE);
             jdbcTemplate.update(sql, user.getFirstName(), user.getLastName(), user.getEmail(), user.getPhone(), user.getAddress(), user.getUsername(), user.getPassword(), user.getRole().name());
             CustomUser registeredUser = getUserByUsername(user.getUsername());
-            registeredUser.setPassword("******");
             return registeredUser;
         } catch (Exception e) {
             System.out.println(e.getMessage());
@@ -27,27 +26,16 @@ public class UserRepository {
         }
     }
 
-    public String deleteUser(Integer id) {
+    public String deleteUser(String username) {
         try {
-            String sql = String.format("DELETE FROM %s WHERE id = ?", USERS_TABLE);
-            jdbcTemplate.update(sql, id);
+            String sql = String.format("DELETE FROM %s WHERE username = ?", USERS_TABLE);
+            jdbcTemplate.update(sql, username);
             return "User deleted successfully";
         } catch (Exception e) {
             return e.getMessage();
         }
     }
 
-    public CustomUser getUserById(Integer id) {
-        try {
-            String sql = String.format("SELECT * FROM %s WHERE id = ?", USERS_TABLE);
-            CustomUser user = jdbcTemplate.queryForObject(sql, new UserMapper(), id);
-            user.setPassword("******");
-            return user;
-        } catch (Exception e) {
-            System.out.println(e.getMessage());
-            return null;
-        }
-    }
 
     public CustomUser getUserByUsername(String username) {
         try {
@@ -64,7 +52,6 @@ public class UserRepository {
         try {
             String sql = String.format("SELECT * FROM %s WHERE email = ?", USERS_TABLE);
             CustomUser user = jdbcTemplate.queryForObject(sql, new UserMapper(), email);
-            user.setPassword("******");
             return user;
         } catch (Exception e) {
             System.out.println(e.getMessage());
@@ -83,11 +70,11 @@ public class UserRepository {
         }
     }
 
-    public CustomUser updateUser(CustomUser user) {
+    public CustomUser updateUser(String username, CustomUser user) {
         try {
-            String sql = String.format("UPDATE %s SET first_name = ?, last_name = ?, email = ?, phone = ?, address = ?, username = ?, password = ?, role = ? WHERE id = ?", USERS_TABLE);
-            jdbcTemplate.update(sql, user.getFirstName(), user.getLastName(), user.getEmail(), user.getPhone(), user.getAddress(), user.getUsername(), user.getPassword(), user.getRole().name(), user.getId());
-            return getUserById(user.getId());
+            String sql = String.format("UPDATE %s SET first_name = ?, last_name = ?, email = ?, phone = ?, address = ? WHERE username = ?", USERS_TABLE);
+            jdbcTemplate.update(sql, user.getFirstName(), user.getLastName(), user.getEmail(), user.getPhone(), user.getAddress(), username);
+            return getUserByUsername(username);
         } catch (Exception e) {
             System.out.println(e.getMessage());
             return null;

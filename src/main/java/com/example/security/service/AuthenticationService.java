@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
@@ -51,17 +52,27 @@ public class AuthenticationService {
 
 //        option 2
         // Load user details
-        CustomUser user = userService.getUserByUsername(authenticationRequest.getUsername());
-        if (user == null || !passwordEncoder.matches(authenticationRequest.getPassword(), user.getPassword())) {
-            throw new BadCredentialsException("Incorrect username or password");
-        }
-
-
+//        CustomUser user = userService.getUserByUsername(authenticationRequest.getUsername());
+//   if (user == null || !passwordEncoder.matches(authenticationRequest.getPassword(), user.getPassword())) {
+//            throw new BadCredentialsException("Incorrect username or password");
+//        }
         // Load user details
-        UserDetails userDetails = customUserDetailsService.loadUserByUsername(authenticationRequest.getUsername());
+//        UserDetails userDetails = customUserDetailsService.loadUserByUsername(authenticationRequest.getUsername());
 
         // Generate and return the JWT token
-        return new AuthenticationResponse(jwtUtil.generateToken(userDetails));
+//        return new AuthenticationResponse(jwtUtil.generateToken(userDetails));
+
+//        option 2 in short - I'm try
+        try {
+            UserDetails userDetails = customUserDetailsService.loadUserByUsername(authenticationRequest.getUsername());
+            if (!passwordEncoder.matches(authenticationRequest.getPassword(), userDetails.getPassword())) {
+                throw new BadCredentialsException("Incorrect password");
+            }
+            return new AuthenticationResponse(jwtUtil.generateToken(userDetails));
+        } catch (Exception e) {
+            throw e;
+        }
+
     }
 }
 

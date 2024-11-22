@@ -7,6 +7,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/admin")
 @CrossOrigin(origins = "http://localhost:3000")
@@ -15,18 +17,15 @@ public class AdminController {
     @Autowired
     private UserService userService;
 
-    // Route for updating another user's information (Admin only)
     @PreAuthorize("hasRole('ADMIN')")
-    @PutMapping("/update/{username}")
-    public ResponseEntity<CustomUser> updateAnotherUser(@PathVariable String username, @RequestBody CustomUser updatedUser) {
-        updatedUser.setUsername(username); // Ensure the username is set
-        CustomUser user = userService.updateAnotherUser(updatedUser);
-        return ResponseEntity.ok(user);
+    @GetMapping(value = "/all-users")
+    public ResponseEntity<List<CustomUser>> getAllUsers() {
+        List<CustomUser> users = userService.getAllUsers();
+        return ResponseEntity.ok(users);
     }
 
-    // Route for deleting another user (Admin only)
     @PreAuthorize("hasRole('ADMIN')")
-    @DeleteMapping("/delete/{username}")
+    @DeleteMapping("/delete-user/{username}")
     public ResponseEntity<String> deleteAnotherUser(@PathVariable String username) {
         return ResponseEntity.ok(userService.deleteUser(username));
     }

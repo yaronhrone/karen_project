@@ -6,6 +6,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
+import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -31,10 +32,11 @@ public class SecurityConfigure implements WebMvcConfigurer {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
                 .csrf(csrf -> csrf.disable()) // Disable CSRF for stateless sessions
+                .cors(Customizer.withDefaults()) // Enable cors for Spring Security
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/authenticate", "/users/register", "/users/search/**", "/users/all-users",
+                        .requestMatchers("/authenticate", "/users/register",
                                 "/h2-console/**").permitAll() // Public endpoints
-                        .requestMatchers("/users/**").hasAuthority("USER")
+                        .requestMatchers("/users/**").hasAnyAuthority("USER", "ADMIN")
                         .requestMatchers("/admin/**").hasAuthority("ADMIN") // Admin-only routes
                         .anyRequest().authenticated() // Require authentication for all other requests
                 )
@@ -44,7 +46,6 @@ public class SecurityConfigure implements WebMvcConfigurer {
         // Allow frame options for H2 console with the new API
         http.headers(headers -> headers
                 .frameOptions(frameOptions -> frameOptions.sameOrigin())); // Allow same-origin frames
-
         return http.build();
     }
 
@@ -76,7 +77,7 @@ public class SecurityConfigure implements WebMvcConfigurer {
                 .allowedMethods("GET", "POST", "PUT", "DELETE") // Allowed HTTP methods
                 .allowedOrigins("*") // Change to specific domains in production
                 .allowedHeaders("*")
-                .allowCredentials(false)
+                .allowCredentials(true)
                 .maxAge(-1);
     }
 }

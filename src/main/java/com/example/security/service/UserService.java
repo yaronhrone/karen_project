@@ -53,15 +53,7 @@ public class UserService {
         if (registeredUser == null) {
             return "The user with this username does not exist, so it cannot be deleted";
         }
-        return userRepository.deleteUser(registeredUser.getId());
-    }
-
-    public CustomUser getUserById(Integer id) {
-        if (id == null) {
-            System.out.println("It is not possible to accept the user without id");
-            return null;
-        }
-        return userRepository.getUserById(id);
+        return userRepository.deleteUser(registeredUser.getUsername());
     }
 
     public CustomUser getUserByUsername(String username) {
@@ -84,14 +76,14 @@ public class UserService {
         return userRepository.getAllUsers();
     }
 
-    public CustomUser updateUser(CustomUser updatedUser) {
+    public CustomUser updateUser(String username, CustomUser updatedUser) {
         // Implement update logic for the logged-in user
-        return userRepository.updateUser(updatedUser);
+        return userRepository.updateUser(username, updatedUser);
     }
 
-    public CustomUser updateAnotherUser(CustomUser updatedUser) {
+    public CustomUser updateAnotherUser(String username, CustomUser updatedUser) {
         // Implement update logic for another user (admin)
-        return userRepository.updateUser(updatedUser);
+        return userRepository.updateUser(username, updatedUser);
     }
 
     // In UserService.java or a utility class

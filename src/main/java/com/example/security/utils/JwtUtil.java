@@ -34,13 +34,8 @@ public class JwtUtil {
     }
 
     public <T> T extractClaim(String token, Function<Claims, T> claimsResolver) {
-        try {
             final Claims claims = extractAllClaims(token);
             return claimsResolver.apply(claims);
-        } catch (ExpiredJwtException e) {
-            // Handle expired token scenario
-            return null;
-        }
     }
 
     public List<GrantedAuthority> extractAuthorities(String token) {
@@ -56,12 +51,7 @@ public class JwtUtil {
     }
 
     private Claims extractAllClaims(String token) {
-        try {
             return Jwts.parser().setSigningKey(SECRET_KEY).parseClaimsJws(token).getBody();
-        } catch (JwtException e) {
-            System.out.println(e.getMessage());
-            return null;
-        }
     }
 
     private Boolean isTokenExpired(String token) {

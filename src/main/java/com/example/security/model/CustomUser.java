@@ -3,7 +3,6 @@ package com.example.security.model;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class CustomUser {
-    private Integer id;
     @JsonProperty(value = "first_name")
     private String firstName;
     @JsonProperty(value = "last_name")
@@ -20,8 +19,7 @@ public class CustomUser {
     public CustomUser() {
     }
 
-    public CustomUser(Integer id, String firstName, String lastName, String email, String phone, String address, String username, String password, Role role) {
-        this.id = id;
+    public CustomUser(String firstName, String lastName, String email, String phone, String address, String username, String password, Role role) {
         this.firstName = firstName;
         this.lastName = lastName;
         this.email = email;
@@ -30,14 +28,6 @@ public class CustomUser {
         this.username = username;
         this.password = password;
         this.role = role;
-    }
-
-    public Integer getId() {
-        return id;
-    }
-
-    public void setId(Integer id) {
-        this.id = id;
     }
 
     public String getFirstName() {
