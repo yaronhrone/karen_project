@@ -6,6 +6,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
+import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -30,22 +31,25 @@ public class SecurityConfigure implements WebMvcConfigurer {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-                .csrf(csrf -> csrf.disable())
+                .csrf(csrf -> csrf.disable()) // Disable CSRF for stateless sessions
+                .cors(Customizer.withDefaults()) // Enable cors for Spring Security
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/authenticate", "/user/register", "/user/search/**", "/user/all-users",
-                                "/item/search/**", "/item/all-items", "/item/all-favorites", "/order/all-orders",
-                                "/h2-console/**").permitAll()
-                        .anyRequest().authenticated()
+                        .requestMatchers("/authenticate", "/users/register",
+                                "/h2-console/**").permitAll() // Public endpoints
+                        .requestMatchers("/users/**").hasAnyAuthority("USER", "ADMIN")
+                        .requestMatchers("/admin/**").hasAuthority("ADMIN") // Admin-only routes
+                        .anyRequest().authenticated() // Require authentication for all other requests
                 )
-                .sessionManagement(sess -> sess.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
+                .sessionManagement(sess -> sess.sessionCreationPolicy(SessionCreationPolicy.STATELESS)) // Stateless session management
+                .addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class);
 
-        // Add JWT Filter
-        http.addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class);
-
+        // Allow frame options for H2 console with the new API
+        http.headers(headers -> headers
+                .frameOptions(frameOptions -> frameOptions.sameOrigin())); // Allow same-origin frames
         return http.build();
     }
 
-    // Password encoder bean
+    // Password encoder bean for hashing passwords
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
@@ -70,13 +74,14 @@ public class SecurityConfigure implements WebMvcConfigurer {
     @Override
     public void addCorsMappings(CorsRegistry registry) {
         registry.addMapping("/**")
-                .allowedMethods("GET", "POST", "PUT", "DELETE")
-                .allowedOrigins("*")
+                .allowedMethods("GET", "POST", "PUT", "DELETE") // Allowed HTTP methods
+                .allowedOrigins("*") // Change to specific domains in production
                 .allowedHeaders("*")
-                .allowCredentials(false)
+                .allowCredentials(true)
                 .maxAge(-1);
     }
 }
+
 
 
 

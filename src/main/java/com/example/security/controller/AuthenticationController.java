@@ -1,6 +1,7 @@
 package com.example.security.controller;
 
 import com.example.security.model.AuthenticationRequest;
+import com.example.security.model.AuthenticationResponse;
 import com.example.security.service.AuthenticationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -14,15 +15,17 @@ public class AuthenticationController {
     @Autowired
     private AuthenticationService authenticationService;
 
-
     @PostMapping("/authenticate")
     public ResponseEntity<?> createAuthenticationToken(@RequestBody AuthenticationRequest authenticationRequest) throws Exception {
-        try{
-            return ResponseEntity.ok(authenticationService.createAuthenticationToken(authenticationRequest));
-        } catch (Exception exception){
+        try {
+            AuthenticationResponse authResponse = authenticationService.createAuthenticationToken(authenticationRequest);
+            return ResponseEntity.ok()
+                    .body(authResponse);
+        } catch (Exception exception) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Incorrect Username Or Password");
         }
     }
 }
+
 
 
