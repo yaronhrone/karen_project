@@ -16,9 +16,10 @@ public class AuthenticationController {
     private AuthenticationService authenticationService;
 
     @PostMapping("/authenticate")
-    public ResponseEntity<?> createAuthenticationToken(@RequestBody AuthenticationRequest authenticationRequest) throws Exception {
+    public ResponseEntity<?> createAuthenticationToken(@RequestBody AuthenticationRequest authenticationRequest) {
         try {
             AuthenticationResponse authResponse = authenticationService.createAuthenticationToken(authenticationRequest);
+            System.out.println("tokan: " + authResponse.getJwt());
             return ResponseEntity.ok()
                     .body(authResponse);
         } catch (Exception exception) {

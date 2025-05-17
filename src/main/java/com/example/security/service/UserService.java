@@ -24,8 +24,8 @@ public class UserService {
     private PasswordEncoder passwordEncoder;
 
     public String register(CustomUser user) {
-        if (user.getFirstName() == null || user.getLastName() == null || user.getEmail() == null
-                || user.getUsername() == null || user.getPassword() == null) {
+        if (user.getFirstName() == null ||user.getFirstName().trim().isEmpty() || user.getLastName() == null || user.getLastName().trim().isEmpty() || user.getEmail() == null ||
+                user.getEmail().trim().isEmpty() || user.getUsername().trim().isEmpty() || user.getPassword().trim().isEmpty() ){
             return "User not created, first name, last name, email, username and password are required";
         }
         CustomUser userWithTheSameEmail = getUserByEmail(user.getEmail());

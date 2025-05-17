@@ -38,7 +38,7 @@ public class JwtUtil {
 
     public List<GrantedAuthority> extractAuthorities(String token) {
         Claims claims = extractAllClaims(token);
-        List<String> roles = claims.get("roles", List.class); // Change: Use "roles" to get a list of roles
+        List<String> roles = claims.get("roles", List.class); // Use "roles" to get a list of roles
         List<GrantedAuthority> authorities = new ArrayList<>();
         if (roles != null) {
             for (String role : roles) {
