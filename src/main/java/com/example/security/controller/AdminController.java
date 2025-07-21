@@ -93,6 +93,50 @@ public class AdminController {
             return new ResponseEntity(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
+    @GetMapping(value = "/all-cakes")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<List<Cake>> getAllCakes() {
+        try {
+            System.out.println("all cakes");
+            return ResponseEntity.ok().body(cakeService.getAllCakes());
+        } catch (Exception e) {
+            return new ResponseEntity(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+    @DeleteMapping(value = "/delete-cake/{name}")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<String> deleteCake(@PathVariable String name) {
+        try {
+            return ResponseEntity.ok().body(cakeService.deleteCake(name));
+        } catch (Exception e) {
+            return new ResponseEntity(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+    @PutMapping(value = "/update-cake")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<String> updateCake(@RequestBody Cake cake) {
+        try {
+
+            return ResponseEntity.ok().body(cakeService.updateCake(cake));
+        } catch (Exception e) {
+            return new ResponseEntity(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+    @PreAuthorize("hasRole('ADMIN')")
+    @DeleteMapping(value = "/delete-chocolate/{name}")
+    public String deleteChocolate(String name) {
+        return chocolateService.deleteChocolate(name);
+    }
+    @PreAuthorize("hasRole('ADMIN')")
+    @PutMapping(value = "/update-chocolate")
+    public String updateChocolate(Chocolate chocolate) {
+        return chocolateService.updateChocolate(chocolate);
+    }
+    @PreAuthorize("hasRole('ADMIN')")
+    @GetMapping(value = "/all-chocolates")
+    public List<Chocolate> getAllChocolates() {
+        return chocolateService.getAllChocolates();
+    }
 }
 
 

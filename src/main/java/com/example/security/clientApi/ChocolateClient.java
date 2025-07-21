@@ -2,16 +2,21 @@ package com.example.security.clientApi;
 
 import com.example.security.model.Chocolate;
 import org.springframework.cloud.openfeign.FeignClient;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @FeignClient(name = "chocolate", url = "http://localhost:8080/api/chocolate")
 public interface ChocolateClient
 {
     @GetMapping("{name}")
-Chocolate getChocolate(@PathVariable String name);
+    Chocolate getChocolate(@PathVariable String name);
     @PostMapping
-String createChocolate(@RequestBody Chocolate chocolate);
+    String createChocolate(@RequestBody Chocolate chocolate);
+    @DeleteMapping("/{name}")
+    String deleteChocolate(@PathVariable String name);
+    @PutMapping
+    String updateChocolate(@RequestBody Chocolate chocolate);
+    @GetMapping
+    List<Chocolate> getAllChocolates();
 }
