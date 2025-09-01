@@ -32,7 +32,7 @@ public class SecurityConfigure implements WebMvcConfigurer {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/authenticate", "/users/register",
                                 "/h2-console/**").permitAll() // Public endpoints
-                        .requestMatchers("/users/**").hasAnyAuthority("USER", "ADMIN")
+                        .requestMatchers("/users/**", "/favorite/**").hasAnyAuthority("USER", "ADMIN")
                         .requestMatchers("/admin/**").hasAuthority("ADMIN") // Admin-only routes
                         .anyRequest().authenticated() // Require authentication for all other requests
                 )

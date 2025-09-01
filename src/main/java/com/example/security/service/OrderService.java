@@ -1,0 +1,97 @@
+package com.example.security.service;
+
+
+import com.example.security.model.*;
+import com.example.security.repository.OrderRepository;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import java.util.List;
+
+@Service
+public class OrderService {
+    @Autowired
+    private OrderRepository orderRepository;
+    @Autowired
+    private UserService userService;
+    @Autowired
+    private CakeService cakeService;
+    @Autowired
+    private ChocolateService chocolateService;
+
+
+    public Integer createOrder(String username) {
+        Order order = new Order();
+        order.setStatus(Status.OPEN);
+        order.setUsername(username);
+        order.setAddressShipping(userService.getUserByUsername(username).getAddress());
+
+        return orderRepository.createOrder(order);
+    }
+    public String addToOrder(String username ,int productId, ProductType productType) {
+          int orderId = 0;
+          int quantity = 1;
+           if (orderRepository.getAllOrderOpen(username).isEmpty()) {
+             orderId = createOrder(username);
+           } else {
+             orderId = orderRepository.getAllOrderOpen(username).getFirst().getId();
+           }
+           if (orderRepository.getProductQuantityFromOrder(orderId,productId, productType ) != null) {
+               quantity = orderRepository.getProductQuantityFromOrder(orderId,productId ,productType) + 1;
+           }
+           OrderItem orderItem = new OrderItem();
+           orderItem.setProductId(productId);
+           orderItem.setProductType(productType);
+           orderItem.setOrderId(orderId);
+           orderItem.setQuantity(quantity);
+        return orderRepository.addOrderItem(orderItem);
+    }
+    public String removeChocolateFromOrder(String username ,int productId, ProductType productType) {
+        int orderId = orderRepository.getAllOrderOpen(username).getFirst().getId();
+        if (orderRepository.getProductQuantityFromOrder(orderId,productId, productType ) == null) {
+            return "Product not found in order";
+        }
+        if (orderRepository.getProductQuantityFromOrder(orderId,productId, productType ) == 1) {
+            return orderRepository.deleteOrderItemsByOrderId(orderId, productId, productType);
+        }
+        OrderItem orderItem = new OrderItem();
+        orderItem.setProductId(productId);
+        orderItem.setProductType(productType);
+        orderItem.setOrderId(orderId);
+        orderItem.setQuantity(orderRepository.getProductQuantityFromOrder(orderId,productId, productType ) - 1);
+        orderRepository.updateOrderItem(orderItem);
+        return "Order item updated successfully";
+    }
+    public String changeOrderStatus(int orderId) {
+
+        return orderRepository.changeOrderStatusToClose(orderId);
+    }
+    public String deleteOrder(int orderId) {
+        return orderRepository.deleteOrder(orderId);
+    }
+    public String deleteAllOrders(String username) {
+        List<Order> orders = orderRepository.getAllOrderByUsername(username);
+        for (Order order : orders) {
+            orderRepository.deleteAllOrderItemsByOrderId(order.getId());
+            orderRepository.deleteOrder(order.getId());
+
+        }
+        System.out.println(orders + " orders deleted");
+        return "Orders deleted successfully";
+    }
+    public List<Order> getAllOrderByUsername(String username) {
+        List<Order> orders = orderRepository.getAllOrderByUsername(username);
+for (Order order : orders) {
+ order.setOrderItems(  allOrderItemsInfo(order.getOrderItems()));
+}
+        return orders;
+    }
+    public List<OrderItem> allOrderItemsInfo(List<OrderItem> order) {
+        for (OrderItem item : order) {
+            item.setName(cakeService.getCakeById(item.getProductId()).getName());
+            item.setPrice(cakeService.getCakeById(item.getProductId()).getPrice());
+        }
+        return order;
+
+    }
+}

@@ -1,0 +1,55 @@
+package com.example.security.controller;
+
+
+import com.example.security.model.Order;
+import com.example.security.model.ProductRequest;
+import com.example.security.model.ProductType;
+import com.example.security.service.OrderService;
+import com.example.security.utils.JwtUtil;
+import jakarta.websocket.server.PathParam;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.*;
+
+import java.security.ProtectionDomain;
+import java.util.List;
+
+@RestController
+@CrossOrigin(origins = "http://localhost:3000")
+@RequestMapping("/order")
+
+public class OrderController {
+    @Autowired
+    private OrderService orderService;
+    @Autowired
+    private JwtUtil jwtUtil;
+
+    @PostMapping
+    @PreAuthorize("hasRole('USER')")
+    public ResponseEntity<String> createOrder(@RequestHeader("Authorization") String token , @RequestBody ProductRequest productRequest) {
+        try {
+            String jwtToken = token.substring(7);
+            String username = jwtUtil.extractUsername(jwtToken);
+            ProductType productType = ProductType.valueOf(productRequest.getProductType());
+            String response = orderService.addToOrder(username,  productRequest.getProductId(), productType);
+            return ResponseEntity.ok().body(response);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+
+    }
+    @GetMapping
+    @PreAuthorize("hasRole('USER')")
+    public ResponseEntity<List<Order>> getOrder(@RequestHeader("Authorization") String token) {
+        try {
+            String jwtToken = token.substring(7);
+            String username = jwtUtil.extractUsername(jwtToken);
+            return ResponseEntity.ok().body(orderService.getAllOrderByUsername(username));
+        } catch (Exception e) {
+            return new ResponseEntity(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+}

@@ -19,4 +19,6 @@ public interface ChocolateClient
     String updateChocolate(@RequestBody Chocolate chocolate);
     @GetMapping
     List<Chocolate> getAllChocolates();
+    @GetMapping("get-by-id/{id}")
+    Chocolate getChocolateById(@PathVariable int id);
 }

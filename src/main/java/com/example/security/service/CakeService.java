@@ -16,6 +16,9 @@ public class CakeService {
 
         return cakeClient.getCake(cake);
     }
+    public Cake getCakeById(int id) {
+        return cakeClient.getCakeById(id);
+    }
     public String addCake(Cake cake) {
 
         return cakeClient.createCake(cake);

@@ -10,8 +10,6 @@ import java.util.List;
 public interface CakeClient {
 @GetMapping("/{cake}")
      Cake getCake(@PathVariable String cake);
-@GetMapping("get-by-id/{id}")
-     Cake getCakeById(@PathVariable int id);
 @PostMapping
 String createCake(@RequestBody Cake cake);
 @GetMapping

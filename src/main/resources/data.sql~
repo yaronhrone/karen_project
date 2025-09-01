@@ -18,7 +18,7 @@ CREATE TABLE orders (
     address_shipping VARCHAR(255) NOT NULL,
     total_price DECIMAL(10,2) NOT NULL,
     PRIMARY KEY (id),
-    FOREIGN KEY (username) REFERENCES users (username)
+    FOREIGN KEY (userame) REFERENCES users (username)
     );
 
 CREATE TABLE order_items (

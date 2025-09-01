@@ -19,6 +19,9 @@ public class ChocolateService  {
         return chocolateClient.getChocolate(name);
 
     }
+    public Chocolate getChocolateById(int id) {
+        return chocolateClient.getChocolateById(id);
+    }
 
 
     public String createChocolate(Chocolate chocolate) {
