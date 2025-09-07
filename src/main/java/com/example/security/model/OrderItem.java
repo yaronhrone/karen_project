@@ -2,6 +2,8 @@ package com.example.security.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+import java.math.BigDecimal;
+
 public class OrderItem {
     private int id;
     @JsonProperty("product_id")
@@ -11,13 +13,13 @@ public class OrderItem {
     @JsonProperty("product_type")
     private ProductType productType;
     private String name;
-    private double price;
+    private BigDecimal price;
     private int quantity;
 
     public OrderItem() {
     }
 
-    public OrderItem(int id, int productId, int orderId, ProductType productType, String name, double price, int quantity) {
+    public OrderItem(int id, int productId, int orderId, ProductType productType, String name, BigDecimal price, int quantity) {
         this.id = id;
         this.productId = productId;
         this.orderId = orderId;
@@ -27,11 +29,11 @@ public class OrderItem {
         this.quantity = quantity;
     }
 
-    public double getPrice() {
+    public BigDecimal getPrice() {
         return price;
     }
 
-    public void setPrice(double price) {
+    public void setPrice(BigDecimal price) {
         this.price = price;
     }
 
@@ -82,5 +84,18 @@ public class OrderItem {
 
     public void setQuantity(int quantity) {
         this.quantity = quantity;
+    }
+
+    @Override
+    public String toString() {
+        return "OrderItem{" +
+                "id=" + id +
+                ", productId=" + productId +
+                ", orderId=" + orderId +
+                ", productType=" + productType +
+                ", name='" + name + '\'' +
+                ", price=" + price +
+                ", quantity=" + quantity +
+                '}';
     }
 }

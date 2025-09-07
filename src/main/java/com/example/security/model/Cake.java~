@@ -1,17 +1,15 @@
 package com.example.security.model;
 
-import java.math.BigDecimal;
-
 public class Cake {
 
     private int id;
     private String name;
     private String image;
-    private BigDecimal price;
+    private double price;
     private boolean isVeg;
     private String description;
 
-    public Cake(int id, String name, String image, BigDecimal price, boolean isVeg, String description) {
+    public Cake(int id, String name, String image, double price, boolean isVeg, String description) {
         this.id = id;
         this.name = name;
         this.image = image;
@@ -59,11 +57,11 @@ public class Cake {
         this.image = image;
     }
 
-    public BigDecimal getPrice() {
+    public double getPrice() {
         return price;
     }
 
-    public void setPrice(BigDecimal price) {
+    public void setPrice(double price) {
         this.price = price;
     }
 

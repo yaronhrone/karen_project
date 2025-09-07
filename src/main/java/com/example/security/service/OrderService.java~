@@ -120,6 +120,7 @@ for (Order order : orders) {
             break;
             }
             item.setQuantity(orderRepository.getProductQuantityFromOrder(item.getOrderId(),item.getProductId(), item.getProductType()));
+//             item.getQuantity() * cakeService.getCakeById(item.getProductId()).getPrice();
         }
         return order;
 

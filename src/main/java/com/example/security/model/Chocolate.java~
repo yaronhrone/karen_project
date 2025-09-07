@@ -1,4 +1,98 @@
 package com.example.security.model;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
+import java.math.BigDecimal;
+
 public class Chocolate {
-}
+
+        private int id;
+        @JsonProperty("chocolate_name")
+        private String name;
+        private String color;
+        private String filling;
+        private Boolean veg;
+        private String image;
+        private double price;
+
+        public Chocolate() {
+        }
+
+        public Chocolate(int id, String name, String color, String filling, Boolean veg, String image, double price) {
+            this.id = id;
+            this.name = name;
+            this.color = color;
+            this.filling = filling;
+            this.veg = veg;
+            this.image = image;
+            this.price = price;
+        }
+
+        public BigDecimal getPrice() {
+            return price;
+        }
+
+        public void setPrice(double price) {
+            this.price = price;
+        }
+
+        public int getId() {
+            return id;
+        }
+
+        public void setId(int id) {
+            this.id = id;
+        }
+
+        @Override
+        public String toString() {
+            return "Chocolate{" +
+                    "name='" + name + '\'' +
+                    ", color='" + color + '\'' +
+                    ", filling='" + filling + '\'' +
+                    ", veg=" + veg +
+                    ", image='" + image + '\'' +
+                    '}';
+        }
+
+        public String getName() {
+            return name;
+        }
+
+        public void setName(String name) {
+            this.name = name;
+        }
+
+        public String getColor() {
+            return color;
+        }
+
+        public void setColor(String color) {
+            this.color = color;
+        }
+
+        public String getFilling() {
+            return filling;
+        }
+
+        public void setFilling(String filling) {
+            this.filling = filling;
+        }
+
+        public Boolean getVeg() {
+            return veg;
+        }
+
+        public void setVeg(Boolean veg) {
+            this.veg = veg;
+        }
+
+        public String getImage() {
+            return image;
+        }
+
+        public void setImage(String image) {
+            this.image = image;
+        }
+    }
+

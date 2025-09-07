@@ -13,6 +13,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import java.security.ProtectionDomain;
 import java.util.List;
 
 @RestController
@@ -31,8 +32,9 @@ public class OrderController {
         try {
             String jwtToken = token.substring(7);
             String username = jwtUtil.extractUsername(jwtToken);
-
-            String response = orderService.addToOrder(username,  productRequest.getProductId(), productRequest.getProductType());
+            ProductType productType = ProductType.valueOf(productRequest.getProductType());
+            System.out.println(productType + " " + productRequest.getProductType());
+            String response = orderService.addToOrder(username,  productRequest.getProductId(), productType);
             return ResponseEntity.ok().body(response);
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(e.getMessage());
@@ -49,6 +51,19 @@ public class OrderController {
         } catch (Exception e) {
             return new ResponseEntity(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
+    }
+    @PutMapping
+    @PreAuthorize("hasRole('USER')")
+    public ResponseEntity<String> updateOrder(@RequestHeader("Authorization") String token  ) {
+        try {
+            String jwtToken = token.substring(7);
+            String username = jwtUtil.extractUsername(jwtToken);
+
+            return ResponseEntity.ok().body(orderService.changeOrderStatus(username));
+        }  catch (Exception e) {
+            return new ResponseEntity(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+
     }
 
 }

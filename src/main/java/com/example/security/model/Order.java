@@ -2,6 +2,7 @@ package com.example.security.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
 
@@ -12,12 +13,12 @@ public class Order {
     @JsonProperty("order_date")
     private LocalDate orderDate;
     @JsonProperty("total_price")
-    private double totalPrice;
+    private BigDecimal totalPrice;
     @JsonProperty("address_shipping")
     private String addressShipping;
     private List<OrderItem> orderItems;
 
-    public Order(int id, String username, Status status, LocalDate orderDate, double totalPrice, String addressShipping, List<OrderItem> orderItems) {
+    public Order(int id, String username, Status status, LocalDate orderDate, BigDecimal totalPrice, String addressShipping, List<OrderItem> orderItems) {
         this.id = id;
         this.username = username;
         this.status = status;
@@ -82,11 +83,24 @@ public class Order {
         this.orderDate = orderDate;
     }
 
-    public double getTotalPrice() {
+    public BigDecimal getTotalPrice() {
         return totalPrice;
     }
 
-    public void setTotalPrice(double totalPrice) {
+    public void setTotalPrice(BigDecimal totalPrice) {
         this.totalPrice = totalPrice;
+    }
+
+    @Override
+    public String toString() {
+        return "Order{" +
+                "id=" + id +
+                ", username='" + username + '\'' +
+                ", status=" + status +
+                ", orderDate=" + orderDate +
+                ", totalPrice=" + totalPrice +
+                ", addressShipping='" + addressShipping + '\'' +
+                ", orderItems=" + orderItems +
+                '}';
     }
 }

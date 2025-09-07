@@ -2,6 +2,8 @@ package com.example.security.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+import java.math.BigDecimal;
+
 public class Chocolate {
 
         private int id;
@@ -11,12 +13,12 @@ public class Chocolate {
         private String filling;
         private Boolean veg;
         private String image;
-        private double price;
+        private BigDecimal price;
 
         public Chocolate() {
         }
 
-        public Chocolate(int id, String name, String color, String filling, Boolean veg, String image, double price) {
+        public Chocolate(int id, String name, String color, String filling, Boolean veg, String image, BigDecimal price) {
             this.id = id;
             this.name = name;
             this.color = color;
@@ -26,11 +28,11 @@ public class Chocolate {
             this.price = price;
         }
 
-        public double getPrice() {
+        public BigDecimal getPrice() {
             return price;
         }
 
-        public void setPrice(double price) {
+        public void setPrice(BigDecimal price) {
             this.price = price;
         }
 

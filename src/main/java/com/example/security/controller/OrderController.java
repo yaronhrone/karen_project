@@ -33,6 +33,7 @@ public class OrderController {
             String jwtToken = token.substring(7);
             String username = jwtUtil.extractUsername(jwtToken);
             ProductType productType = ProductType.valueOf(productRequest.getProductType());
+            System.out.println(productType + " " + productRequest.getProductType());
             String response = orderService.addToOrder(username,  productRequest.getProductId(), productType);
             return ResponseEntity.ok().body(response);
         } catch (Exception e) {
@@ -50,6 +51,20 @@ public class OrderController {
         } catch (Exception e) {
             return new ResponseEntity(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
+    }
+    @PutMapping
+    @PreAuthorize("hasRole('USER')")
+    public ResponseEntity<String> updateOrder(@RequestHeader("Authorization") String token  ) {
+        try {
+            String jwtToken = token.substring(7);
+            String username = jwtUtil.extractUsername(jwtToken);
+            String response = orderService.changeOrderStatus(username);
+
+            return ResponseEntity.ok().body(response);
+        }  catch (Exception e) {
+            return new ResponseEntity(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+
     }
 
 }

@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 public class ProductRequest {
     @JsonProperty("product_id")
     private int productId;
+    @JsonProperty("product_type")
     private String productType;
 
     public int getProductId() {

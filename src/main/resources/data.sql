@@ -12,7 +12,7 @@ CREATE TABLE users (
 );
 CREATE TABLE orders (
     id INT AUTO_INCREMENT ,
-    username INT NOT NULL,
+    username VARCHAR(255) NOT NULL,
     order_status VARCHAR(255) NOT NULL,
     order_date DATE NOT NULL DEFAULT CURRENT_DATE,
     address_shipping VARCHAR(255) NOT NULL,
@@ -27,7 +27,7 @@ CREATE TABLE order_items (
     product_id INT NOT NULL,
     product_type VARCHAR(255) NOT NULL,
     quantity INT NOT NULL,
-    PRIMARY KEY (order_id),
+    PRIMARY KEY (id),
     FOREIGN KEY (order_id) REFERENCES orders (id)
 );
 CREATE TABLE favorites_chocolate (
