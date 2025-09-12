@@ -36,6 +36,7 @@ public class OrderRepository {
 //        return jdbcTemplate.query(sql, new OrderMapper(), username);
 //    }
     public List<Order> getAllOrderOpen(String username) {
+
         String sql = "SELECT * FROM " + ORDER_TABLE + " WHERE username = ? AND order_status = 'OPEN'";
         return jdbcTemplate.query(sql, new OrderMapper(), username);
     }
@@ -64,23 +65,20 @@ public class OrderRepository {
         jdbcTemplate.update(sql, orderItem.getOrderId(), orderItem.getProductId(), orderItem.getProductType().name(), orderItem.getQuantity());
     }
     public void updateOrderItem(OrderItem orderItem) {
-        String sql = "UPDATE " + ORDER_ITEM_TABLE + " SET order_id = ?, product_id = ?, product_type = ?, quantity = ? WHERE id = ?";
-        jdbcTemplate.update(sql, orderItem.getOrderId(), orderItem.getProductId(), orderItem.getProductType(), orderItem.getQuantity(), orderItem.getId());
+        System.out.println(orderItem + " order item updated");
+        String sql = "UPDATE " + ORDER_ITEM_TABLE + " SET  quantity = ? - 1  WHERE order_id = ? AND product_id = ? AND product_type = ?";
+        jdbcTemplate.update(sql, orderItem.getQuantity(), orderItem.getOrderId(), orderItem.getProductId(), orderItem.getProductType().name());
+
     }
-    public String deleteOrderItem(int id) {
-        String sql = "DELETE FROM " + ORDER_ITEM_TABLE + " WHERE id = ?";
-        jdbcTemplate.update(sql, id);
-        return "Order item deleted successfully";
-    }
+
     public List<OrderItem> getOrderItemsByOrderId(int orderId) {
         String sql = "SELECT * FROM " + ORDER_ITEM_TABLE + " WHERE order_id = ?";
         return jdbcTemplate.query(sql, new OrderItemsMapper(), orderId);
     }
-public String deleteOrderItemsByOrderId(int orderId, int productId, ProductType productType) {
+public void deleteOrderItemsByOrderId(int orderId, int productId, ProductType productType) {
     String sql = "DELETE FROM " + ORDER_ITEM_TABLE + " WHERE order_id = ? AND product_id = ? AND product_type = ?";
-    jdbcTemplate.update(sql, orderId, productId, productType);
-    return "Order items deleted successfully";
-    }
+    jdbcTemplate.update(sql, orderId, productId, productType.name());
+}
     public Integer getProductQuantityFromOrder(int orderId, int productId, ProductType productType) {
         try {
         String sql = "SELECT quantity FROM " + ORDER_ITEM_TABLE + " WHERE order_id = ? AND product_id = ? AND product_type = ?";
@@ -99,9 +97,5 @@ public String deleteOrderItemsByOrderId(int orderId, int productId, ProductType 
         jdbcTemplate.update(sql, orderId, productId, productType.name());
 
     }
-    public String removeQuantityFromOrderItem(int orderId, int productId, ProductType productType) {
-        String sql = "UPDATE " + ORDER_ITEM_TABLE + " SET quantity = quantity - 1 WHERE order_id = ? AND product_id = ? AND product_type = ?";
-        jdbcTemplate.update(sql, orderId, productId, productType.name());
-        return "Order item updated successfully";
-    }
+
 }

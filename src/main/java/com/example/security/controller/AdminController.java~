@@ -118,10 +118,8 @@ public class AdminController {
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<String> updateCake(@RequestBody Cake cake) {
         try {
-            String result = cakeService.updateCake(cake);
-            if (result.contains("updated")) {
-            return ResponseEntity.ok().body(result);
-            }return ResponseEntity.badRequest().body(result);
+
+            return ResponseEntity.ok().body(cakeService.updateCake(cake));
         } catch (Exception e) {
             return new ResponseEntity(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }

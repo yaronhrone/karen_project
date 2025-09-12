@@ -1,0 +1,4 @@
+package com.example.security.clientApi;
+
+public class FeignErrorDecoder {
+}

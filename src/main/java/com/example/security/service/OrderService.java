@@ -53,19 +53,26 @@ public class OrderService {
                 orderRepository.addOrderItem(orderItem);
         return "Order item added successfully";
     }
-    public String removeChocolateFromOrder(String username ,int productId, ProductType productType) {
+    public String removeItemFromOrder(String username ,int productId, ProductType productType) {
+        if (orderRepository.getAllOrderOpen(username).isEmpty()) {
+            return "Order not found";
+        }
         int orderId = orderRepository.getAllOrderOpen(username).getFirst().getId();
         if (orderRepository.getProductQuantityFromOrder(orderId,productId, productType ) == null) {
             return "Product not found in order";
         }
-        if (orderRepository.getProductQuantityFromOrder(orderId,productId, productType ) == 1) {
-            return orderRepository.deleteOrderItemsByOrderId(orderId, productId, productType);
-        }
+        int quantity = orderRepository.getProductQuantityFromOrder(orderId,productId, productType );
+        if (quantity == 1) {
+            orderRepository.deleteOrderItemsByOrderId(orderId, productId, productType);
+            if (orderRepository.getOrderItemsByOrderId(orderId).isEmpty()){
+            orderRepository.deleteOrder(orderId);}
+            return "Order item deleted successfully";}
         OrderItem orderItem = new OrderItem();
         orderItem.setProductId(productId);
         orderItem.setProductType(productType);
         orderItem.setOrderId(orderId);
-        orderItem.setQuantity(orderRepository.getProductQuantityFromOrder(orderId,productId, productType ) - 1);
+        orderItem.setQuantity(quantity);
+
         orderRepository.updateOrderItem(orderItem);
         return "Order item updated successfully";
     }

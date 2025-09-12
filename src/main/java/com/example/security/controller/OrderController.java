@@ -66,5 +66,17 @@ public class OrderController {
         }
 
     }
+    @DeleteMapping
+    @PreAuthorize("hasRole('USER')")
+    public ResponseEntity<String> deleteOrder(@RequestHeader("Authorization") String token, @RequestBody ProductRequest productRequest) {
+        try {
+            String jwtToken = token.substring(7);
+            String username = jwtUtil.extractUsername(jwtToken);
+            String response = orderService.removeItemFromOrder(username, productRequest.getProductId(), ProductType.valueOf(productRequest.getProductType()));
+            return ResponseEntity.ok().body(response);
+        } catch (Exception e) {
+            return new ResponseEntity(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
 
 }
