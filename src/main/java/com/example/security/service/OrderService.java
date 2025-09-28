@@ -122,12 +122,14 @@ for (Order order : orders) {
             item.setPrice(cakeService.getCakeById(item.getProductId()).getPrice());
             break;
                 case CHOCOLATE:
+                    System.out.println(chocolateService.getChocolateById(item.getProductId()).getName());
             item.setName(chocolateService.getChocolateById(item.getProductId()).getName());
             item.setPrice(chocolateService.getChocolateById(item.getProductId()).getPrice());
             break;
             }
             item.setQuantity(orderRepository.getProductQuantityFromOrder(item.getOrderId(),item.getProductId(), item.getProductType()));
         }
+        System.out.println(order + " order items");
         return order;
 
     }

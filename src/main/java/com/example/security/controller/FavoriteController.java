@@ -15,17 +15,18 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/favorite")
-@CrossOrigin("*")
+@CrossOrigin(origins ="http://localhost:3000")
 public class FavoriteController {
     @Autowired
     private FavoriteService favoriteService;
     @Autowired
     private JwtUtil jwtUtil;
 
-    @PostMapping("chocolate/{id}")
+    @PostMapping("/chocolate/{id}")
     @PreAuthorize("hasRole('USER')")
     public ResponseEntity<String> addFavorite(@RequestHeader(value = "Authorization") String token, @PathVariable int id) {
         try {
+            System.out.println(id + " id chocolate");
             String jwtToken = token.substring(7);
             String username = jwtUtil.extractUsername(jwtToken);
             String result = favoriteService.addChocolateFavorite(username, id);
@@ -39,7 +40,7 @@ public class FavoriteController {
 
     }
 
-    @DeleteMapping("chocolate/{id}")
+    @DeleteMapping("/chocolate/{id}")
     @PreAuthorize("hasRole('USER')")
     public ResponseEntity<String> deleteFavorite(@RequestHeader(value = "Authorization") String token, @PathVariable int id) {
         try {
@@ -63,6 +64,7 @@ public class FavoriteController {
             String jwtToken = token.substring(7);
             String username = jwtUtil.extractUsername(jwtToken);
             List<Chocolate> result = favoriteService.getChocolateFavorite(username);
+            System.out.println(result + " result");
 
                 return new ResponseEntity(result, HttpStatus.OK);
         } catch (Exception e) {

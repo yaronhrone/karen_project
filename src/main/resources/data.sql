@@ -33,13 +33,13 @@ CREATE TABLE order_items (
 CREATE TABLE favorites_chocolate (
     username VARCHAR(255) NOT NULL,
     chocolate_id INT NOT NULL,
-    PRIMARY KEY (username),
+    PRIMARY KEY (username, chocolate_id),
     FOREIGN KEY (username) REFERENCES users (username)
 );
 CREATE TABLE favorites_cake (
     username VARCHAR(255) NOT NULL,
     cake_id INT NOT NULL,
-    PRIMARY KEY (username),
+    PRIMARY KEY (username, cake_id),
     FOREIGN KEY (username) REFERENCES users (username)
 );
 

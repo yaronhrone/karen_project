@@ -6,7 +6,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-@FeignClient(name = "chocolate", url = "http://localhost:8080/api/chocolate")
+@FeignClient(name = "chocolate", url = "http://localhost:8080/api/chocolate", fallback = ChocolateClientFallback.class)
 public interface ChocolateClient
 {
     @GetMapping("/{name}")

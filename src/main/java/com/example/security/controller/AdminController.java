@@ -58,8 +58,12 @@ public class AdminController {
     @PostMapping(value = "/chocolate")
     public ResponseEntity<String> createChocolate(@RequestBody Chocolate chocolate ) {
         try {
+            String result = chocolateService.createChocolate(chocolate);
+            if (result.contains("created")) {
 
-            return ResponseEntity.ok().body(chocolateService.createChocolate(chocolate));
+            return ResponseEntity.ok().body(result);
+            }
+            return ResponseEntity.badRequest().body(result);
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
@@ -70,6 +74,8 @@ public class AdminController {
     public ResponseEntity<Chocolate> getCholate(@PathVariable String name) {
 
         try {
+            Chocolate chocolate = chocolateService.getChocolate(name);
+
             return ResponseEntity.ok().body(chocolateService.getChocolate(name));
         } catch (Exception e) {
             return new ResponseEntity(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);

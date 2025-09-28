@@ -44,18 +44,20 @@ public class Chocolate {
             this.id = id;
         }
 
-        @Override
-        public String toString() {
-            return "Chocolate{" +
-                    "name='" + name + '\'' +
-                    ", color='" + color + '\'' +
-                    ", filling='" + filling + '\'' +
-                    ", veg=" + veg +
-                    ", image='" + image + '\'' +
-                    '}';
-        }
+    @Override
+    public String toString() {
+        return "Chocolate{" +
+                "id=" + id +
+                ", name='" + name + '\'' +
+                ", color='" + color + '\'' +
+                ", filling='" + filling + '\'' +
+                ", veg=" + veg +
+                ", image='" + image + '\'' +
+                ", price=" + price +
+                '}';
+    }
 
-        public String getName() {
+    public String getName() {
             return name;
         }
 
