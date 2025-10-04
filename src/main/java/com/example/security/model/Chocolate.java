@@ -7,28 +7,25 @@ import java.math.BigDecimal;
 public class Chocolate {
 
         private int id;
-        @JsonProperty("chocolate_name")
         private String name;
-        private String color;
-        private String filling;
-        private Boolean veg;
+        private String description;
+        private Boolean isVeg;
         private String image;
         private BigDecimal price;
 
         public Chocolate() {
         }
 
-        public Chocolate(int id, String name, String color, String filling, Boolean veg, String image, BigDecimal price) {
-            this.id = id;
-            this.name = name;
-            this.color = color;
-            this.filling = filling;
-            this.veg = veg;
-            this.image = image;
-            this.price = price;
-        }
+    public Chocolate(int id, String name, String description, Boolean isVeg, String image, BigDecimal price) {
+        this.id = id;
+        this.name = name;
+        this.description = description;
+        this.isVeg = isVeg;
+        this.image = image;
+        this.price = price;
+    }
 
-        public BigDecimal getPrice() {
+    public BigDecimal getPrice() {
             return price;
         }
 
@@ -49,12 +46,19 @@ public class Chocolate {
         return "Chocolate{" +
                 "id=" + id +
                 ", name='" + name + '\'' +
-                ", color='" + color + '\'' +
-                ", filling='" + filling + '\'' +
-                ", veg=" + veg +
+                ", description='" + description + '\'' +
+                ", isVeg=" + isVeg +
                 ", image='" + image + '\'' +
                 ", price=" + price +
                 '}';
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
     }
 
     public String getName() {
@@ -65,29 +69,13 @@ public class Chocolate {
             this.name = name;
         }
 
-        public String getColor() {
-            return color;
-        }
-
-        public void setColor(String color) {
-            this.color = color;
-        }
-
-        public String getFilling() {
-            return filling;
-        }
-
-        public void setFilling(String filling) {
-            this.filling = filling;
-        }
 
         public Boolean getVeg() {
-            return veg;
+            return isVeg;
         }
 
-        public void setVeg(Boolean veg) {
-            this.veg = veg;
-        }
+        public void setVeg(Boolean isVeg) {
+            this.isVeg = isVeg;}
 
         public String getImage() {
             return image;

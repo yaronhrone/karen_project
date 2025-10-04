@@ -29,7 +29,6 @@ public class ChocolateService  {
     public String createChocolate(Chocolate chocolate) {
         try {
             Chocolate existing = chocolateClient.getChocolate(chocolate.getName());
-        System.out.println(existing +" the chocolate no fund");
         if (existing != null) {
             return "Chocolate already exists";
         }

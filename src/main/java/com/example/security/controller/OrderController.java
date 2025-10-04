@@ -68,7 +68,7 @@ public class OrderController {
     }
     @DeleteMapping
     @PreAuthorize("hasRole('USER')")
-    public ResponseEntity<String> deleteOrder(@RequestHeader("Authorization") String token, @RequestBody ProductRequest productRequest) {
+    public ResponseEntity<String> deleteOrderItem(@RequestHeader("Authorization") String token, @RequestBody ProductRequest productRequest) {
         try {
             String jwtToken = token.substring(7);
             String username = jwtUtil.extractUsername(jwtToken);
@@ -78,5 +78,18 @@ public class OrderController {
             return new ResponseEntity(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
+        @DeleteMapping("/{id}")
+        @PreAuthorize("hasRole('USER')")
+        public ResponseEntity<String> deleteOrder(@RequestHeader("Authorization") String token, @PathVariable int id){
+        try {
+            String jwtToken = token.substring(7);
+            String username = jwtUtil.extractUsername(jwtToken);
+            String result = orderService.deleteOrder(id);
+            System.out.println("is deleted order");
+        return new ResponseEntity<>(result,HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+        }
 
 }

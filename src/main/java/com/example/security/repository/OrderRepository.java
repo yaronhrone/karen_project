@@ -31,10 +31,7 @@ public class OrderRepository {
         jdbcTemplate.update(sql, id);
         return "Order deleted successfully";
     }
-//    public List<Order> getOrderCloseByUsername(String username) {
-//        String sql = "SELECT * FROM " + ORDER_TABLE + " WHERE username = ? AND order_status = 'CLOSED'";
-//        return jdbcTemplate.query(sql, new OrderMapper(), username);
-//    }
+
     public List<Order> getAllOrderOpen(String username) {
 
         String sql = "SELECT * FROM " + ORDER_TABLE + " WHERE username = ? AND order_status = 'OPEN'";

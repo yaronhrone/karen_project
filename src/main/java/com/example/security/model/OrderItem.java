@@ -15,13 +15,16 @@ public class OrderItem {
     private String name;
     private BigDecimal price;
     private int quantity;
-//    private String image;
-//    private String description;
+    private String image;
+    private String description;
+    private boolean isVeg;
+    @JsonProperty("total_price")
+    private BigDecimal totalPrice;
 
     public OrderItem() {
     }
 
-    public OrderItem(int id, int productId, int orderId, ProductType productType, String name, BigDecimal price, int quantity) {
+    public OrderItem(int id, int productId, int orderId, ProductType productType, String name, BigDecimal price, int quantity, String image, String description, boolean isVeg, BigDecimal totalPrice) {
         this.id = id;
         this.productId = productId;
         this.orderId = orderId;
@@ -29,10 +32,46 @@ public class OrderItem {
         this.name = name;
         this.price = price;
         this.quantity = quantity;
+        this.image = image;
+        this.description = description;
+        this.isVeg = isVeg;
+        this.totalPrice = totalPrice;
     }
 
     public BigDecimal getPrice() {
         return price;
+    }
+
+    public BigDecimal getTotalPrice() {
+        return totalPrice;
+    }
+
+    public void setTotalPrice(BigDecimal totalPrice) {
+        this.totalPrice = totalPrice;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public boolean isVeg() {
+        return isVeg;
+    }
+
+    public void setVeg(boolean veg) {
+        isVeg = veg;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public String getImage() {
+        return image;
+    }
+
+    public void setImage(String image) {
+        this.image = image;
     }
 
     public void setPrice(BigDecimal price) {

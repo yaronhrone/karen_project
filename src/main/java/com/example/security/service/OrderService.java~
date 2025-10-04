@@ -121,14 +121,13 @@ for (Order order : orders) {
             item.setImage(cakeService.getCakeById(item.getProductId()).getImage());
             item.setDescription(cakeService.getCakeById(item.getProductId()).getDescription());
             item.setVeg(cakeService.getCakeById(item.getProductId()).isVeg());
-            item.setTotalPrice(chocolateService.getChocolateById(item.getProductId()).getPrice().multiply( BigDecimal.valueOf(item.getQuantity())));
             break;
                 case CHOCOLATE:
-
+               
             item.setName(chocolateService.getChocolateById(item.getProductId()).getName());
             item.setPrice(chocolateService.getChocolateById(item.getProductId()).getPrice());
             item.setImage(chocolateService.getChocolateById(item.getProductId()).getImage());
-            item.setDescription(chocolateService.getChocolateById(item.getProductId()).getDescription()) ;
+            item.setDescription(chocolateService.getChocolateById(item.getProductId()).getColor()+" " + "with filling " +chocolateService.getChocolateById(item.getProductId()).getFilling() );
             item.setVeg(chocolateService.getChocolateById(item.getProductId()).getVeg());
             item.setTotalPrice(chocolateService.getChocolateById(item.getProductId()).getPrice().multiply( BigDecimal.valueOf(item.getQuantity())));
             break;

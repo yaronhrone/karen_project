@@ -16,7 +16,6 @@ public class Order {
     private BigDecimal totalPrice;
     @JsonProperty("address_shipping")
     private String addressShipping;
-    @JsonProperty("order_items")
     private List<OrderItem> orderItems;
 
     public Order(int id, String username, Status status, LocalDate orderDate, BigDecimal totalPrice, String addressShipping, List<OrderItem> orderItems) {
