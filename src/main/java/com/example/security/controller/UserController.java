@@ -1,6 +1,9 @@
 package com.example.security.controller;
 
+import com.example.security.model.AuthenticationRequest;
+import com.example.security.model.AuthenticationResponse;
 import com.example.security.model.CustomUser;
+import com.example.security.service.AuthenticationService;
 import com.example.security.service.UserService;
 import com.example.security.utils.JwtUtil;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,15 +22,21 @@ public class UserController {
 
     @Autowired
     private UserService userService;
+    @Autowired
+    private AuthenticationService authenticationService;
 
     @PostMapping(value = "/register")
-    public ResponseEntity<String> register(@RequestBody CustomUser user) {
+    public ResponseEntity<?> register(@RequestBody CustomUser user) {
+        System.out.println(user + "user from controller");
         try {
+            String rowPassword = user.getPassword();
             String result = userService.register(user);
             if (result.contains("successfully")) {
-                return new ResponseEntity(result, HttpStatus.CREATED);
+
+              AuthenticationResponse response =  authenticationService.createAuthenticationToken(new AuthenticationRequest(user.getUsername(), rowPassword));
+                return new ResponseEntity(response, HttpStatus.CREATED);
             }
-            return new ResponseEntity(result, HttpStatus.BAD_REQUEST);
+            return new ResponseEntity(result , HttpStatus.BAD_REQUEST);
         } catch (Exception e) {
             return new ResponseEntity(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }

@@ -15,10 +15,9 @@ public class OrderService {
     private OrderRepository orderRepository;
     @Autowired
     private UserService userService;
+
     @Autowired
-    private CakeService cakeService;
-    @Autowired
-    private ChocolateService chocolateService;
+    private ItemService itemService;
 
 
     public Integer createOrder(String username) {
@@ -30,7 +29,7 @@ public class OrderService {
 
         return orderRepository.createOrder(order);
     }
-    public String addToOrder(String username ,int productId, ProductType productType) {
+    public String addToOrder(String username ,int productId) {
           int orderId = 0;
           int quantity = 1;
            if (orderRepository.getAllOrderOpen(username).isEmpty()) {
@@ -40,36 +39,40 @@ public class OrderService {
            } else {
                orderId = orderRepository.getAllOrderOpen(username).getFirst().getId();
 
-               if (orderRepository.getProductQuantityFromOrder(orderId, productId, productType) != 0) {
-                   orderRepository.addQuantityToOrderItem(orderId,productId, productType);
+               if (orderRepository.getProductQuantityFromOrder(orderId, productId) != 0) {
+                   orderRepository.addQuantityToOrderItem(orderId,productId);
+                   System.out.println(orderRepository.getProductQuantityFromOrder(orderId, productId));
+                   List<Order> order = getAllOrderByUsername(username);
+                   orderRepository.updateTotalPriceInOrder(calculateTotalPrice(order.getLast().getOrderItems()) , orderId);
                    return " The item added successfully";
                }
            }
            OrderItem orderItem = new OrderItem();
            orderItem.setProductId(productId);
-           orderItem.setProductType(productType);
            orderItem.setOrderId(orderId);
            orderItem.setQuantity(quantity);
-                orderRepository.addOrderItem(orderItem);
+           orderItem.setPrice(itemService.getItemById(productId).getPrice());
+           orderRepository.addOrderItem(orderItem);
+           List<Order> order = getAllOrderByUsername(username);
+           orderRepository.updateTotalPriceInOrder(calculateTotalPrice(order.getLast().getOrderItems()) , orderId);
         return "Order item added successfully";
     }
-    public String removeItemFromOrder(String username ,int productId, ProductType productType) {
+    public String removeItemFromOrder(String username ,int productId) {
         if (orderRepository.getAllOrderOpen(username).isEmpty()) {
             return "Order not found";
         }
         int orderId = orderRepository.getAllOrderOpen(username).getFirst().getId();
-        if (orderRepository.getProductQuantityFromOrder(orderId,productId, productType ) == null) {
+        if (orderRepository.getProductQuantityFromOrder(orderId,productId ) == null) {
             return "Product not found in order";
         }
-        int quantity = orderRepository.getProductQuantityFromOrder(orderId,productId, productType );
+        int quantity = orderRepository.getProductQuantityFromOrder(orderId,productId );
         if (quantity == 1) {
-            orderRepository.deleteOrderItemsByOrderId(orderId, productId, productType);
+            orderRepository.deleteOrderItemsByOrderId(orderId, productId);
             if (orderRepository.getOrderItemsByOrderId(orderId).isEmpty()){
             orderRepository.deleteOrder(orderId);}
             return "Order item deleted successfully";}
         OrderItem orderItem = new OrderItem();
-        orderItem.setProductId(productId);
-        orderItem.setProductType(productType);
+        orderItem.setProductId(productId);;
         orderItem.setOrderId(orderId);
         orderItem.setQuantity(quantity);
 
@@ -81,6 +84,10 @@ public class OrderService {
         return orderRepository.changeOrderStatusToClose(username);
     }
     public String deleteOrder(int orderId) {
+        Order order = orderRepository.getOrderById(orderId);
+        if (order == null) {
+            return "Order not found";
+        }
         orderRepository.deleteAllOrderItemsByOrderId(orderId);
         return orderRepository.deleteOrder(orderId);
     }
@@ -91,7 +98,7 @@ public class OrderService {
             orderRepository.deleteOrder(order.getId());
 
         }
-        System.out.println(orders + " orders deleted");
+
         return "Orders deleted successfully";
     }
     public List<Order> getAllOrderByUsername(String username) {
@@ -99,12 +106,7 @@ public class OrderService {
 for (Order order : orders) {
  order.setOrderItems(  allOrderItemsInfo(
         orderRepository.getOrderItemsByOrderId(order.getId())));
-    order.setTotalPrice(
-            order.getOrderItems().stream()
-                    .map(orderItem -> orderItem.getPrice().multiply(BigDecimal.valueOf(orderItem.getQuantity())))
-                    .reduce(BigDecimal.ZERO, BigDecimal::add)
-
-    );
+    order.setTotalPrice(calculateTotalPrice(order.getOrderItems()));
 
 }
 
@@ -114,29 +116,29 @@ for (Order order : orders) {
 
 
         for (OrderItem item : order) {
-            switch (item.getProductType()) {
-                case CAKE :
-            item.setName(cakeService.getCakeById(item.getProductId()).getName());
-            item.setPrice(cakeService.getCakeById(item.getProductId()).getPrice());
-            item.setImage(cakeService.getCakeById(item.getProductId()).getImage());
-            item.setDescription(cakeService.getCakeById(item.getProductId()).getDescription());
-            item.setVeg(cakeService.getCakeById(item.getProductId()).isVeg());
-            item.setTotalPrice(chocolateService.getChocolateById(item.getProductId()).getPrice().multiply( BigDecimal.valueOf(item.getQuantity())));
-            break;
-                case CHOCOLATE:
 
-            item.setName(chocolateService.getChocolateById(item.getProductId()).getName());
-            item.setPrice(chocolateService.getChocolateById(item.getProductId()).getPrice());
-            item.setImage(chocolateService.getChocolateById(item.getProductId()).getImage());
-            item.setDescription(chocolateService.getChocolateById(item.getProductId()).getDescription()) ;
-            item.setVeg(chocolateService.getChocolateById(item.getProductId()).getVeg());
-            item.setTotalPrice(chocolateService.getChocolateById(item.getProductId()).getPrice().multiply( BigDecimal.valueOf(item.getQuantity())));
-            break;
+
+            item.setName(itemService.getItemById(item.getProductId()).getName());
+//            item.setPrice(itemService.getItemById(item.getProductId()).getPrice());
+            item.setImage(itemService.getItemById(item.getProductId()).getImage());
+            item.setDescription(itemService.getItemById(item.getProductId()).getDescription());
+            item.setVeg(itemService.getItemById(item.getProductId()).getVeg());
+            item.setTotalPrice(itemService.getItemById(item.getProductId()).getPrice().multiply( BigDecimal.valueOf(item.getQuantity())));
+//            item.setQuantity(orderRepository.getProductQuantityFromOrder(item.getOrderId(),item.getProductId()));
             }
-            item.setQuantity(orderRepository.getProductQuantityFromOrder(item.getOrderId(),item.getProductId(), item.getProductType()));
-        }
+
         System.out.println(order + " order items");
         return order;
 
+    }
+    private BigDecimal calculateTotalPrice(List<OrderItem> items) {
+        BigDecimal total = BigDecimal.ZERO;
+
+        for (OrderItem item : items) {
+            BigDecimal itemPrice = item.getPrice().multiply(BigDecimal.valueOf(item.getQuantity()));
+            total = total.add(itemPrice);
+        }
+
+        return total;
     }
 }

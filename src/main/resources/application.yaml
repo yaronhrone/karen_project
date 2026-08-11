@@ -18,12 +18,9 @@ spring:
       path: /h2-console
 
   external-api:
-    cake:
-      name: "cake"
-      url: "http://localhost:8080/api/cakes"
-    chocolate:
-      name: "chocolate"
-      url: "http://localhost:8080/api/chocolate"
+    items:
+      name: "items"
+      url: "http://localhost:8080/api/items"
 jwt:
   secret: your/jwt/secret/key123456789/012345678901234567890123456789
   expiration:  36000000 # Example: 10 hours in milliseconds

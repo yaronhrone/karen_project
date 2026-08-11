@@ -1,20 +1,20 @@
 package com.example.security.service;
 
-import com.example.security.security.CustomUserDetailsService;
 import com.example.security.model.AuthenticationRequest;
 import com.example.security.model.AuthenticationResponse;
+import com.example.security.security.CustomUserDetailsService;
 import com.example.security.utils.JwtUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.BadCredentialsException;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 @Service
 public class AuthenticationService {
 
     @Autowired
-    private CustomUserDetailsService  customUserDetailsService;
+    private CustomUserDetailsService customUserDetailsService;
 
     @Autowired
     private JwtUtil jwtUtil;
@@ -25,6 +25,7 @@ public class AuthenticationService {
     public AuthenticationResponse createAuthenticationToken(AuthenticationRequest authenticationRequest) throws Exception {
         try {
             UserDetails userDetails = customUserDetailsService.loadUserByUsername(authenticationRequest.getUsername());
+            System.out.println(authenticationRequest.getPassword() + " " + userDetails.getPassword() + " inside service" + passwordEncoder.matches(authenticationRequest.getPassword(), userDetails.getPassword()));
             if (!passwordEncoder.matches(authenticationRequest.getPassword(), userDetails.getPassword())) {
                 throw new BadCredentialsException("Incorrect password");
             }
@@ -35,8 +36,5 @@ public class AuthenticationService {
 
     }
 }
-
-
-
 
 

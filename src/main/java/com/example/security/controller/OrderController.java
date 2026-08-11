@@ -3,17 +3,14 @@ package com.example.security.controller;
 
 import com.example.security.model.Order;
 import com.example.security.model.ProductRequest;
-import com.example.security.model.ProductType;
 import com.example.security.service.OrderService;
 import com.example.security.utils.JwtUtil;
-import jakarta.websocket.server.PathParam;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
-import java.security.ProtectionDomain;
 import java.util.List;
 
 @RestController
@@ -26,15 +23,14 @@ public class OrderController {
     @Autowired
     private JwtUtil jwtUtil;
 
-    @PostMapping
+    @PostMapping("/{item_id}")
     @PreAuthorize("hasRole('USER')")
-    public ResponseEntity<String> createOrder(@RequestHeader("Authorization") String token , @RequestBody ProductRequest productRequest) {
+    public ResponseEntity<String> addItemOrder(@RequestHeader("Authorization") String token , @PathVariable (value = "item_id") int  itemId) {
         try {
             String jwtToken = token.substring(7);
             String username = jwtUtil.extractUsername(jwtToken);
-            ProductType productType = ProductType.valueOf(productRequest.getProductType());
-            System.out.println(productType + " " + productRequest.getProductType());
-            String response = orderService.addToOrder(username,  productRequest.getProductId(), productType);
+
+            String response = orderService.addToOrder(username, itemId);
             return ResponseEntity.ok().body(response);
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(e.getMessage());
@@ -66,13 +62,16 @@ public class OrderController {
         }
 
     }
-    @DeleteMapping
+    @DeleteMapping("item/{item_id}")
     @PreAuthorize("hasRole('USER')")
-    public ResponseEntity<String> deleteOrderItem(@RequestHeader("Authorization") String token, @RequestBody ProductRequest productRequest) {
+    public ResponseEntity<String> removeOrderItem(@RequestHeader("Authorization") String token, @PathVariable (value = "item_id" ) int itemId) {
         try {
             String jwtToken = token.substring(7);
             String username = jwtUtil.extractUsername(jwtToken);
-            String response = orderService.removeItemFromOrder(username, productRequest.getProductId(), ProductType.valueOf(productRequest.getProductType()));
+            String response = orderService.removeItemFromOrder(username, itemId);
+            if (response.contains("not found")) {
+                return new ResponseEntity(response, HttpStatus.BAD_REQUEST);
+            }
             return ResponseEntity.ok().body(response);
         } catch (Exception e) {
             return new ResponseEntity(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
@@ -85,7 +84,10 @@ public class OrderController {
             String jwtToken = token.substring(7);
             String username = jwtUtil.extractUsername(jwtToken);
             String result = orderService.deleteOrder(id);
-            System.out.println("is deleted order");
+            if (result.contains("not found")) {
+                return new ResponseEntity(result, HttpStatus.BAD_REQUEST);
+            }
+
         return new ResponseEntity<>(result,HttpStatus.OK);
         } catch (Exception e) {
             return new ResponseEntity(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);

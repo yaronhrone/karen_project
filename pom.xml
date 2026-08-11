@@ -131,7 +131,11 @@
 			<artifactId>annotations</artifactId>
 			<version>24.0.0</version>
 		</dependency>
-
+		<dependency>
+			<groupId>com.cloudinary</groupId>
+			<artifactId>cloudinary-http44</artifactId>
+			<version>1.36.0</version>
+		</dependency>
 		<!-- Spring Security Core (כבר כלול בתוך spring-boot-starter-security, אז לא חובה) -->
 		<!--
         <dependency>

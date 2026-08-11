@@ -10,8 +10,6 @@ public class OrderItem {
     private int productId;
     @JsonProperty("order_id")
     private int orderId;
-    @JsonProperty("product_type")
-    private ProductType productType;
     private String name;
     private BigDecimal price;
     private int quantity;
@@ -24,11 +22,10 @@ public class OrderItem {
     public OrderItem() {
     }
 
-    public OrderItem(int id, int productId, int orderId, ProductType productType, String name, BigDecimal price, int quantity, String image, String description, boolean isVeg, BigDecimal totalPrice) {
+    public OrderItem(int id, int productId, int orderId, String name, BigDecimal price, int quantity, String image, String description, boolean isVeg, BigDecimal totalPrice) {
         this.id = id;
         this.productId = productId;
         this.orderId = orderId;
-        this.productType = productType;
         this.name = name;
         this.price = price;
         this.quantity = quantity;
@@ -41,6 +38,8 @@ public class OrderItem {
     public BigDecimal getPrice() {
         return price;
     }
+
+
 
     public BigDecimal getTotalPrice() {
         return totalPrice;
@@ -111,14 +110,6 @@ public class OrderItem {
     }
 
 
-    public ProductType getProductType() {
-        return productType;
-    }
-
-    public void setProductType(ProductType productType) {
-        this.productType = productType;
-    }
-
     public int getQuantity() {
         return quantity;
     }
@@ -133,10 +124,13 @@ public class OrderItem {
                 "id=" + id +
                 ", productId=" + productId +
                 ", orderId=" + orderId +
-                ", productType=" + productType +
                 ", name='" + name + '\'' +
                 ", price=" + price +
                 ", quantity=" + quantity +
+                ", image='" + image + '\'' +
+                ", description='" + description + '\'' +
+                ", isVeg=" + isVeg +
+                ", totalPrice=" + totalPrice +
                 '}';
     }
 }

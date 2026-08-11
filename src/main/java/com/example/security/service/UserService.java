@@ -14,7 +14,10 @@ public class UserService {
 
     @Autowired
     private UserRepository userRepository;
-
+    @Autowired
+    private FavoriteService favoriteService;
+    @Autowired
+    private OrderService orderService;
     @Autowired
     private PasswordEncoder passwordEncoder;
 
@@ -47,8 +50,8 @@ public class UserService {
         return userRepository.findUserByEmail(email);
     }
 
-    public List<CustomUser> getAllUsers() {
-        return userRepository.findAllUsers();
+    public List<CustomUser> getAllUsers(int page, int size) {
+        return userRepository.findAllUsers(page, size);
     }
 
     public CustomUser updateUser(CustomUser updatedUser) {
@@ -60,6 +63,8 @@ public class UserService {
         if (registeredUser == null) {
             return "The user with this username does not exist, so it cannot be deleted";
         }
+        favoriteService.deleteAllItemFavorites(registeredUser.getUsername());
+        orderService.deleteAllOrders(registeredUser.getUsername());
         return userRepository.deleteUser(registeredUser.getUsername());
     }
 
