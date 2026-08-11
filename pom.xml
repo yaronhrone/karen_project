@@ -72,6 +72,14 @@
 			<artifactId>spring-cloud-starter-openfeign</artifactId>
 		</dependency>
 
+		<!-- Required for @FeignClient's fallback attribute to actually be
+		     invoked - without a circuit breaker implementation on the
+		     classpath the fallback is silently ignored -->
+		<dependency>
+			<groupId>org.springframework.cloud</groupId>
+			<artifactId>spring-cloud-starter-circuitbreaker-resilience4j</artifactId>
+		</dependency>
+
 		<!-- JWT (JJWT 0.11.5) -->
 		<dependency>
 			<groupId>io.jsonwebtoken</groupId>

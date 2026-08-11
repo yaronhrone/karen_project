@@ -21,6 +21,10 @@ spring:
     items:
       name: "items"
       url: "http://localhost:8080/api/items"
+  cloud:
+    openfeign:
+      circuitbreaker:
+        enabled: true # required for @FeignClient(fallback = ...) to actually be used
 # Must match jwt.secret in the items/products service (8080) - it validates
 # tokens issued here. Override with the JWT_SECRET env var in production
 # instead of relying on the default below.

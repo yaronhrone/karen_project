@@ -22,8 +22,8 @@ public class UserService {
     private PasswordEncoder passwordEncoder;
 
     public String register(CustomUser user) {
-        if (user.getFirstName() == null ||user.getFirstName().trim().isEmpty() || user.getLastName() == null || user.getLastName().trim().isEmpty() || user.getEmail() == null ||
-                user.getEmail().trim().isEmpty() || user.getUsername().trim().isEmpty() || user.getPassword().trim().isEmpty() ){
+        if (isBlank(user.getFirstName()) || isBlank(user.getLastName()) || isBlank(user.getEmail())
+                || isBlank(user.getUsername()) || isBlank(user.getPassword())) {
             return "User not created, first name, last name, email, username and password are required";
         }
         CustomUser userWithTheSameEmail = getUserByEmail(user.getEmail());
@@ -66,6 +66,10 @@ public class UserService {
         favoriteService.deleteAllItemFavorites(registeredUser.getUsername());
         orderService.deleteAllOrders(registeredUser.getUsername());
         return userRepository.deleteUser(registeredUser.getUsername());
+    }
+
+    private static boolean isBlank(String value) {
+        return value == null || value.trim().isEmpty();
     }
 
 }
