@@ -14,7 +14,6 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping(value = "/users")
-@CrossOrigin(origins = "http://localhost:3000")
 public class UserController {
 
     @Autowired
@@ -42,7 +41,7 @@ public class UserController {
         }
     }
 
-    @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
+    @PreAuthorize("hasAnyAuthority('USER','ADMIN')")
     @GetMapping
     public ResponseEntity<CustomUser> getUserByUsername(@RequestHeader(value = "Authorization") String token) {
         try {
@@ -55,7 +54,7 @@ public class UserController {
         }
     }
 
-    @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
+    @PreAuthorize("hasAnyAuthority('USER','ADMIN')")
     @PutMapping
     public ResponseEntity<CustomUser> updateUser(@RequestHeader(value = "Authorization") String token, @RequestBody CustomUser updatedUser) {
         try {
@@ -82,7 +81,7 @@ public class UserController {
         }
     }
 
-    @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
+    @PreAuthorize("hasAnyAuthority('USER','ADMIN')")
     @DeleteMapping
     public ResponseEntity<String> deleteUser(@RequestHeader(value = "Authorization") String token) {
         try {

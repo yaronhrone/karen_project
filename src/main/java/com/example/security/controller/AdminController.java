@@ -21,7 +21,6 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/admin")
-@CrossOrigin(origins = "http://localhost:3000")
 public class AdminController {
 
     @Autowired
@@ -35,7 +34,7 @@ public class AdminController {
     @Autowired
     private CloudinaryConfig cloudinaryConfig;
 
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAuthority('ADMIN')")
     @GetMapping(value = "/all-users/")
     public ResponseEntity<List<CustomUser>> getAllUsers(@RequestParam (defaultValue = "1") int page , @RequestParam (defaultValue = "10" ) int size) {
         try {
@@ -46,7 +45,7 @@ public class AdminController {
         }
     }
 
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAuthority('ADMIN')")
     @DeleteMapping("/delete-user/{username}")
     public ResponseEntity<String> deleteAnotherUser(@PathVariable String username) {
         System.out.println("username delete " + username);
@@ -61,7 +60,7 @@ public class AdminController {
         }
     }
 
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAuthority('ADMIN')")
     @PostMapping(value = "/item" , consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
     public ResponseEntity<String> createItem(@RequestPart("item") ItemRequest itemRequest , @RequestPart("file") MultipartFile file) throws IOException {
 
@@ -102,7 +101,7 @@ public class AdminController {
 
     }
 
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAuthority('ADMIN')")
     @GetMapping(value = "/{name}")
     public ResponseEntity<Item> getItem(@PathVariable String name) {
 
@@ -117,7 +116,7 @@ public class AdminController {
 
 
 
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAuthority('ADMIN')")
     @DeleteMapping("/delete_by_name/{name}")
     public ResponseEntity<String> deleteItemByName( @PathVariable String name) {
         try {
@@ -132,7 +131,7 @@ public class AdminController {
         }
     }
 
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAuthority('ADMIN')")
     @PutMapping(value = "/update_item")
     public ResponseEntity<String> updateItem(@RequestBody Item item) {
 
@@ -146,7 +145,7 @@ public class AdminController {
             return new ResponseEntity(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAuthority('ADMIN')")
     @GetMapping(value = "/all_items/")
     public ResponseEntity<List<Item>> getAllItem(@RequestParam (defaultValue = "1") int page , @RequestParam (defaultValue = "10" ) int size) {
         try {
@@ -155,7 +154,7 @@ public class AdminController {
             return new ResponseEntity(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAuthority('ADMIN')")
     @DeleteMapping("delete_by_id/{id}")
     public ResponseEntity<String> deleteItemById(@PathVariable int id) {
         try {
@@ -169,7 +168,7 @@ public class AdminController {
             return new ResponseEntity(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAuthority('ADMIN')")
     @GetMapping("/order/{username}")
     public ResponseEntity<List<Order>> getOrder(@PathVariable String username) {
         System.out.println(username);

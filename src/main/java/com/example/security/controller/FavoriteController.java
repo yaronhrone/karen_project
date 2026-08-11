@@ -13,7 +13,6 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/favorite")
-@CrossOrigin(origins ="http://localhost:3000")
 public class FavoriteController {
     @Autowired
     private FavoriteService favoriteService;
@@ -21,7 +20,7 @@ public class FavoriteController {
     private JwtUtil jwtUtil;
 
     @PostMapping("/item/{id}")
-    @PreAuthorize("hasRole('USER')")
+    @PreAuthorize("hasAnyAuthority('USER','ADMIN')")
     public ResponseEntity<String> addFavorite(@RequestHeader(value = "Authorization") String token, @PathVariable int id) {
         try {
             System.out.println(id + " id chocolate");
@@ -39,7 +38,7 @@ public class FavoriteController {
     }
 
     @DeleteMapping("/item/{id}")
-    @PreAuthorize("hasRole('USER')")
+    @PreAuthorize("hasAnyAuthority('USER','ADMIN')")
     public ResponseEntity<String> removeItemFromFavorite(@RequestHeader(value = "Authorization") String token, @PathVariable int id) {
         try {
             String jwtToken = token.substring(7);
@@ -56,7 +55,7 @@ public class FavoriteController {
     }
 
     @GetMapping ("/item")
-    @PreAuthorize("hasRole('USER')")
+    @PreAuthorize("hasAnyAuthority('USER','ADMIN')")
     public ResponseEntity<String> getFavorite(@RequestHeader(value = "Authorization") String token) {
         try {
             String jwtToken = token.substring(7);
@@ -71,7 +70,7 @@ public class FavoriteController {
 
     }
     @DeleteMapping("/item")
-    @PreAuthorize("hasRole('USER')")
+    @PreAuthorize("hasAnyAuthority('USER','ADMIN')")
     public ResponseEntity<String> deleteAllFavorite(@RequestHeader(value = "Authorization") String token) {
         try {
             String jwtToken = token.substring(7);
