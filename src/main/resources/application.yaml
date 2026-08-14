@@ -16,15 +16,20 @@ spring:
     console:
       enabled: true
       path: /h2-console
-
-  external-api:
-    items:
-      name: "items"
-      url: "http://localhost:8080/api/items"
   cloud:
     openfeign:
       circuitbreaker:
         enabled: true # required for @FeignClient(fallback = ...) to actually be used
+
+# Was previously nested under spring: (spring.external-api...) - a property
+# namespace that isn't actually spring's, so it never resolved and the
+# @FeignClient annotation had its URL hardcoded instead. Now it's the real
+# source of truth: override via EXTERNAL_API_ITEMS_URL for Docker, where the
+# items service is reachable at its container hostname, not localhost.
+external-api:
+  items:
+    name: "items"
+    url: "${EXTERNAL_API_ITEMS_URL:http://localhost:8080/api/items}"
 # Must match jwt.secret in the items/products service (8080) - it validates
 # tokens issued here. Override with the JWT_SECRET env var in production
 # instead of relying on the default below.

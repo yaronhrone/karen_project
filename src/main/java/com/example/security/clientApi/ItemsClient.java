@@ -6,7 +6,12 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-@FeignClient(name = "items", url = "http://localhost:8080/api/items", fallback = ItemsClientFallback.class)
+// url was previously hardcoded to http://localhost:8080/api/items, duplicating
+// (and overriding, since a literal `url` always wins) the external-api.items.url
+// property that already existed in application.yaml but was never actually read.
+// Wired to that property instead so it can be pointed at the items container's
+// Docker network hostname without a code change.
+@FeignClient(name = "items", url = "${external-api.items.url}", fallback = ItemsClientFallback.class)
 public interface ItemsClient
 {
     @GetMapping("/{name}")
