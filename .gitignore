@@ -36,3 +36,29 @@ build/
 *~
 .DS_Store
 *.zip
+
+### Node / frontend ###
+node_modules/
+/coverage
+.pnp
+.pnp.js
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+### Env / secrets ###
+# Root-level .env holds real Docker Compose secrets (JWT_SECRET, POSTGRES_PASSWORD,
+# GOOGLE_CLIENT_ID) - see .env.example for the template. Nested .env files (e.g.
+# frontend/.env) are placeholder-only templates and are meant to be committed.
+/.env
+**/.env.local
+**/.env.development.local
+**/.env.test.local
+**/.env.production.local
+
+### Claude Code / machine-specific ###
+.claude/
+*.lnk
+
+### Postgres (only relevant if ever run outside Docker's own named volume) ###
+postgres-data/

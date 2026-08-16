@@ -1,0 +1,45 @@
+server:
+  port: 8081
+
+# Optional commented out H2 configuration
+spring:
+  main:
+    allow-circular-references: true
+  datasource:
+    url: jdbc:h2:mem:mydb
+    username: sa
+    password: yaron
+    driverClassName: org.h2.Driver
+  jpa:
+    spring.jpa.database-platform: org.hibernate.dialect.H2Dialect
+  h2:
+    console:
+      enabled: true
+      path: /h2-console
+  cloud:
+    openfeign:
+      circuitbreaker:
+        enabled: true # required for @FeignClient(fallback = ...) to actually be used
+
+# Was previously nested under spring: (spring.external-api...) - a property
+# namespace that isn't actually spring's, so it never resolved and the
+# @FeignClient annotation had its URL hardcoded instead. Now it's the real
+# source of truth: override via EXTERNAL_API_ITEMS_URL for Docker, where the
+# items service is reachable at its container hostname, not localhost.
+external-api:
+  items:
+    name: "items"
+    url: "${EXTERNAL_API_ITEMS_URL:http://localhost:8080/api/items}"
+# Must match jwt.secret in the items/products service (8080) - it validates
+# tokens issued here. Override with the JWT_SECRET env var in production
+# instead of relying on the default below.
+jwt:
+  secret: ${JWT_SECRET:your/jwt/secret/key123456789/012345678901234567890123456789}
+  expiration:  36000000 # Example: 10 hours in milliseconds
+#  expiration: 20000 # Example: 20 seconds
+
+google:
+  client-id: ${GOOGLE_CLIENT_ID:PASTE_YOUR_GOOGLE_CLIENT_ID_HERE}
+
+
+

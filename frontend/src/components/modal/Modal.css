@@ -1,0 +1,170 @@
+/* Modal.css */
+
+/* overlay - was missing position:fixed, so inset:0 never did anything and
+   the "backdrop" was really just an opaque box wherever the DOM put it,
+   not centered over the page */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1100;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  background: rgba(58, 47, 40, 0.45);
+  animation: overlayFade 150ms ease;
+}
+
+@keyframes overlayFade {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+/* card */
+.modal-card {
+  position: relative;
+  z-index: 1200;
+  width: min(420px, 100%);
+  max-height: 86vh;
+
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-lg);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  transform: translateY(14px) scale(0.995);
+  animation: cardIn 200ms cubic-bezier(.18,.9,.3,1) forwards;
+  background: var(--color-surface);
+}
+
+@keyframes cardIn {
+  to {
+    transform: translateY(0) scale(1);
+    opacity: 1;
+  }
+}
+
+/* header */
+.modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 18px 20px;
+  border-bottom: 1px solid var(--color-bg-alt);
+}
+
+.modal-title {
+  margin: 0;
+  font-size: 1.2rem;
+  color: var(--color-heading);
+}
+
+/* close button */
+.modal-close {
+  border: none;
+  background: transparent;
+  font-size: 1.55rem;
+  line-height: 1;
+  cursor: pointer;
+  padding: 6px;
+  color: var(--color-text-muted);
+  border-radius: var(--radius-sm);
+}
+.modal-close:hover {
+  background: var(--color-bg-alt);
+  color: var(--color-text);
+}
+
+/* body */
+.modal-body {
+  padding: 18px 20px;
+  overflow: auto;
+  gap: 12px;
+  display: flex;
+  flex-direction: column;
+  color: var(--color-text);
+}
+
+/* footer */
+.modal-footer {
+  display: flex;
+  gap: 12px;
+  padding: 14px 20px;
+  border-top: 1px solid var(--color-bg-alt);
+  justify-content: flex-end;
+  background: var(--color-bg-alt);
+}
+
+/* buttons */
+.btn {
+  padding: 8px 16px;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  border: 1px solid transparent;
+  font-weight: 600;
+  font-size: 14px;
+  background: var(--color-bg-alt);
+  color: var(--color-text);
+  transition: background var(--transition), color var(--transition);
+}
+
+.btn:hover {
+  background: var(--color-accent-soft);
+}
+
+.btn-primary {
+  background: var(--color-accent);
+  color: #fff;
+}
+
+.btn-primary:hover {
+  background: var(--color-accent-hover);
+}
+
+.btn-danger {
+  background: var(--color-danger);
+  color: #fff;
+}
+
+.btn-danger:hover {
+  background: var(--color-danger-hover);
+}
+
+.btn-ghost {
+  background: transparent;
+  border-color: var(--color-text-muted);
+  color: var(--color-text-muted);
+}
+
+.btn-ghost:hover {
+  background: var(--color-bg-alt);
+  color: var(--color-text);
+}
+
+.btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.btn_icon {
+  cursor: pointer;
+  color: var(--color-accent);
+  vertical-align: middle;
+  border-radius: 50%;
+  padding: 2px;
+  transition: background var(--transition);
+}
+
+.btn_icon:hover {
+  background: var(--color-accent-soft);
+}
+
+/* responsive */
+@media (max-width: 520px) {
+  .modal-card {
+    width: 100%;
+    border-radius: var(--radius-sm);
+  }
+  .modal-title { font-size: 1rem; }
+  .modal-footer { flex-direction: column-reverse; align-items: stretch; gap: 8px; }
+}

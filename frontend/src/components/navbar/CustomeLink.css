@@ -1,0 +1,19 @@
+.custom-link {
+  color: var(--color-text);
+  text-decoration: none;
+  font-size: 1rem;
+  font-weight: 500;
+  padding-bottom: 2px;
+  border-bottom: 2px solid transparent;
+  transition: color var(--transition), border-color var(--transition);
+}
+
+.custom-link.active {
+  color: var(--color-accent);
+  border-bottom-color: var(--color-accent);
+}
+
+.custom-link:hover {
+  color: var(--color-accent-hover);
+  border-bottom-color: var(--color-accent-soft);
+}

@@ -1,0 +1,25 @@
+server:
+  port: 8080
+
+spring:
+  main:
+    allow-circular-references: true
+  datasource:
+    url: jdbc:h2:mem:mydb
+    username: sa
+    password: password
+    driverClassName: org.h2.Driver
+  h2:
+    console:
+      enabled: true
+  redis:
+    host: localhost
+    port: 6379
+    ttl: 300 # 5 minutes
+    is-redis-server-active: true
+
+# Must match jwt.secret in the users/security service (8081) - both services
+# validate tokens issued by that service. Override with the JWT_SECRET env
+# var in production instead of relying on the default below.
+jwt:
+  secret: ${JWT_SECRET:your/jwt/secret/key123456789/012345678901234567890123456789}

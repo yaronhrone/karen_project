@@ -1,0 +1,90 @@
+name: karen-project
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      # This is the default db created automatically by the image; the two
+      # databases the services actually use (items_db, users_db) are created
+      # by the init script below on first startup only.
+      POSTGRES_DB: postgres
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+      - ./postgres-init:/docker-entrypoint-initdb.d
+    ports:
+      # 5433 on the host, not 5432 - another project's Postgres container
+      # (clinic_db) already holds 5432. Only needed if you want to connect an
+      # external client (pgAdmin/DBeaver/psql); the services themselves talk
+      # to each other over the compose network as postgres:5432.
+      - "5433:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  items-service:
+    build:
+      context: ./items-service
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/items_db
+      SPRING_DATASOURCE_USERNAME: ${POSTGRES_USER}
+      SPRING_DATASOURCE_PASSWORD: ${POSTGRES_PASSWORD}
+      # application.yaml hardcodes org.h2.Driver for local dev - must be
+      # overridden explicitly, Spring won't infer it from the URL when a
+      # driverClassName is already set
+      SPRING_DATASOURCE_DRIVER_CLASS_NAME: org.postgresql.Driver
+      SPRING_SQL_INIT_MODE: always
+      # spring.sql.init.platform alone did not exclude the generic data.sql
+      # (H2/AUTO_INCREMENT syntax) as expected - point at the Postgres file
+      # explicitly instead of relying on that resolution
+      SPRING_SQL_INIT_DATA_LOCATIONS: classpath:data-postgresql.sql
+      JWT_SECRET: ${JWT_SECRET}
+      # Redis is wired into the code but never actually called from any
+      # request path today - skipped here rather than running an idle
+      # container. Flip to true (and add a redis service) if that changes.
+      SPRING_REDIS_IS_REDIS_SERVER_ACTIVE: "false"
+    ports:
+      - "8080:8080"
+
+  users-service:
+    build:
+      context: ./security
+    depends_on:
+      postgres:
+        condition: service_healthy
+      items-service:
+        condition: service_started
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/users_db
+      SPRING_DATASOURCE_USERNAME: ${POSTGRES_USER}
+      SPRING_DATASOURCE_PASSWORD: ${POSTGRES_PASSWORD}
+      # application.yaml hardcodes org.h2.Driver for local dev - must be
+      # overridden explicitly, Spring won't infer it from the URL when a
+      # driverClassName is already set
+      SPRING_DATASOURCE_DRIVER_CLASS_NAME: org.postgresql.Driver
+      SPRING_SQL_INIT_MODE: always
+      SPRING_SQL_INIT_DATA_LOCATIONS: classpath:data-postgresql.sql
+      JWT_SECRET: ${JWT_SECRET}
+      GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID}
+      # Container-network hostname, not localhost - see ItemsClient.java
+      EXTERNAL_API_ITEMS_URL: http://items-service:8080/api/items
+    ports:
+      - "8081:8081"
+
+  frontend:
+    build:
+      context: ./frontend
+    depends_on:
+      - items-service
+      - users-service
+    ports:
+      - "3000:80"
+
+volumes:
+  pgdata:

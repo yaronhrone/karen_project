@@ -1,0 +1,87 @@
+.orderCard {
+display: flex;
+flex-direction: column;
+margin: 20px;
+padding: 20px;
+border-radius: 5px;
+}
+.orderHeader {
+    display: flex;
+    flex-direction: row;
+    align-items:right;
+justify-content: space-evenly;
+font-size: 20px;
+font-weight: bold;
+margin-bottom: 10px;
+}
+
+.orderItem {
+display: flex;
+flex-direction: row-reverse;
+margin-right: 20px;
+justify-content: space-evenly;
+}
+.orderItemInfo{
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: flex-end;
+    margin-left: 20px;
+}
+.orderItem img {
+    width: 150px;
+    height: 150px;
+    object-fit: cover;
+    border-radius: 50%;
+    margin-top: 50px;
+}
+.orderItemQuantity {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 10px;
+    margin-bottom: 10px;
+}
+.quantity{
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    gap: 20px;
+    padding: 5px;
+    border-radius: 20px;
+}
+.icon:hover{
+    cursor: pointer;
+    opacity: 0.6;
+}
+.btns{
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    gap: 20px;
+}
+.btns .btn:hover{
+    opacity: 0.85;
+}
+.line{
+    background: var(--color-bg-alt);
+    height: 2px;
+    width: 100%;
+    margin: 5px;
+}
+
+.orderItemContainer{
+        width: 90%;
+        height: 200px;
+        overflow-y: auto;
+        padding: 10px;
+        border-radius: 8px;
+      }
+.number{
+        font-weight: bold;
+        font-size: 24px;
+        color: var(--color-heading);
+      }

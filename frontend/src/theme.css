@@ -1,0 +1,41 @@
+/*
+ * Design tokens for the store. Palette is the existing warm cream/chocolate
+ * hue family (already used across the site) refined and tied to the actual
+ * brand logo's dusty-rose/terracotta accent instead of the previous bright
+ * orange, which didn't match anything else on the site.
+ */
+:root {
+  /* Backgrounds */
+  --color-bg: #fbf3e9;
+  --color-bg-alt: #f6e9d8;
+  --color-surface: #ffffff;
+
+  /* Text */
+  --color-text: #3a2f28;
+  --color-text-muted: #7a6a5c;
+  --color-heading: #8a6a3f;
+
+  /* Brand accent - from the logo's terracotta/rose diamond */
+  --color-accent: #b5794f;
+  --color-accent-hover: #9c6540;
+  --color-accent-soft: #f0ddc9;
+
+  /* Feedback */
+  --color-danger: #b3454a;
+  --color-danger-hover: #963a3e;
+  --color-success: #3f8f5f;
+
+  /* Typography */
+  --font-heading: 'Cormorant', serif;
+  --font-body: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+
+  /* Shape & elevation */
+  --radius-sm: 8px;
+  --radius-md: 14px;
+  --radius-lg: 22px;
+  --shadow-sm: 0 2px 8px rgba(58, 47, 40, 0.08);
+  --shadow-md: 0 8px 24px rgba(58, 47, 40, 0.12);
+  --shadow-lg: 0 16px 40px rgba(58, 47, 40, 0.18);
+
+  --transition: 200ms ease;
+}

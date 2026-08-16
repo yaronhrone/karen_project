@@ -1,0 +1,169 @@
+.links {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 14px 32px;
+  gap: 24px;
+  background: var(--color-heading);
+  color: #fff;
+  position: relative;
+}
+
+.links .custom-link {
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.links .custom-link.active,
+.links .custom-link:hover {
+  color: #fff;
+  border-bottom-color: var(--color-accent-soft);
+}
+
+.products {
+  flex: 2;
+  display: flex;
+  align-items: center;
+  gap: 15%;
+}
+
+.item {
+  display: flex;
+  align-items: center;
+  color: #fff;
+  font-weight: 600;
+  font-size: 16px;
+  margin: 0;
+  cursor: pointer;
+}
+
+.items_Close {
+  display: none;
+}
+
+.items_Open {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  min-width: 160px;
+  display: flex;
+  flex-direction: column;
+  border-radius: var(--radius-sm);
+  padding: 10px;
+  gap: 4px;
+  background: var(--color-surface);
+  box-shadow: var(--shadow-md);
+  z-index: 5;
+}
+
+.items_Open .custom-link {
+  color: var(--color-text);
+  padding: 6px 10px;
+  border-bottom: none;
+  border-radius: var(--radius-sm);
+}
+
+.items_Open .custom-link:hover {
+  background: var(--color-accent-soft);
+  color: var(--color-accent-hover);
+}
+
+.search {
+  position: relative;
+  height: 40px;
+  width: 260px;
+}
+
+.search input {
+  height: 100%;
+  width: 100%;
+  border-radius: var(--radius-sm);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  font-size: 15px;
+  /* the page isn't marked dir="rtl", so it renders left-to-right overall -
+     text-align/padding are set to match where the icon actually sits
+     rather than assuming logical start/end map to the visual right/left */
+  text-align: right;
+  padding-right: 36px;
+  padding-left: 12px;
+  background: rgba(255, 255, 255, 0.15);
+  color: #fff;
+}
+
+.search input::placeholder {
+  color: rgba(255, 255, 255, 0.75);
+}
+
+.search input:focus {
+  outline: none;
+  background: var(--color-surface);
+  color: var(--color-text);
+}
+
+.icon_search {
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: rgba(255, 255, 255, 0.85);
+  pointer-events: none;
+}
+
+.search input:focus ~ .icon_search {
+  color: var(--color-text-muted);
+}
+
+.search-area {
+  position: relative;
+  display: inline-block;
+}
+
+.items_search {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  background: var(--color-surface);
+  border-radius: var(--radius-sm);
+  box-shadow: var(--shadow-md);
+  width: 320px;
+  max-height: 280px;
+  overflow-y: auto;
+  opacity: 0;
+  transform: translateY(-10px);
+  pointer-events: none;
+  transition: opacity var(--transition), transform var(--transition);
+  z-index: 999;
+}
+
+.search-area:hover .items_search {
+  opacity: 1;
+  transform: translateY(0);
+  pointer-events: auto;
+}
+
+.item_info {
+  display: block;
+  color: var(--color-text);
+  font-weight: 500;
+  font-size: 15px;
+  text-decoration: none;
+  padding: 10px 14px;
+  border-bottom: 1px solid var(--color-bg-alt);
+}
+
+.item_info:hover {
+  cursor: pointer;
+  background: var(--color-accent-soft);
+}
+
+.auth {
+  flex: 1;
+  display: flex;
+  gap: 24px;
+  justify-content: flex-end;
+  align-items: center;
+}
+
+.login-register {
+  display: flex;
+  gap: 25px;
+}

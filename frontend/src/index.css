@@ -1,0 +1,43 @@
+body {
+  margin: 0;
+  font-family: var(--font-body);
+  background: var(--color-bg);
+  color: var(--color-text);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  box-sizing: border-box;
+}
+
+*, *::before, *::after {
+  box-sizing: inherit;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-heading);
+  color: var(--color-heading);
+  font-weight: 600;
+}
+
+a {
+  color: inherit;
+}
+
+/* Shared page heading, used by the chocolate/cake/cookie catalog pages
+   (previously each page redefined its own, with a heavy multi-layer
+   text-shadow, a cursive font, and dir:ltr forced onto Hebrew text) */
+.title {
+  text-align: center;
+  font-size: clamp(28px, 4vw, 40px);
+  color: var(--color-heading);
+  margin: 32px auto 8px;
+}
+
+.load-more {
+  text-align: center;
+  margin: 8px auto 40px;
+}
+
+code {
+  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
+    monospace;
+}
