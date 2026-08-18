@@ -23,3 +23,13 @@ spring:
 # var in production instead of relying on the default below.
 jwt:
   secret: ${JWT_SECRET:your/jwt/secret/key123456789/012345678901234567890123456789}
+
+management:
+  health:
+    # spring-data-redis being on the classpath auto-registers a Redis health
+    # indicator regardless of the app's own is-redis-server-active flag above -
+    # Redis is never actually called from any request path today (see
+    # docker-compose.yml), so with no Redis container running this would
+    # otherwise permanently report /actuator/health as DOWN.
+    redis:
+      enabled: false

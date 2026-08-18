@@ -1,6 +1,11 @@
 import axios from "axios";
-const BASE_URL_PROTUCT = "http://localhost:8080/api/items";
-const BASE_URL = "http://localhost:8081";
+// Falls back to localhost for local dev (`npm start`); in production these
+// must be set at build time via REACT_APP_* env vars (baked into the bundle -
+// CRA cannot read them at runtime) to the server's real public address,
+// since "localhost" from the browser's own perspective is the visitor's
+// machine, not wherever this app is actually deployed.
+const BASE_URL_PROTUCT = process.env.REACT_APP_ITEMS_API_URL || "http://localhost:8080/api/items";
+const BASE_URL = process.env.REACT_APP_USERS_API_URL || "http://localhost:8081";
 
 
 // users

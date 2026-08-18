@@ -1,6 +1,7 @@
 package com.example.security.security;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
@@ -28,6 +29,11 @@ public class SecurityConfigure {
     @Autowired
     private JwtRequestFilter jwtRequestFilter;
 
+    // Defaults to localhost for local dev; override with the real deployed
+    // frontend URL via this env var in production (see docker-compose.yml).
+    @Value("${FRONTEND_URL:http://localhost:3000}")
+    private String frontendUrl;
+
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
@@ -35,7 +41,7 @@ public class SecurityConfigure {
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/authenticate", "/authenticate/google", "/users/register",
-                                "/h2-console/**").permitAll() // Public endpoints
+                                "/h2-console/**", "/actuator/health").permitAll() // Public endpoints
                         .requestMatchers("/users/**", "/favorite**", "/chocolate/**", "/cake/**", "/order/**").hasAnyAuthority("USER", "ADMIN")
                         .requestMatchers("/admin/**").hasAuthority("ADMIN") // Admin-only routes
                         .anyRequest().authenticated() // Require authentication for all other requests
@@ -61,7 +67,7 @@ public class SecurityConfigure {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(List.of("http://localhost:3000"));
+        configuration.setAllowedOrigins(List.of(frontendUrl));
         configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE"));
         configuration.setAllowedHeaders(List.of("*"));
         configuration.setAllowCredentials(true);
