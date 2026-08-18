@@ -21,3 +21,8 @@ docker compose ps      # לוודא ש-4 הקונטיינרים healthy
   דרך `docker-compose.prod.yml` (מחליף `build:` ב-`image:` מ-GHCR).
 - **SSH ידני לשרת:** `ssh -i ~/.ssh/karen-project-ec2.pem ubuntu@<Elastic IP>`
 - **לוגים בשרת:** `cd /home/ubuntu/app && docker compose logs -f --tail=100`
+
+## פתרון תקלות (Troubleshooting)
+
+- **`deploy` job נכשל ב-GitHub Actions:** ודא ש-Security Group מאפשר SSH (22) מכל כתובת
+  (`0.0.0.0/0`) — GitHub Actions רץ מ-IP-ים דינמיים, לא ניתן להגביל ל-IP קבוע אחד.
