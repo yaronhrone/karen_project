@@ -1,0 +1,21 @@
+# Production override - replaces each service's local `build:` with a
+# pre-built image pulled from GHCR (built by GitHub Actions on every push to
+# main). Used as: docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d
+#
+# Why: the EC2 instance is a t3.micro (1GB RAM) - building 2 Maven projects
+# and an npm project at once would be slow at best, OOM at worst. Building
+# happens in GitHub Actions instead, where resources are plentiful.
+name: karen-project
+
+services:
+  items-service:
+    image: ghcr.io/yaronhrone/karen-project-items-service:latest
+    build: !reset null
+
+  users-service:
+    image: ghcr.io/yaronhrone/karen-project-users-service:latest
+    build: !reset null
+
+  frontend:
+    image: ghcr.io/yaronhrone/karen-project-frontend:latest
+    build: !reset null
