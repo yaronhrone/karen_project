@@ -9,15 +9,19 @@ RUN npm ci
 COPY . .
 
 # CRA bakes REACT_APP_* vars into the JS bundle at build time (not readable at
-# container runtime). REACT_APP_GOOGLE_CLIENT_ID deliberately stays out of this -
-# it's already supplied via the committed .env/.env.local files (copied in by
-# COPY . . above) and apiServise.js has no fallback for it, so an unset build
-# ARG would silently blank it out. The two API URLs below DO have safe
-# localhost fallbacks in code, so they're safe to wire through build args -
-# passed via docker-compose's build.args, sourced from the deploy env's .env,
-# to point at the real server address instead of localhost in production.
+# container runtime). All three are passed in via docker-compose's build.args,
+# sourced from .env - this is the only mechanism that actually reaches a CI
+# build: .env.local is gitignored on purpose and never exists in a fresh
+# `actions/checkout`, so relying on it here silently shipped a placeholder
+# Google client ID to production (found via a real "error 400" from Google -
+# the deployed bundle had no client_id in it at all). ARGs default to empty
+# when not passed (e.g. a bare `docker build` with no --build-arg), which
+# falls back to the localhost/"unset" defaults already handled in code
+# (apiServise.js's `||` fallbacks, GoogleOAuthProvider's own error if empty).
+ARG REACT_APP_GOOGLE_CLIENT_ID
 ARG REACT_APP_ITEMS_API_URL
 ARG REACT_APP_USERS_API_URL
+ENV REACT_APP_GOOGLE_CLIENT_ID=$REACT_APP_GOOGLE_CLIENT_ID
 ENV REACT_APP_ITEMS_API_URL=$REACT_APP_ITEMS_API_URL
 ENV REACT_APP_USERS_API_URL=$REACT_APP_USERS_API_URL
 

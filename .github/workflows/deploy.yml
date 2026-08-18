@@ -47,6 +47,7 @@ jobs:
           push: true
           tags: ${{ env.REGISTRY }}/yaronhrone/${{ matrix.image }}:latest
           build-args: |
+            REACT_APP_GOOGLE_CLIENT_ID=${{ secrets.REACT_APP_GOOGLE_CLIENT_ID }}
             REACT_APP_ITEMS_API_URL=${{ secrets.REACT_APP_ITEMS_API_URL }}
             REACT_APP_USERS_API_URL=${{ secrets.REACT_APP_USERS_API_URL }}
           cache-from: type=gha,scope=${{ matrix.service }}

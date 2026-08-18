@@ -101,6 +101,7 @@ services:
     build:
       context: ./frontend
       args:
+        REACT_APP_GOOGLE_CLIENT_ID: ${REACT_APP_GOOGLE_CLIENT_ID:-}
         REACT_APP_ITEMS_API_URL: ${REACT_APP_ITEMS_API_URL:-}
         REACT_APP_USERS_API_URL: ${REACT_APP_USERS_API_URL:-}
     restart: unless-stopped
