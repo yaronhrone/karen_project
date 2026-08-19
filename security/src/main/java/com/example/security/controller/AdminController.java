@@ -177,6 +177,32 @@ public class AdminController {
         }
 
     }
+
+    // Orders already sent by a customer (RECEIVED/IN_PROGRESS) that still
+    // need Keren's attention, across all users - the inbox view in Admin.
+    @PreAuthorize("hasAuthority('ADMIN')")
+    @GetMapping("/orders/active")
+    public ResponseEntity<List<Order>> getActiveOrders() {
+        try {
+            return ResponseEntity.ok().body(orderService.getActiveOrders());
+        } catch (Exception e) {
+            return new ResponseEntity(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @PreAuthorize("hasAuthority('ADMIN')")
+    @PutMapping("/order/{id}/status")
+    public ResponseEntity<String> advanceOrderStatus(@PathVariable int id, @RequestParam String status) {
+        try {
+            String result = orderService.advanceOrderStatus(id, status);
+            if ("Invalid status".equals(result)) {
+                return ResponseEntity.badRequest().body(result);
+            }
+            return ResponseEntity.ok().body(result);
+        } catch (Exception e) {
+            return new ResponseEntity(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
 }
 
 

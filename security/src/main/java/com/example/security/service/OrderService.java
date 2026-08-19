@@ -18,6 +18,11 @@ public class OrderService {
 
     @Autowired
     private ItemService itemService;
+    @Autowired
+    private WhatsAppNotificationService whatsAppNotificationService;
+
+    private static final List<String> ACTIVE_ORDER_STATUSES = List.of("RECEIVED", "IN_PROGRESS");
+    private static final List<String> ADVANCEABLE_STATUSES = List.of("IN_PROGRESS", "READY");
 
 
     public Integer createOrder(String email) {
@@ -80,8 +85,46 @@ public class OrderService {
         return "Order item updated successfully";
     }
     public String changeOrderStatus(String email) {
+        String result = orderRepository.changeOrderStatusToReceived(email);
 
-        return orderRepository.changeOrderStatusToClose(email);
+        // Notify Keren over WhatsApp that a new order came in, so she isn't
+        // relying on manually checking Admin for it. A failure here (GreenAPI
+        // not configured yet, network hiccup, ...) must not fail the
+        // customer's request - the order itself already went through.
+        try {
+            List<Order> orders = orderRepository.getAllOrderByEmail(email);
+            Order justSent = orders.stream()
+                    .filter(o -> "RECEIVED".equals(o.getStatus().name()))
+                    .reduce((first, second) -> second) // latest one
+                    .orElse(null);
+            if (justSent != null) {
+                justSent.setOrderItems(allOrderItemsInfo(orderRepository.getOrderItemsByOrderId(justSent.getId())));
+                whatsAppNotificationService.sendNewOrderNotification(justSent);
+            }
+        } catch (Exception e) {
+            System.out.println(e.getMessage() + " - failed to send WhatsApp new-order notification");
+        }
+
+        return result;
+    }
+
+    public String advanceOrderStatus(int orderId, String newStatus) {
+        if (!ADVANCEABLE_STATUSES.contains(newStatus)) {
+            return "Invalid status";
+        }
+        orderRepository.updateOrderStatus(orderId, newStatus);
+        return "Order status updated successfully";
+    }
+
+    // Keren's "active orders" inbox - orders already sent by a customer that
+    // still need her attention (not yet marked ready/shipped).
+    public List<Order> getActiveOrders() {
+        List<Order> orders = orderRepository.getOrdersByStatuses(ACTIVE_ORDER_STATUSES);
+        for (Order order : orders) {
+            order.setOrderItems(allOrderItemsInfo(orderRepository.getOrderItemsByOrderId(order.getId())));
+            order.setTotalPrice(calculateTotalPrice(order.getOrderItems()));
+        }
+        return orders;
     }
     public String deleteOrder(int orderId) {
         Order order = orderRepository.getOrderById(orderId);

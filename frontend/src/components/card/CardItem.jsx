@@ -28,6 +28,11 @@ function CardItem({ item, isFavoriteDefault }) {
 
 
     const toggleFavorite = async (id) => {
+        // See the matching fix/comment in CardChocolate.jsx's toggleFavorite -
+        // same missing isRequstToGetCurrentUserDone guard, same bug.
+        if (!isRequstToGetCurrentUserDone) {
+            return;
+        }
         if(!currentUser){
             if(isFavorite){
              toggleFavoriteContext(id);

@@ -36,35 +36,68 @@
   cursor: pointer;
 }
 
-.items_Close {
-  display: none;
-}
-
+/* Shared base for both states, so opening/closing can transition instead of
+   snapping via display:none (which can't be animated). Opens toward the
+   left edge of the navbar rather than hugging the same side as the trigger. */
+.items_Close,
 .items_Open {
   position: absolute;
   top: 100%;
-  right: 0;
-  min-width: 160px;
+  left: 12px;
+  min-width: 190px;
   display: flex;
   flex-direction: column;
-  border-radius: var(--radius-sm);
+  border-radius: var(--radius-md);
   padding: 10px;
-  gap: 4px;
+  gap: 2px;
   background: var(--color-surface);
-  box-shadow: var(--shadow-md);
+  box-shadow: var(--shadow-lg);
   z-index: 5;
+  transition: opacity var(--transition), transform var(--transition);
 }
 
-.items_Open .custom-link {
+.items_Close {
+  opacity: 0;
+  transform: translateY(-8px);
+  pointer-events: none;
+}
+
+.items_Open {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.items_Open .custom-link,
+.items_Close .custom-link {
+  display: flex;
+  align-items: center;
+  gap: 10px;
   color: var(--color-text);
-  padding: 6px 10px;
+  padding: 10px 12px;
   border-bottom: none;
   border-radius: var(--radius-sm);
+  font-weight: 600;
+  font-size: 15px;
+}
+
+.items_Open .custom-link svg,
+.items_Close .custom-link svg {
+  font-size: 19px;
+  color: var(--color-accent);
 }
 
 .items_Open .custom-link:hover {
   background: var(--color-accent-soft);
   color: var(--color-accent-hover);
+}
+
+.items_Open .custom-link:hover svg {
+  color: var(--color-accent-hover);
+}
+
+.items_Open .custom-link + .custom-link,
+.items_Close .custom-link + .custom-link {
+  border-top: 1px solid var(--color-bg-alt);
 }
 
 .search {

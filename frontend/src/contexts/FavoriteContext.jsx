@@ -24,8 +24,12 @@ export const FavoriteProvider = ({ children }) => {
     });
   };
 
+  const clearFavorites = () => {
+    setFavorites([]);
+  };
+
   return (
-    <FavoriteContext.Provider value={{ favorites, toggleFavoriteContext }}>
+    <FavoriteContext.Provider value={{ favorites, toggleFavoriteContext, clearFavorites }}>
       {children}
     </FavoriteContext.Provider>
   );

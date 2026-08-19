@@ -1,17 +1,17 @@
 header {
+  position: relative;
   display: flex;
   align-items: center;
   justify-content: center;
   gap: clamp(24px, 8vw, 96px);
   flex-wrap: wrap;
-  padding: 18px 20px 8px;
+  padding: 18px 20px;
   background: var(--color-surface);
-  box-shadow: var(--shadow-sm);
 }
 
 .icon {
-  width: 92px;
-  height: 92px;
+  width: 130px;
+  height: 130px;
   object-fit: cover;
   border-radius: 50%;
   border: 3px solid var(--color-accent-soft);
@@ -22,6 +22,9 @@ header {
   transform: scale(1.06);
 }
 
+/* Free-delivery badge - currently disabled (commented out in Header.jsx).
+   When re-enabled, pin it to a far edge instead of inline next to the logo,
+   e.g.: */
 .delivery {
   display: flex;
   align-items: center;
@@ -32,6 +35,10 @@ header {
   color: var(--color-accent-hover);
   font-size: 15px;
   font-weight: 600;
+  position: absolute;
+  left: 20px;
+  top: 50%;
+  transform: translateY(-50%);
 }
 
 .delivery p {

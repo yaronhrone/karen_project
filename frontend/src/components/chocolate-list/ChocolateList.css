@@ -1,8 +1,228 @@
+.chocolate-page {
+  display: flex;
+  align-items: flex-start;
+  gap: 24px;
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 0 16px;
+}
+
+.chocolate-main {
+  flex: 3;
+  min-width: 0;
+}
+
+.package-hint {
+  text-align: center;
+  color: var(--color-text-muted);
+  font-size: 14px;
+  margin: -4px 0 16px;
+}
+
 .cart {
   display: flex;
   flex-wrap: wrap;
   gap: 20px;
   justify-content: center;
+}
+
+/* Package-builder sidebar: stays docked next to the grid instead of a modal
+   popup, so picking chocolates to complete a box doesn't interrupt browsing. */
+.builder-sidebar {
+  flex: 1;
+  min-width: 260px;
+  max-width: 320px;
+  align-self: flex-start;
+  position: sticky;
+  top: 20px;
+}
+
+.builder-sidebar-inner {
+  background: var(--color-surface);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+  padding: 22px;
+  transition: box-shadow var(--transition);
+}
+
+.builder-sidebar.open .builder-sidebar-inner {
+  box-shadow: var(--shadow-md);
+}
+
+.builder-title {
+  font-family: var(--font-heading);
+  color: var(--color-heading);
+  font-size: 21px;
+  margin: 0 0 4px;
+}
+
+.builder-subtitle {
+  font-size: 12px;
+  color: var(--color-text-muted);
+  margin: 0 0 16px;
+}
+
+.builder-empty {
+  font-size: 14px;
+  color: var(--color-text-muted);
+  text-align: center;
+  padding: 12px 0 4px;
+}
+
+/* Guest checkout confirmation - replaces a blocking alert() that used to
+   fire on send. Shown for a few seconds, then the sidebar falls back to
+   the empty state on its own. */
+.builder-confirmed {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  text-align: center;
+  padding: 24px 0 12px;
+  color: var(--color-text);
+  font-weight: 600;
+}
+
+.builder-confirmed-icon {
+  font-size: 40px;
+  color: var(--color-success);
+}
+
+.builder-list {
+  list-style: none;
+  margin: 0 0 16px;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.builder-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid var(--color-bg-alt);
+}
+
+.builder-item-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.builder-item-info strong {
+  font-size: 14px;
+  color: var(--color-text);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.builder-item-price {
+  font-size: 12px;
+  color: var(--color-accent-hover);
+  font-weight: 600;
+}
+
+.builder-stepper {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: var(--color-bg-alt);
+  border-radius: 999px;
+  padding: 3px;
+  flex-shrink: 0;
+}
+
+.stepper-btn {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-size: 13px;
+  color: var(--color-accent-hover);
+  background: var(--color-surface);
+  transition: background var(--transition), color var(--transition);
+}
+
+.stepper-btn:hover {
+  background: var(--color-accent);
+  color: #fff;
+}
+
+.stepper-qty {
+  min-width: 14px;
+  text-align: center;
+  font-weight: 700;
+  font-size: 13px;
+}
+
+.builder-summary {
+  padding-top: 4px;
+  margin-bottom: 16px;
+}
+
+.builder-summary-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  font-size: 14px;
+  color: var(--color-text-muted);
+  margin-bottom: 6px;
+}
+
+.builder-total {
+  font-family: var(--font-heading);
+  font-size: 22px;
+  color: var(--color-accent-hover);
+}
+
+.builder-note {
+  font-size: 13px;
+  font-weight: 600;
+  border-radius: var(--radius-sm);
+  padding: 8px 12px;
+  margin: 10px 0 0;
+}
+
+.builder-note-success {
+  background: var(--color-accent-soft);
+  color: var(--color-accent-hover);
+}
+
+.builder-note-pending {
+  background: var(--color-bg-alt);
+  color: var(--color-text-muted);
+}
+
+.builder-actions {
+  display: flex;
+  gap: 10px;
+}
+
+.builder-actions .btn {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+}
+
+@media (max-width: 860px) {
+  .chocolate-page {
+    flex-direction: column;
+  }
+  .builder-sidebar {
+    position: static;
+    max-width: none;
+    width: 100%;
+  }
 }
 
 .cards-container {

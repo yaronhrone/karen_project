@@ -61,10 +61,23 @@ public class OrderRepository {
         String sql = "SELECT * FROM " + ORDER_TABLE + " WHERE user_email = ? ";
         return jdbcTemplate.query(sql, new OrderMapper(), userEmail);
     }
-    public String changeOrderStatusToClose(String userEmail) {
-        String sql = "UPDATE " + ORDER_TABLE + " SET order_status = 'CLOSE' WHERE user_email = ? AND order_status = 'OPEN'";
+    public String changeOrderStatusToReceived(String userEmail) {
+        String sql = "UPDATE " + ORDER_TABLE + " SET order_status = 'RECEIVED' WHERE user_email = ? AND order_status = 'OPEN'";
         jdbcTemplate.update(sql, userEmail);
         return "Order status updated successfully";
+    }
+
+    public void updateOrderStatus(int orderId, String status) {
+        String sql = "UPDATE " + ORDER_TABLE + " SET order_status = ? WHERE id = ?";
+        jdbcTemplate.update(sql, status, orderId);
+    }
+
+    // Keren's "active orders" inbox in Admin - orders she still needs to act
+    // on (already sent by the customer, not yet marked ready/shipped).
+    public List<Order> getOrdersByStatuses(List<String> statuses) {
+        String placeholders = String.join(",", statuses.stream().map(s -> "?").toArray(String[]::new));
+        String sql = "SELECT * FROM " + ORDER_TABLE + " WHERE order_status IN (" + placeholders + ") ORDER BY order_date DESC";
+        return jdbcTemplate.query(sql, new OrderMapper(), statuses.toArray());
     }
 
     // Order Items

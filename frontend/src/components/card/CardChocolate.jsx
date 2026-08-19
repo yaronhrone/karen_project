@@ -23,6 +23,18 @@ const CardChocolate = ({ item, isFavoriteDefault, addToList, removeFromList, rem
 
 
     const toggleFavorite = async (id) => {
+        // Every other list component (ChocolateList, CakeList, CookieList...)
+        // gates the logged-in/guest branch on `currentUser && isRequstToGetCurrentUserDone`,
+        // not just `currentUser` - this component was missing that second check.
+        // On page load there's a short window where currentUser is still null
+        // while the "who am I" request is in flight; clicking the heart in that
+        // window took the guest branch (saved only to local storage) even for a
+        // logged-in user, so the click looked like it worked (heart filled in,
+        // no error) but never reached the server - it just never showed up on
+        // the Favorites page afterwards.
+        if (!isRequstToGetCurrentUserDone) {
+            return;
+        }
         if (!currentUser) {
             if (isFavorite) {
                 toggleFavoriteContext(id);
@@ -69,7 +81,11 @@ const CardChocolate = ({ item, isFavoriteDefault, addToList, removeFromList, rem
         setClicked(false);
     }
     useEffect(() => {
-        if (removedItemId === item.id) {
+        // removedItemId is already the boolean "was this card's item cleared?"
+        // (ChocolateList passes removedItemIdState.includes(chocolate.id)) -
+        // comparing it to item.id here always failed (bool !== number), so
+        // "נקה" (clear) never actually un-highlighted the cards it cleared.
+        if (removedItemId) {
             setClicked(false);
         }
     }, [removedItemId]);

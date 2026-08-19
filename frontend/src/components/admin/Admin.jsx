@@ -1,15 +1,25 @@
-import React, { useContext, useState } from 'react'
+import React, { useContext, useEffect, useState } from 'react'
 import UserContext from '../../contexts/UserContext';
 import { useNavigate } from 'react-router-dom';
-import { createItem, deleteItemById, deltedUser, fetchAllUsers, getAllItems, getAllOrderByEmail, updateItem } from '../../service/apiServise';
+import { advanceOrderStatus, createItem, deleteItemById, deltedUser, fetchAllUsers, getActiveOrders, getAllItems, getAllOrderByEmail, updateItem } from '../../service/apiServise';
 import CardItem from '../card/CardItem';
 import './Admin.css';
 import OrderFinish from '../order/OrderFinish';
+import { getOrderStatusLabel } from '../../utils/orderStatus';
+
+// RECEIVED -> IN_PROGRESS -> READY, the same 3-stage flow OrderService
+// enforces server-side (advanceOrderStatus there rejects anything else).
+const NEXT_STATUS = {
+    RECEIVED: 'IN_PROGRESS',
+    IN_PROGRESS: 'READY',
+};
+
 function Admin() {
     const { currentUser, isRequstToGetCurrentUserDone } = useContext(UserContext);
     const navigate = useNavigate();
     const isAdmin = currentUser?.role?.includes('ADMIN');
     const [userOrder, setUserOrder] = useState([]);
+    const [activeOrders, setActiveOrders] = useState([]);
     const [users, setUsers] = useState([]);
     const [selectedUserEmail, setSelectedUserEmail] = useState('');
     const [pageUser, setPageUser] = useState(1);
@@ -65,6 +75,41 @@ function Admin() {
             }
         }
     }
+    const loadActiveOrders = async () => {
+        try {
+            const { data } = await getActiveOrders();
+            setActiveOrders(data);
+        } catch (error) {
+            console.log(error);
+            if (error.response?.status === 400 || error.response?.status === 500) {
+                setError(error.response.data);
+            }
+        }
+    }
+    const handleAdvanceStatus = async (order) => {
+        const nextStatus = NEXT_STATUS[order.status];
+        if (!nextStatus) {
+            return;
+        }
+        try {
+            await advanceOrderStatus(order.id, nextStatus);
+            // READY orders drop out of the inbox entirely (no longer
+            // "active"), so just reload rather than patch the one row.
+            loadActiveOrders();
+        } catch (error) {
+            console.log(error);
+            if (error.response?.status === 400 || error.response?.status === 500) {
+                setError(error.response.data);
+            }
+        }
+    }
+    // Loads as soon as the admin check passes, not only after a click - so
+    // Keren sees right away whether there's a new order waiting.
+    useEffect(() => {
+        if (isAdmin) {
+            loadActiveOrders();
+        }
+    }, [isAdmin]);
     const handleCreateItem = async (e) => {
         e.preventDefault();
         if (!file || !itemsFrom.name || !itemsFrom.description || !itemsFrom.price || !itemsFrom.category) {
@@ -178,6 +223,23 @@ console.log(realFile + "file ");
         <div className='admin'>
             <h2 className='tital'>Admin page</h2>
             {error && <p>{error}</p>}
+
+            <div className='active_orders_container'>
+                <h2 className='tital'>הזמנות פעילות</h2>
+                {activeOrders.length === 0
+                    ? <p>אין הזמנות פעילות כרגע</p>
+                    : activeOrders.map(order => (
+                        <div key={order.id}>
+                            <OrderFinish order={order} />
+                            {NEXT_STATUS[order.status] && (
+                                <button className='btn' type='button' onClick={() => handleAdvanceStatus(order)}>
+                                    העבר ל"{getOrderStatusLabel(NEXT_STATUS[order.status])}"
+                                </button>
+                            )}
+                        </div>
+                    ))}
+            </div>
+
             <form onSubmit={handleCreateItem} className='form_item'>
                 <h2 className='tital'>הוספת מוצר</h2>
                 <input type="text" placeholder="שם במוצר" value={itemsFrom.name} onChange={(e) => setItemsFrom({ ...itemsFrom, name: e.target.value })} />

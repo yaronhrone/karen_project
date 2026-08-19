@@ -91,6 +91,9 @@ services:
       SPRING_SQL_INIT_DATA_LOCATIONS: classpath:data-postgresql.sql
       JWT_SECRET: ${JWT_SECRET}
       GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID}
+      GREEN_API_ID_INSTANCE: ${GREEN_API_ID_INSTANCE:-}
+      GREEN_API_TOKEN_INSTANCE: ${GREEN_API_TOKEN_INSTANCE:-}
+      KEREN_WHATSAPP_NUMBER: ${KEREN_WHATSAPP_NUMBER:-}
       FRONTEND_URL: ${FRONTEND_URL:-http://localhost:3000}
       # Container-network hostname, not localhost - see ItemsClient.java
       EXTERNAL_API_ITEMS_URL: http://items-service:8080/api/items

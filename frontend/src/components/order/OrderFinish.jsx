@@ -1,37 +1,33 @@
 import React from 'react'
+import './Order.css';
+import { getOrderStatusLabel } from '../../utils/orderStatus';
 
 function OrderFinish({ order }) {
 
     return (
-        <div key={order.id}>
+        <div className='orderCard'>
             <div className='orderHeader'>
-                <h3>מצב הזמנה: {order.status === "CLOSE" ? "סגור" : "פתוח"}</h3>
-                <h3>תאריך הזמנה:{order.order_date}</h3>
-                <h3>מחיר כולל: {order.total_price}</h3>
+                <h3>מצב הזמנה: {getOrderStatusLabel(order.status)}</h3>
+                <h3>תאריך הזמנה: {order.order_date}</h3>
+                <h3>מחיר כולל: ₪{order.total_price}</h3>
             </div>
-            <div className='orderItemContainer'> 
-            {order.order_items.map(oi => (
-                <div key={oi.id} className='orderItem'     style={{
-            padding: "8px",
-            marginBottom: "5px",
-            background: "#f8aeaeff",
-            borderRadius: "4px",
-          }} >
-                    <img src={oi.image} alt={oi.name} width={100} height={100} />
-                    <div className='orderItemInfo'>
-                        <h3>{oi.name}</h3>
-                        <p>{oi.description}</p>
+            <div className='orderItemContainer'>
+                {order.order_items.map(oi => (
+                    <div key={oi.id} className='orderItem'>
+                        {oi.image
+                            ? <img src={oi.image} alt={oi.name} />
+                            : <div className='img-placeholder' aria-hidden="true" />}
+                        <div className='orderItemInfo'>
+                            <h3>{oi.name}</h3>
+                            <p>{oi.description}</p>
+                        </div>
                         <div className='orderItemQuantity'>
-                                <h3>כמות:{oi.quantity}</h3>
-
-                            <h3 style={{ marginLeft: '30px' }}>מחיר: {oi.price}</h3>
+                            <span className='number'>כמות: {oi.quantity}</span>
+                            <span className='number'>₪{oi.total_price}</span>
                         </div>
                     </div>
-                    <h3>מחיר כולל: {oi.total_price}</h3>
-                    </div>
-            ))}
+                ))}
             </div>
-
         </div>
     )
 }

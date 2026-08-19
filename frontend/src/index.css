@@ -37,6 +37,75 @@ a {
   margin: 8px auto 40px;
 }
 
+/* Shared button utility classes, used across the site (order/cart, the
+   chocolate-package sidebar, the modal component, etc). These used to live
+   in Modal.css - fine while Modal was the only place that pulled them into
+   the bundle, but CRA only bundles a CSS file if some component still
+   imports it, so once nothing imported Modal.css anymore these would have
+   silently vanished from every other page that also relies on them. */
+.btn {
+  padding: 8px 16px;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  border: 1px solid transparent;
+  font-weight: 600;
+  font-size: 14px;
+  background: var(--color-bg-alt);
+  color: var(--color-text);
+  transition: background var(--transition), color var(--transition);
+}
+
+.btn:hover {
+  background: var(--color-accent-soft);
+}
+
+.btn-primary {
+  background: var(--color-accent);
+  color: #fff;
+}
+
+.btn-primary:hover {
+  background: var(--color-accent-hover);
+}
+
+.btn-danger {
+  background: var(--color-danger);
+  color: #fff;
+}
+
+.btn-danger:hover {
+  background: var(--color-danger-hover);
+}
+
+.btn-ghost {
+  background: transparent;
+  border-color: var(--color-text-muted);
+  color: var(--color-text-muted);
+}
+
+.btn-ghost:hover {
+  background: var(--color-bg-alt);
+  color: var(--color-text);
+}
+
+.btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.btn_icon {
+  cursor: pointer;
+  color: var(--color-accent);
+  vertical-align: middle;
+  border-radius: 50%;
+  padding: 2px;
+  transition: background var(--transition);
+}
+
+.btn_icon:hover {
+  background: var(--color-accent-soft);
+}
+
 code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;

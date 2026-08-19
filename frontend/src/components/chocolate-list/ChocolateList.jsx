@@ -7,12 +7,14 @@ import CardChocolate from '../card/CardChocolate';
 import { cartContext } from '../../contexts/CartContext';
 import AddIcon from '@mui/icons-material/Add';
 import RemoveIcon from '@mui/icons-material/Remove';
-import { isDisabled } from '@testing-library/user-event/dist/utils';
-import Modal from '../modal/Modal';
+import CloseIcon from '@mui/icons-material/Close';
+import CheckCircleIcon from '@mui/icons-material/CheckCircle';
+import { useNavigate } from 'react-router-dom';
 
 
 function ChocolateList() {
   const { currentUser, isRequstToGetCurrentUserDone } = useContext(UserContext);
+  const navigate = useNavigate();
   const [chocolates, setChocolates] = useState([]);
   const [favorites, setFavorites] = useState([]);
   const [page, setPage] = useState(1);
@@ -22,7 +24,7 @@ function ChocolateList() {
   const [removedItemIdState, setRemovedItemId] = useState([]);
   const { cartItems, addToCart, removeFromCart } = useContext(cartContext);
   const [errorFromServer, setErrorFromServer] = useState("");
-  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [orderConfirmed, setOrderConfirmed] = useState(false);
   const getChocolates = async () => {
     try {
       if (currentUser && isRequstToGetCurrentUserDone) {
@@ -53,7 +55,6 @@ function ChocolateList() {
   const addToListChocolate = (item) => {
     console.log("Added chocolate with ID:", item);
     setChocolateList([...chocolateList, item]);
-    setIsModalOpen(true);
 
   }
   const removeFromListChocolate = (item) => {
@@ -85,9 +86,14 @@ function ChocolateList() {
 
   };
   const notifyChild = (removedItemId) => {
-    console.log(`Item with ID ${removedItemId} was removed from the list.`);
-    setRemovedItemId([...removedItemIdState, removedItemId]);
-    console.log(removedItemIdState);
+    // Functional update - reads the previous state directly instead of the
+    // removedItemIdState closure, which matters when notifyChild fires
+    // several times in the same tick (clearList below calls it once per
+    // item in a .forEach): each call in a loop would otherwise read the
+    // same stale array and overwrite the previous call's result instead of
+    // accumulating, so only the last cleared item actually got marked
+    // removed - which is exactly why "נקה" only ever un-highlighted one card.
+    setRemovedItemId(prev => [...prev, removedItemId]);
   }
 
   const totalQuantity = chocolateList.reduce((sum, item) => sum + item.quantity, 0);
@@ -102,10 +108,10 @@ function ChocolateList() {
       }
     }
     let needToComplete = 0;
- 
+
 
     if (remaining > 0) {
-        
+
       const possiblePackages = packageSizes.filter(s => s > remaining);
       if (possiblePackages.length > 0) {
         needToComplete = Math.min(...possiblePackages) - remaining;
@@ -137,7 +143,7 @@ function ChocolateList() {
 
 
   const { packages, remaining, needToComplete  } = calculatePackages(totalQuantity);
-  
+
   const clearList = () => {
     chocolateList.forEach(item => {
       notifyChild(item.id);
@@ -145,7 +151,7 @@ function ChocolateList() {
     setChocolateList([]);
   };
   const sendOrder = async () => {
-    
+
     if (currentUser === null) {
       for (const choc of chocolateList) {
         for (let i = 0; i < choc.quantity; i++) {
@@ -153,8 +159,17 @@ function ChocolateList() {
         }
       };
       clearList();
-      alert("ההזמנה נשלחה  לעמוד ההזמנות להמשך טיפול בהזמנה");
-      setIsModalOpen(false);
+      // Was a browser alert() - blocks until dismissed and needs an explicit
+      // click just to go away. Replaced with a brief inline green-checkmark
+      // banner, then land on /order same as the logged-in path below - the
+      // cart is now visible there too (as a guest cart, login required only
+      // to actually send it), instead of leaving the guest stranded on the
+      // catalog page with no way to see what they just added.
+      setOrderConfirmed(true);
+      setTimeout(() => {
+        setOrderConfirmed(false);
+        navigate('/order');
+      }, 900);
       return;
     }
     for (const choc of chocolateList) {
@@ -175,9 +190,10 @@ function ChocolateList() {
       }
     };
     clearList();
-    alert("ההזמנה נשלחה  לעמוד ההזמנות להמשך טיפול בהזמנה");
-    setIsModalOpen(false);
-
+    // The alert already promised this ("...לעמוד ההזמנות...") but nothing
+    // actually navigated there - only reachable by then manually clicking
+    // "הזמנות" in the navbar.
+    navigate('/order');
   };
 
   useEffect(() => {
@@ -189,7 +205,6 @@ function ChocolateList() {
   }, []);
 
   useEffect(() => {
-    setIsModalOpen(chocolateList.length > 0);
     if (chocolateList.length === 0) {
       localStorage.removeItem("chocolate_list");
     } else {
@@ -197,83 +212,97 @@ function ChocolateList() {
     }
   }, [chocolateList]);
 
-  return (
+  const hasSelection = chocolateList.length > 0;
 
-    <>
-      <h1 className='title'>פרלינים</h1>
-      <p>הפרלינים מגיעים במארזים של 5 \ 6 \ 9 \ 12 \ 22 \ 30   </p>
-      <div className='list_chocolate'>
+  return (
+    <div className={`chocolate-page ${hasSelection ? 'with-builder' : ''}`}>
+      <div className="chocolate-main">
+        <h1 className='title'>פרלינים</h1>
+        <p className="package-hint">הפרלינים מגיעים במארזים של 5 \ 6 \ 9 \ 12 \ 22 \ 30</p>
         {errorFromServer && <p className='error_server'>{errorFromServer}</p>}
 
+        <div className="cart">
+          {chocolates.map((chocolate) => (
+            <CardChocolate
+              key={chocolate.id}
+              item={chocolate}
+              isFavoriteDefault={favorites.includes(chocolate.id)}
+              addToList={addToListChocolate}
+              removeFromList={removeFromListChocolate}
+              removedItemId={removedItemIdState.includes(chocolate.id)}
+              click={chocolateList.some(item => item.id === chocolate.id)}
+            />
+          ))}
+        </div>
+        <div className='load-more'>
+          <button className='btn' onClick={getChocolates}>עוד שוקולדים</button>
+        </div>
       </div>
-      <Modal
-        isOpen={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
-        title="סקירת ההזמנה"
-        footer={
-          <>
-            <button className="btn btn-ghost" onClick={() => { clearList(); setIsModalOpen(false); }}>
-              נקה רשימה
-            </button>
-            <button className='btn' onClick={() => sendOrder()} disabled={remaining > 0}>שלח הזמנה</button>
-          </>
-        }
-      >
-        <div>
-          {chocolateList.length === 0 ? (
-            <p>הסל ריק</p>
-          ) : (
+
+      {/* Persistent package-builder sidebar - replaces the old popup modal so
+          it stays visible while browsing instead of interrupting each pick */}
+      <aside className={`builder-sidebar ${hasSelection ? 'open' : ''}`}>
+        <div className="builder-sidebar-inner">
+          <h2 className="builder-title">הקופסה שלי</h2>
+          <p className="builder-subtitle">הפרלינים מגיעים במארזים של 5 \ 6 \ 9 \ 12 \ 22 \ 30</p>
+
+          {hasSelection ? (
             <>
-              <p>הפרלינים מגיעים במארזים של 5 \ 6 \ 9 \ 12 \ 22 \ 30   </p>
-
-
-              <ul style={{ paddingLeft: 18 }}>
+              <ul className="builder-list">
                 {chocolateList.map(it => (
-                  <li key={it.id} style={{ marginBottom: 8 , listStyleType: "none" }}>
-                    <AddIcon onClick={() => updateQuantity(it.id, 1)} className='btn_icon'>  +  </AddIcon>
-                    <strong>{it.name}</strong>
-                    <span>   — כמות:
-                      <RemoveIcon onClick={() => updateQuantity(it.id, -1)} className='btn_icon'>  -  </RemoveIcon>
-                      <span style={{ fontWeight: "bold", fontSize: "20px" }}>  {it.quantity}  </span>
-                    </span>
-                    <p>  מחיר: {it.price * it.quantity} </p>
+                  <li key={it.id} className="builder-item">
+                    <div className="builder-item-info">
+                      <strong>{it.name}</strong>
+                      <span className="builder-item-price">₪{it.price * it.quantity}</span>
+                    </div>
+                    <div className="builder-stepper">
+                      <span className="stepper-btn" onClick={() => updateQuantity(it.id, -1)}><RemoveIcon fontSize="inherit" /></span>
+                      <span className="stepper-qty">{it.quantity}</span>
+                      <span className="stepper-btn" onClick={() => updateQuantity(it.id, 1)}><AddIcon fontSize="inherit" /></span>
+                    </div>
                   </li>
                 ))}
               </ul>
 
-
-
-              <div style={{ marginTop: 10 }}>
-                <p>סה"כ: {totalQuantity} פריטים</p>
-                <p>סה"כ: {chocolateList.reduce((total, item) => total + item.price * item.quantity, 0)} ש"ח</p>
-                {packages.length > 0 && <p>מארזים שנוצרו: {packages.join(", ")}</p>}
-                {remaining ? (
-                  <p>  חסר להשלים: {needToComplete}</p>
-
+              <div className="builder-summary">
+                <div className="builder-summary-row">
+                  <span>סה"כ פריטים</span>
+                  <strong>{totalQuantity}</strong>
+                </div>
+                <div className="builder-summary-row">
+                  <span>סה"כ לתשלום</span>
+                  <strong className="builder-total">₪{chocolateList.reduce((total, item) => total + item.price * item.quantity, 0)}</strong>
+                </div>
+                {packages.length > 0 && (
+                  <p className="builder-note builder-note-success">מארזים שנוצרו: {packages.join(", ")}</p>
+                )}
+                {remaining > 0 ? (
+                  <p className="builder-note builder-note-pending">עוד {needToComplete} להשלמת המארז הבא</p>
                 ) : (
-                  <p>לא ניתן להתאים לחבילה.</p>
+                  packages.length === 0 && <p className="builder-note builder-note-pending">לא ניתן להתאים לחבילה</p>
                 )}
               </div>
+
+              <div className="builder-actions">
+                <button className="btn btn-ghost" onClick={clearList}>
+                  <CloseIcon fontSize="inherit" /> נקה
+                </button>
+                <button className="btn btn-primary" onClick={sendOrder} disabled={remaining > 0}>
+                  שלח הזמנה
+                </button>
+              </div>
             </>
+          ) : orderConfirmed ? (
+            <div className="builder-confirmed">
+              <CheckCircleIcon className="builder-confirmed-icon" />
+              <p>ההזמנה נשלחה בהצלחה</p>
+            </div>
+          ) : (
+            <p className="builder-empty">בחרו פרלינים מהרשימה כדי להתחיל להרכיב מארז</p>
           )}
         </div>
-      </Modal>
-      <div className="cart">
-        {chocolates.map((chocolate) => (
-          <CardChocolate
-            key={chocolate.id}
-            item={chocolate}
-            isFavoriteDefault={favorites.includes(chocolate.id)}
-            addToList={addToListChocolate}
-            removeFromList={removeFromListChocolate}
-            removedItemId={removedItemIdState.includes(chocolate.id)}
-            click={chocolateList.some(item => item.id === chocolate.id)}
-          />
-        ))}
-      </div>
-      <button className='btn' onClick={getChocolates}>עוד שוקולדים</button>
-
-    </>
+      </aside>
+    </div>
 
   )
 }

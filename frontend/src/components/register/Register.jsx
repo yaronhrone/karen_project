@@ -1,13 +1,18 @@
 import React, { useContext, useEffect, useState } from 'react'
 import './Register.css';
 import { fetchCurrentUser, register, loginWithGoogle } from '../../service/apiServise';
+import { mergeGuestDataToAccount } from '../../service/mergeGuestData';
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
 import { useNavigate } from 'react-router-dom';
 import UserContext from '../../contexts/UserContext';
+import { cartContext } from '../../contexts/CartContext';
+import { FavoriteContext } from '../../contexts/FavoriteContext';
 import { GoogleLogin } from '@react-oauth/google';
 function Register() {
   const { currentUser, updateCurrentUserContext } = useContext(UserContext);
+  const { cartItems, clearCart } = useContext(cartContext);
+  const { favorites, clearFavorites } = useContext(FavoriteContext);
   const [formData, setFormData] = useState({
     first_name: '',
     last_name: '',
@@ -86,8 +91,11 @@ function Register() {
 
       const { data } = await fetchCurrentUser();
       updateCurrentUserContext(data);
+      // Same guest-cart/favorites carry-over as Login.jsx - see that file's
+      // comment on mergeGuestDataToAccount for why.
+      const hadGuestCart = await mergeGuestDataToAccount(cartItems, favorites, { clearCart, clearFavorites });
       setTimeout(() => {
-        navigate('/');
+        navigate(hadGuestCart ? '/order' : '/');
       }, 200);
 
     } catch (err) {
@@ -114,8 +122,9 @@ function Register() {
       await loginWithGoogle(credentialResponse.credential);
       const { data } = await fetchCurrentUser();
       updateCurrentUserContext(data);
+      const hadGuestCart = await mergeGuestDataToAccount(cartItems, favorites, { clearCart, clearFavorites });
       setTimeout(() => {
-        navigate('/');
+        navigate(hadGuestCart ? '/order' : '/');
       }, 200);
     } catch (err) {
       setErrorFromServer('הכניסה עם Google נכשלה, נסה/י שוב');

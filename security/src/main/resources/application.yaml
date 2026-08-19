@@ -41,5 +41,13 @@ jwt:
 google:
   client-id: ${GOOGLE_CLIENT_ID:PASTE_YOUR_GOOGLE_CLIENT_ID_HERE}
 
+# WhatsApp new-order notifications to Keren, via GreenAPI (green-api.com).
+# Placeholders until Yaron sets up the account - see .env.example for how to
+# get id-instance/api-token-instance and the phone number format needed.
+green-api:
+  id-instance: ${GREEN_API_ID_INSTANCE:PASTE_YOUR_GREEN_API_ID_INSTANCE_HERE}
+  api-token-instance: ${GREEN_API_TOKEN_INSTANCE:PASTE_YOUR_GREEN_API_TOKEN_HERE}
+  keren-phone: ${KEREN_WHATSAPP_NUMBER:PASTE_KEREN_PHONE_HERE}
+
 
 

@@ -1,6 +1,9 @@
 import React, { useContext, useState } from 'react'
 import { fetchCurrentUser, loging, loginWithGoogle } from '../../service/apiServise';
+import { mergeGuestDataToAccount } from '../../service/mergeGuestData';
 import UserContext from '../../contexts/UserContext';
+import { cartContext } from '../../contexts/CartContext';
+import { FavoriteContext } from '../../contexts/FavoriteContext';
 import { useNavigate } from 'react-router-dom';
 import { GoogleLogin } from '@react-oauth/google';
 import './Login.css'
@@ -10,14 +13,20 @@ function Login() {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const { updateCurrentUserContext } = useContext(UserContext);
+    const { cartItems, clearCart } = useContext(cartContext);
+    const { favorites, clearFavorites } = useContext(FavoriteContext);
     const [error, setError] = useState('');
     const native = useNavigate();
 
     const goToHomeAfterLogin = async () => {
         const { data } = await fetchCurrentUser();
         updateCurrentUserContext(data);
+        // Carry over whatever this person built up as a guest (cart +
+        // favorites) onto the account they just logged into, instead of
+        // leaving it stranded in localStorage.
+        const hadGuestCart = await mergeGuestDataToAccount(cartItems, favorites, { clearCart, clearFavorites });
         setTimeout(() => {
-            native('/');
+            native(hadGuestCart ? '/order' : '/');
         }, 200);
     }
 
