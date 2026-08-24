@@ -19,10 +19,16 @@ public class ItemService {
 
 
     public String createItem(Items item){
-       if (itemRepository.getItemByName(item.getName()) == null )
-       {
-           return "The item is exists";
-       }
+        // Was inverted: getItemByName never actually returns null in the
+        // normal case (it returns an empty List when nothing matches, only
+        // null on a genuine query exception) - so this condition was true
+        // for every brand-new product name, and createItem was never
+        // reached at all; an item with an already-taken name fell through
+        // to the insert instead of being blocked. Both directions backwards.
+        List<Items> existing = itemRepository.getItemByName(item.getName());
+        if (existing != null && !existing.isEmpty()) {
+            return "The item is exists";
+        }
 
         return itemRepository.createItem(item);
     }

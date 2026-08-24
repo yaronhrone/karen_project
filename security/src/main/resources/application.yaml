@@ -21,6 +21,28 @@ spring:
       circuitbreaker:
         enabled: true # required for @FeignClient(fallback = ...) to actually be used
 
+# Spring Cloud Circuitbreaker's Resilience4j default TimeLimiter is 1 second -
+# fine for a single call, but the CSV bulk import can fire off a couple dozen
+# sequential ItemsClient calls (existence check + create per row) in one
+# request; a normal DB round-trip that's briefly a bit slower than usual
+# (e.g. under that burst) trips the 1s limit, and the call falls back
+# silently ("Fallback cold not create") even though nothing is actually
+# broken - that's what caused rows 7/12 to fail on a 20-row import while
+# everything around them succeeded. Raised well above anything a single
+# create/lookup should realistically take.
+resilience4j:
+  timelimiter:
+    configs:
+      default:
+        timeout-duration: 10s
+
+feign:
+  client:
+    config:
+      default:
+        connectTimeout: 5000
+        readTimeout: 10000
+
 # Was previously nested under spring: (spring.external-api...) - a property
 # namespace that isn't actually spring's, so it never resolved and the
 # @FeignClient annotation had its URL hardcoded instead. Now it's the real

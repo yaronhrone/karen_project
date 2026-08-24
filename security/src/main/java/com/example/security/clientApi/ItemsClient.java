@@ -11,7 +11,7 @@ import java.util.List;
 // property that already existed in application.yaml but was never actually read.
 // Wired to that property instead so it can be pointed at the items container's
 // Docker network hostname without a code change.
-@FeignClient(name = "items", url = "${external-api.items.url}", fallback = ItemsClientFallback.class)
+@FeignClient(name = "items", url = "${external-api.items.url}", fallback = ItemsClientFallback.class, configuration = ItemsClientConfig.class)
 public interface ItemsClient
 {
     @GetMapping("/{name}")

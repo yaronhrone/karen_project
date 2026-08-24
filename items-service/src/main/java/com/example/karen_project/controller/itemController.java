@@ -23,11 +23,18 @@ public class itemController {
         try {
             System.out.println(item + "item");
                 String result = itemService.createItem(item);
-                if (result.contains("created")) {
-                    return new ResponseEntity<>(result, HttpStatus.OK);
-                } else {
-                    return new ResponseEntity<>(result, HttpStatus.BAD_REQUEST);
-                }
+                // Always 200, even for the "already exists" business rejection
+                // (not just the real create). This is only ever called through
+                // security's ItemsClient (a @FeignClient with a circuit
+                // breaker/fallback) - Feign throws for any non-2xx status by
+                // default, and the circuit breaker can't tell "items-service
+                // rejected this on purpose" apart from a real fault, so a 400
+                // here used to get replaced with the generic fallback message
+                // ("Fallback cold not create") on the caller's side, hiding
+                // the real "item already exists" reason completely. The
+                // actual result text (still checked via .contains("created"))
+                // is what carries the real outcome now, not the HTTP status.
+                return new ResponseEntity<>(result, HttpStatus.OK);
             } catch (Exception e) {
                 System.out.println(e.getMessage());
                 return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);

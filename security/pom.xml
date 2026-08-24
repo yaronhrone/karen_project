@@ -151,6 +151,15 @@
 			<artifactId>google-api-client</artifactId>
 			<version>2.7.0</version>
 		</dependency>
+
+		<!-- CSV parsing for the bulk product import (Admin -> "ייבוא מוצרים") -
+		     handles quoted fields (commas inside a description, etc.) properly,
+		     which a manual String.split(",") would not. -->
+		<dependency>
+			<groupId>org.apache.commons</groupId>
+			<artifactId>commons-csv</artifactId>
+			<version>1.11.0</version>
+		</dependency>
 		<!-- Spring Security Core (כבר כלול בתוך spring-boot-starter-security, אז לא חובה) -->
 		<!--
         <dependency>

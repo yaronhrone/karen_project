@@ -37,8 +37,13 @@ public class ItemService {
 //            return "Item already exists";
 //        }
         System.out.println(item + "item from service back from microservice");
-       String result = itemClient.createItem(item);
-        return "Chocolate created " + result;
+        // Pass items-service's own result straight through - it was
+        // previously always prefixed with "Chocolate created ", which made
+        // AdminController's `result.contains("created")` success check
+        // always true even when itemClient.createItem() actually failed
+        // (e.g. the ItemsClientFallback string "Fallback cold not create"),
+        // silently masking every failed creation as a success.
+        return itemClient.createItem(item);
     }
     public String deleteItemByName(String name) throws IOException {
 

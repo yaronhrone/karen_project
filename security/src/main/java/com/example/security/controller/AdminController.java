@@ -2,6 +2,7 @@ package com.example.security.controller;
 
 import com.cloudinary.utils.ObjectUtils;
 import com.example.security.model.*;
+import com.example.security.service.ItemImportService;
 import com.example.security.service.ItemService;
 import com.example.security.service.OrderService;
 import com.example.security.service.UserService;
@@ -33,6 +34,8 @@ public class AdminController {
     private JwtUtil jwtUtil;
     @Autowired
     private CloudinaryConfig cloudinaryConfig;
+    @Autowired
+    private ItemImportService itemImportService;
 
     @PreAuthorize("hasAuthority('ADMIN')")
     @GetMapping(value = "/all-users/")
@@ -167,6 +170,21 @@ public class AdminController {
             return new ResponseEntity(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
+    // Bulk product import from a CSV file (header row: name, description,
+    // price, category, veg, image_url) - see ItemImportService for the
+    // per-row validation/upload logic. A failed row is skipped and reported,
+    // it doesn't abort the whole file.
+    @PreAuthorize("hasAuthority('ADMIN')")
+    @PostMapping(value = "/items/import", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
+    public ResponseEntity<ItemImportResult> importItems(@RequestPart("file") MultipartFile file) {
+        try {
+            ItemImportResult result = itemImportService.importItemsFromCsv(file.getInputStream());
+            return ResponseEntity.ok(result);
+        } catch (IOException e) {
+            return new ResponseEntity(e.getMessage(), HttpStatus.BAD_REQUEST);
+        }
+    }
+
     @PreAuthorize("hasAuthority('ADMIN')")
     @GetMapping("/order/{email}")
     public ResponseEntity<List<Order>> getOrder(@PathVariable String email) {
