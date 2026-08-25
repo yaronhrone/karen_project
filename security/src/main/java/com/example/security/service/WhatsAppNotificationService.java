@@ -57,11 +57,13 @@ public class WhatsAppNotificationService {
                     .append(" (₪").append(item.getTotalPrice()).append(")\n");
         }
         sb.append("\nסה\"כ: ₪").append(order.getTotalPrice());
-        // WhatsAppWebhookController parses replies to this exact chat for a
-        // number + one of these two keywords - this line is what lets Keren
-        // update the status herself, right from here, without opening Admin.
-        sb.append("\n\nלעדכון סטטוס, השיבי: \"בהכנה ").append(order.getId())
-                .append("\" או \"מוכן ").append(order.getId()).append("\"");
+        // Tried having Keren reply here to update status, but the instance
+        // IS her own WhatsApp number - a message she sends to her own
+        // self-chat is never delivered as an "incoming" webhook event (there's
+        // no second party for it to come from), confirmed directly against
+        // GreenAPI's own API, not just our side. Would need a second, separate
+        // number acting as the "bot" for that to work - decided not to do
+        // that for now, so status stays admin-panel-only (see DECISIONS.md).
         return sb.toString();
     }
 }
