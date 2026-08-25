@@ -18,6 +18,7 @@ import Footer from './components/footer/Footer';
 import SearchPage from './components/searchPage/SearchPage';
 import Header from './components/header/Header';
 import { CartProvider } from './contexts/CartContext';
+import PhoneNumberPrompt from './components/phone-prompt/PhoneNumberPrompt';
 
 
 
@@ -51,6 +52,11 @@ function App() {
       <UserContext.Provider value={{ currentUser, updateCurrentUserContext, isRequstToGetCurrentUserDone }}>
           <CartProvider>
             <Router>
+              {/* Blocking, no skip - Google Sign-In never provides a phone
+                  number, and Keren needs one to reach the customer over
+                  WhatsApp. Catches every entry point (login/register/an
+                  older Google account), not just right after signing up. */}
+              {isRequstToGetCurrentUserDone && currentUser && !currentUser.phone && <PhoneNumberPrompt />}
               <Header />
               <NavBar />
               <Routes>

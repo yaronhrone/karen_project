@@ -41,7 +41,10 @@ public class SecurityConfigure {
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/authenticate", "/authenticate/google", "/users/register",
-                                "/h2-console/**", "/actuator/health").permitAll() // Public endpoints
+                                "/h2-console/**", "/actuator/health", "/webhook/**").permitAll() // Public endpoints
+                        // /webhook/** has no JWT to check - GreenAPI calls it directly, not our
+                        // own frontend. Its own safety check is verifying the sender phone number
+                        // matches Keren's, done inside the controller itself.
                         .requestMatchers("/users/**", "/favorite**", "/chocolate/**", "/cake/**", "/order/**").hasAnyAuthority("USER", "ADMIN")
                         .requestMatchers("/admin/**").hasAuthority("ADMIN") // Admin-only routes
                         .anyRequest().authenticated() // Require authentication for all other requests

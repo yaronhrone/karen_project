@@ -49,7 +49,7 @@ public class WhatsAppNotificationService {
 
     private String buildMessage(Order order) {
         StringBuilder sb = new StringBuilder();
-        sb.append("הזמנה חדשה התקבלה!\n");
+        sb.append("הזמנה #").append(order.getId()).append(" התקבלה!\n");
         sb.append("לקוח: ").append(order.getUserEmail()).append("\n\n");
         for (OrderItem item : order.getOrderItems()) {
             sb.append("- ").append(item.getName())
@@ -57,6 +57,11 @@ public class WhatsAppNotificationService {
                     .append(" (₪").append(item.getTotalPrice()).append(")\n");
         }
         sb.append("\nסה\"כ: ₪").append(order.getTotalPrice());
+        // WhatsAppWebhookController parses replies to this exact chat for a
+        // number + one of these two keywords - this line is what lets Keren
+        // update the status herself, right from here, without opening Admin.
+        sb.append("\n\nלעדכון סטטוס, השיבי: \"בהכנה ").append(order.getId())
+                .append("\" או \"מוכן ").append(order.getId()).append("\"");
         return sb.toString();
     }
 }
