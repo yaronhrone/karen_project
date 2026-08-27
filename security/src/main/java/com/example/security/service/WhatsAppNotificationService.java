@@ -1,6 +1,7 @@
 package com.example.security.service;
 
 import com.example.security.clientApi.GreenApiClient;
+import com.example.security.model.CustomUser;
 import com.example.security.model.GreenApiMessageRequest;
 import com.example.security.model.Order;
 import com.example.security.model.OrderItem;
@@ -36,24 +37,32 @@ public class WhatsAppNotificationService {
         return value != null && !value.isBlank() && !value.startsWith("PASTE_");
     }
 
-    public void sendNewOrderNotification(Order order, String customerPhone) {
+    public void sendNewOrderNotification(Order order, CustomUser customer) {
         if (!isConfigured()) {
             System.out.println("GreenAPI not configured yet - skipping WhatsApp notification for order " + order.getId());
             return;
         }
 
         String chatId = kerenPhone + "@c.us";
-        String message = buildMessage(order, customerPhone);
+        String message = buildMessage(order, customer);
         greenApiClient.sendMessage(idInstance, apiTokenInstance, new GreenApiMessageRequest(chatId, message));
     }
 
-    private String buildMessage(Order order, String customerPhone) {
+    private String buildMessage(Order order, CustomUser customer) {
         StringBuilder sb = new StringBuilder();
         sb.append("הזמנה #").append(order.getId()).append(" התקבלה!\n");
-        sb.append("לקוח: ").append(order.getUserEmail()).append("\n");
+        // Name first (if we actually have one) since that's how Keren will
+        // recognize/address the customer - email/phone are the fallback for
+        // when she needs to actually contact them.
+        String fullName = fullName(customer);
+        if (fullName != null) {
+            sb.append("לקוח: ").append(fullName).append("\n");
+        }
+        sb.append("אימייל: ").append(order.getUserEmail()).append("\n");
         // The whole point of including this: Keren can immediately open
         // Bit/PayBox and send a payment request to this exact number for the
         // order total, without having to go look it up anywhere first.
+        String customerPhone = customer != null ? customer.getPhone() : null;
         sb.append("טלפון: ").append(customerPhone != null && !customerPhone.isBlank() ? customerPhone : "לא זמין").append("\n\n");
         for (OrderItem item : order.getOrderItems()) {
             sb.append("- ").append(item.getName())
@@ -69,5 +78,28 @@ public class WhatsAppNotificationService {
         // number acting as the "bot" for that to work - decided not to do
         // that for now, so status stays admin-panel-only (see DECISIONS.md).
         return sb.toString();
+    }
+
+    // Built from whatever pieces are actually there - "אם יש ואפשר" - so a
+    // user with only one of the two names still shows something useful
+    // instead of the whole line being skipped.
+    private String fullName(CustomUser customer) {
+        if (customer == null) {
+            return null;
+        }
+        String first = customer.getFirstName();
+        String last = customer.getLastName();
+        boolean hasFirst = first != null && !first.isBlank();
+        boolean hasLast = last != null && !last.isBlank();
+        if (hasFirst && hasLast) {
+            return first + " " + last;
+        }
+        if (hasFirst) {
+            return first;
+        }
+        if (hasLast) {
+            return last;
+        }
+        return null;
     }
 }
