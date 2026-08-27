@@ -1,0 +1,23 @@
+kerendiamonds.xubi.org {
+    handle /api/items/* {
+        reverse_proxy items-service:8080
+    }
+    handle /authenticate* {
+        reverse_proxy users-service:8081
+    }
+    handle /users* {
+        reverse_proxy users-service:8081
+    }
+    handle /order* {
+        reverse_proxy users-service:8081
+    }
+    handle /favorite* {
+        reverse_proxy users-service:8081
+    }
+    handle /admin* {
+        reverse_proxy users-service:8081
+    }
+    handle {
+        reverse_proxy frontend:80
+    }
+}
