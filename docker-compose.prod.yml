@@ -32,6 +32,7 @@ services:
   # Caddyfile; everything not matched falls through to the frontend.
   proxy:
     image: caddy:2-alpine
+    restart: unless-stopped
     ports:
       - "80:80"
       - "443:443"
