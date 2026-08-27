@@ -99,7 +99,8 @@ public class OrderService {
                     .orElse(null);
             if (justSent != null) {
                 justSent.setOrderItems(allOrderItemsInfo(orderRepository.getOrderItemsByOrderId(justSent.getId())));
-                whatsAppNotificationService.sendNewOrderNotification(justSent);
+                String customerPhone = userService.getUserByEmail(email).getPhone();
+                whatsAppNotificationService.sendNewOrderNotification(justSent, customerPhone);
             }
         } catch (Exception e) {
             System.out.println(e.getMessage() + " - failed to send WhatsApp new-order notification");

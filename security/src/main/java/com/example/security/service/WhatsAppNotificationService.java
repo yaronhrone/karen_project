@@ -36,21 +36,25 @@ public class WhatsAppNotificationService {
         return value != null && !value.isBlank() && !value.startsWith("PASTE_");
     }
 
-    public void sendNewOrderNotification(Order order) {
+    public void sendNewOrderNotification(Order order, String customerPhone) {
         if (!isConfigured()) {
             System.out.println("GreenAPI not configured yet - skipping WhatsApp notification for order " + order.getId());
             return;
         }
 
         String chatId = kerenPhone + "@c.us";
-        String message = buildMessage(order);
+        String message = buildMessage(order, customerPhone);
         greenApiClient.sendMessage(idInstance, apiTokenInstance, new GreenApiMessageRequest(chatId, message));
     }
 
-    private String buildMessage(Order order) {
+    private String buildMessage(Order order, String customerPhone) {
         StringBuilder sb = new StringBuilder();
         sb.append("הזמנה #").append(order.getId()).append(" התקבלה!\n");
-        sb.append("לקוח: ").append(order.getUserEmail()).append("\n\n");
+        sb.append("לקוח: ").append(order.getUserEmail()).append("\n");
+        // The whole point of including this: Keren can immediately open
+        // Bit/PayBox and send a payment request to this exact number for the
+        // order total, without having to go look it up anywhere first.
+        sb.append("טלפון: ").append(customerPhone != null && !customerPhone.isBlank() ? customerPhone : "לא זמין").append("\n\n");
         for (OrderItem item : order.getOrderItems()) {
             sb.append("- ").append(item.getName())
                     .append(" x").append(item.getQuantity())
