@@ -1,4 +1,22 @@
 kerendiamonds.xubi.org {
+    # Applied to every response, including the API routes below - Caddy's
+    # automatic HTTPS already redirects http->https, but nothing here was
+    # telling the browser to *require* HTTPS on repeat visits, or blocking
+    # this site (admin/order pages included) from being framed by another
+    # site for clickjacking.
+    header {
+        Strict-Transport-Security "max-age=31536000; includeSubDomains"
+        X-Content-Type-Options "nosniff"
+        X-Frame-Options "DENY"
+        Referrer-Policy "strict-origin-when-cross-origin"
+        # frame-ancestors only (not a full CSP) - the frontend loads Google
+        # Sign-In and Cloudinary-hosted images, and a resource-restricting
+        # CSP written blind here risks silently breaking one of those
+        # without a way to browser-test it from this pass. frame-ancestors
+        # is the modern, non-breaking equivalent of X-Frame-Options above.
+        Content-Security-Policy "frame-ancestors 'self'"
+    }
+
     handle /api/items/* {
         reverse_proxy items-service:8080
     }

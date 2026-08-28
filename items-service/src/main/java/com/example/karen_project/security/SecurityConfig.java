@@ -5,6 +5,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
@@ -26,6 +27,13 @@ import java.util.List;
  */
 @Configuration
 @EnableWebSecurity
+// Was URL-matcher-only: the ADMIN gate below was the single line standing
+// between "catalog write" and "anyone" - a future reorder, a new endpoint
+// under an unmatched path, or a matcher typo would have silently reopened
+// create/update/delete with no compiler or test signal. @PreAuthorize on the
+// write endpoints themselves (itemController) is a second, independent layer
+// that doesn't depend on getting the matcher list right.
+@EnableMethodSecurity
 public class SecurityConfig {
 
     @Autowired

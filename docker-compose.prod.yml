@@ -8,6 +8,13 @@
 name: karen-project
 
 services:
+  # The three app services below already lose their host port publish in
+  # prod - this one was missing the same override, so the base file's
+  # "5433:5432" stayed live on the internet with only an EC2 Security Group
+  # rule (outside this repo) standing between it and anyone who finds it.
+  postgres:
+    ports: !reset []
+
   items-service:
     image: ghcr.io/yaronhrone/karen-project-items-service:latest
     build: !reset null

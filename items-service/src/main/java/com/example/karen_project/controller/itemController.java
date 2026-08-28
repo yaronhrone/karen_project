@@ -6,6 +6,7 @@ import com.example.karen_project.service.ItemService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -19,6 +20,7 @@ public class itemController {
 
 
     @PostMapping
+    @PreAuthorize("hasAuthority('ADMIN')")
     public ResponseEntity<String> createItem(@RequestBody Items item) {
         try {
             System.out.println(item + "item");
@@ -97,6 +99,7 @@ List<Items> items = itemService.getAll(page, size);
         }
     }
     @DeleteMapping("/{name}")
+    @PreAuthorize("hasAuthority('ADMIN')")
     public ResponseEntity<String> deleteItem(@PathVariable String name){
         try {
             String r = itemService.deleteItem(name);
@@ -110,6 +113,7 @@ List<Items> items = itemService.getAll(page, size);
         }
     }
     @DeleteMapping("/delete_by_id/{id}")
+    @PreAuthorize("hasAuthority('ADMIN')")
     public ResponseEntity<String> deleteItemById(@PathVariable int id){
         try {
             String r = itemService.deleteItemById(id);
@@ -138,6 +142,7 @@ List<Items> items = itemService.getAll(page, size);
     }
 
     @PutMapping("/update")
+    @PreAuthorize("hasAuthority('ADMIN')")
     public ResponseEntity<String> updateItem(@RequestBody Items item){
         try {
             System.out.println(item + "item update");

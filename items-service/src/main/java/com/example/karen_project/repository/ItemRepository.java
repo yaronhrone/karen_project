@@ -50,9 +50,23 @@ public class ItemRepository {
     }
 
     public List<Items> getAll(int page,int size){
+        page = clampPage(page);
+        size = clampSize(size);
         int offset = (page - 1) * size;
         String sql = String.format("SELECT * FROM %s ORDER BY id DESC LIMIT ? OFFSET ?",ITEMS_TABLE);
         return jdbcTemplate.query(sql,new ItemMapper(),size,offset);
+    }
+
+    // page/size come straight from a public, unauthenticated @RequestParam
+    // with no upper/lower bound - without this, an anonymous caller could
+    // send a negative page (negative OFFSET, a raw SQL error surfaced to the
+    // client) or a huge size (forcing a huge LIMIT) with nothing else in
+    // front of these routes to stop them.
+    private static int clampPage(int page) {
+        return Math.max(page, 1);
+    }
+    private static int clampSize(int size) {
+        return Math.max(1, Math.min(size, 100));
     }
     public String updateItem(Items item){
         String sql = String.format("UPDATE %s SET name = ?, description = ?, IsVeg = ?, image = ?, price = ?, category = ?, delete_img_id = ? WHERE id = ?",ITEMS_TABLE);
@@ -61,6 +75,8 @@ public class ItemRepository {
     }
     public List<Items> getItemsByCategory(String category,int page,int size){
         try {
+            page = clampPage(page);
+            size = clampSize(size);
             int offset = (page - 1) * size;
             String sql = String.format("SELECT * FROM %s WHERE category = ? ORDER BY id DESC  LIMIT ? OFFSET ?",ITEMS_TABLE);
         return jdbcTemplate.query(sql,new ItemMapper(),category,size,offset);

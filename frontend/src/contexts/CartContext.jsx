@@ -15,8 +15,14 @@ useEffect(() => {
 
 
 const addToCart = (item) => {
-
-    setcartItems([...cartItems, item]);
+    // Functional update, like decrementFromCart below - addToCart is called
+    // synchronously in a loop when a guest checks out multiple units
+    // (ChocolateList.sendOrder), and closing over the outer `cartItems`
+    // meant every call in that loop read the same stale snapshot, so only
+    // the last call's result survived - a guest ordering several chocolates
+    // at quantity >1 ended up with almost everything silently dropped from
+    // their cart.
+    setcartItems(prev => [...prev, item]);
 };
 const removeFromCart = (itemId) => {
     // cartItems holds raw item ids (addToCart is always called with an id,
