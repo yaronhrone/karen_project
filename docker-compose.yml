@@ -87,9 +87,9 @@ services:
       SPRING_SQL_INIT_DATA_LOCATIONS: classpath:data-postgresql.sql
       JWT_SECRET: ${JWT_SECRET}
       GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID}
-      CLOUDINARY_CLOUD_NAME: ${CLOUDINARY_CLOUD_NAME}
-      CLOUDINARY_API_KEY: ${CLOUDINARY_API_KEY}
-      CLOUDINARY_API_SECRET: ${CLOUDINARY_API_SECRET}
+      # No AWS credentials here on purpose - the S3 SDK picks up the EC2
+      # instance's IAM role automatically (see application.yaml). Override
+      # AWS_S3_BUCKET/AWS_S3_REGION only if not using the defaults.
       GREEN_API_ID_INSTANCE: ${GREEN_API_ID_INSTANCE:-}
       GREEN_API_TOKEN_INSTANCE: ${GREEN_API_TOKEN_INSTANCE:-}
       KEREN_WHATSAPP_NUMBER: ${KEREN_WHATSAPP_NUMBER:-}

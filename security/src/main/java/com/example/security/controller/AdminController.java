@@ -1,10 +1,10 @@
 package com.example.security.controller;
 
-import com.cloudinary.utils.ObjectUtils;
 import com.example.security.model.*;
 import com.example.security.service.ItemImportService;
 import com.example.security.service.ItemService;
 import com.example.security.service.OrderService;
+import com.example.security.service.S3Service;
 import com.example.security.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -17,7 +17,6 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.List;
-import java.util.Map;
 
 @RestController
 @RequestMapping("/admin")
@@ -30,7 +29,7 @@ public class AdminController {
     @Autowired
     private OrderService orderService;
     @Autowired
-    private CloudinaryConfig cloudinaryConfig;
+    private S3Service s3Service;
     @Autowired
     private ItemImportService itemImportService;
 
@@ -67,23 +66,16 @@ public class AdminController {
                 if(file.isEmpty()) {
                     return ResponseEntity.badRequest().body("Please upload a file");
                 }
-        // העלאה ל-Cloudinary
-        Map uploadResult = cloudinaryConfig.getCloudinary()
-                .uploader()
-                .upload(file.getBytes(), ObjectUtils.emptyMap());
-
-        String imageUrl = (String) uploadResult.get("secure_url");
-        String imageId = (String) uploadResult.get("public_id");
-                System.out.println(imageId);
-        System.out.println(imageUrl);
+        // העלאה ל-S3
+        S3Service.UploadResult uploadResult = s3Service.upload(file);
 
                     Item item = new Item();
-                    item.setDeleteImgId(imageId);
+                    item.setDeleteImgId(uploadResult.key());
                     item.setName(itemRequest.getName());
                     item.setCategory(itemRequest.getCategory());
                     item.setDescription(itemRequest.getDescription());
                     item.setPrice(itemRequest.getPrice());
-                    item.setImage(imageUrl);
+                    item.setImage(uploadResult.url());
                     item.setVeg(itemRequest.isVeg());
                     System.out.println(item + " item from create item");
                     String result = itemService.createItem(item);

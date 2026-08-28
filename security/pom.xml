@@ -143,10 +143,16 @@
 			<artifactId>annotations</artifactId>
 			<version>24.0.0</version>
 		</dependency>
+		<!-- Product image storage - reads/writes/deletes objects in the
+		     keren-diamonds-product-images S3 bucket (replaces Cloudinary,
+		     which is no longer used anywhere). Credentials come from the
+		     default provider chain: the EC2 instance's IAM role in
+		     production, the local AWS CLI profile for local dev - no
+		     access keys stored anywhere in this app. -->
 		<dependency>
-			<groupId>com.cloudinary</groupId>
-			<artifactId>cloudinary-http44</artifactId>
-			<version>1.36.0</version>
+			<groupId>software.amazon.awssdk</groupId>
+			<artifactId>s3</artifactId>
+			<version>2.54.6</version>
 		</dependency>
 
 		<!-- Verifies Google Sign-In ID tokens on /authenticate/google -->

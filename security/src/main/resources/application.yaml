@@ -67,16 +67,15 @@ jwt:
 google:
   client-id: ${GOOGLE_CLIENT_ID:PASTE_YOUR_GOOGLE_CLIENT_ID_HERE}
 
-# Was a hardcoded live credential in CloudinaryConfig.java (committed to git,
-# still present in git history). Set the real values via env vars in
-# production - these placeholders just mean image upload/delete won't work
-# until they're set. The leaked key must also be rotated in the Cloudinary
-# dashboard (Settings > Security) - removing it from the code doesn't
-# invalidate a secret that's already in git history.
-cloudinary:
-  cloud-name: ${CLOUDINARY_CLOUD_NAME:PASTE_YOUR_CLOUDINARY_CLOUD_NAME_HERE}
-  api-key: ${CLOUDINARY_API_KEY:PASTE_YOUR_CLOUDINARY_API_KEY_HERE}
-  api-secret: ${CLOUDINARY_API_SECRET:PASTE_YOUR_CLOUDINARY_API_SECRET_HERE}
+# Product image storage - replaces Cloudinary. No credentials here on
+# purpose: S3Client uses the default AWS credential chain (the EC2
+# instance's IAM role in production, the local AWS CLI profile for local
+# dev) - see S3Service. Bucket name/region aren't secrets, safe as plain
+# defaults.
+aws:
+  s3:
+    bucket: ${AWS_S3_BUCKET:keren-diamonds-product-images}
+    region: ${AWS_S3_REGION:eu-central-1}
 
 # WhatsApp new-order notifications to Keren, via GreenAPI (green-api.com).
 # Placeholders until Yaron sets up the account - see .env.example for how to

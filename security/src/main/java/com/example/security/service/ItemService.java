@@ -1,15 +1,11 @@
 package com.example.security.service;
 
-import com.cloudinary.utils.ObjectUtils;
 import com.example.security.clientApi.ItemsClient;
-import com.example.security.model.CloudinaryConfig;
 import com.example.security.model.Item;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.io.IOException;
 import java.util.List;
-import java.util.Map;
 
 @Service
 public class ItemService {
@@ -17,7 +13,7 @@ public class ItemService {
     @Autowired
     private ItemsClient itemClient;
     @Autowired
-    private CloudinaryConfig cloudinaryConfig;
+    private S3Service s3Service;
 
 
 
@@ -45,21 +41,13 @@ public class ItemService {
         // silently masking every failed creation as a success.
         return itemClient.createItem(item);
     }
-    public String deleteItemByName(String name) throws IOException {
+    public String deleteItemByName(String name) {
 
       Item existing = itemClient.getItem(name);
         if (existing != null) {
-            // Was existing.getImage() (the full secure_url) - Cloudinary's
-            // destroy() takes a public_id, not a URL, so this silently
-            // no-op'd and every "delete by name" left the image orphaned on
-            // Cloudinary forever. getDeleteImgId() is the actual public_id,
-            // same field deleteItemById() below already uses correctly.
-            if (existing.getDeleteImgId() != null) {
-                Map deleteResult = cloudinaryConfig.getCloudinary()
-                        .uploader()
-                        .destroy(existing.getDeleteImgId(), ObjectUtils.emptyMap());
-                System.out.println(deleteResult + " delete result name");
-            }
+            // delete_img_id holds the S3 object key (see S3Service) - the
+            // same field a Cloudinary public_id used to live in.
+            s3Service.delete(existing.getDeleteImgId());
 
             return itemClient.deleteItem(name);
     } return "Item not found";
@@ -71,17 +59,10 @@ public class ItemService {
 
     }
     public List<Item> getAllItem(int page, int size) {return itemClient.getAllItem(page,size); }
-    public String deleteItemById(int id) throws IOException {
+    public String deleteItemById(int id) {
         Item existing = itemClient.getItemById(id);
         if (existing != null) {
-            if (existing.getDeleteImgId() != null) {
-
-            Map deleteResult = cloudinaryConfig.getCloudinary()
-                    .uploader()
-                    .destroy(existing.getDeleteImgId(), ObjectUtils.emptyMap());
-            System.out.println(deleteResult + " delete result id");
-            }
-
+            s3Service.delete(existing.getDeleteImgId());
         }
             return itemClient.deleteItemById(id);
     }

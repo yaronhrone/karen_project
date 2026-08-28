@@ -1,13 +1,12 @@
 package com.example.security.service;
 
-import com.cloudinary.utils.ObjectUtils;
-import com.example.security.model.CloudinaryConfig;
 import com.example.security.model.Item;
 import com.example.security.model.ItemImportResult;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
@@ -15,16 +14,16 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.math.BigDecimal;
 import java.nio.charset.StandardCharsets;
-import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 @Service
 public class ItemImportService {
     @Autowired
     private ItemService itemService;
-    @Autowired
-    private CloudinaryConfig cloudinaryConfig;
+    @Value("${aws.s3.bucket}")
+    private String s3Bucket;
+    @Value("${aws.s3.region}")
+    private String s3Region;
 
     private static final Set<String> VALID_CATEGORIES = Set.of("chocolate", "cake", "cookie");
 
@@ -86,24 +85,13 @@ public class ItemImportService {
 
         String description = getField(record, "description");
         boolean veg = "true".equalsIgnoreCase(getField(record, "veg")) || "1".equals(getField(record, "veg"));
+        // Was: downloaded whatever URL the row gave and re-uploaded it to
+        // Cloudinary (a network fetch that could fail on its own, e.g. a
+        // Google Drive share link). Now the URL is stored as-is - it's
+        // already meant to be a stable S3 URL (see the admin UI's own
+        // guidance), so there's nothing to re-host.
         String imageUrl = getField(record, "image_url");
-
-        String uploadedImageUrl = null;
-        String uploadedImageId = null;
-        if (imageUrl != null && !imageUrl.isBlank()) {
-            try {
-                Map uploadResult = cloudinaryConfig.getCloudinary()
-                        .uploader()
-                        .upload(imageUrl, ObjectUtils.emptyMap());
-                uploadedImageUrl = (String) uploadResult.get("secure_url");
-                uploadedImageId = (String) uploadResult.get("public_id");
-            } catch (Exception e) {
-                // Broken/unreachable URL (e.g. a Google Drive share link that
-                // wasn't converted to a direct-download link) - the product
-                // itself is still worth creating, just without a photo yet.
-                result.addError(rowNumber, "לא הצלחתי להוריד את התמונה (" + imageUrl + ") - המוצר נוצר בלי תמונה, אפשר להוסיף ידנית אחר כך");
-            }
-        }
+        String imageKey = s3KeyIfOurBucket(imageUrl);
 
         Item item = new Item();
         item.setName(name);
@@ -111,8 +99,8 @@ public class ItemImportService {
         item.setPrice(price);
         item.setCategory(category);
         item.setVeg(veg);
-        item.setImage(uploadedImageUrl);
-        item.setDeleteImgId(uploadedImageId);
+        item.setImage((imageUrl == null || imageUrl.isBlank()) ? null : imageUrl);
+        item.setDeleteImgId(imageKey);
 
         // itemService.createItem's return value is the real signal - it can
         // fail for reasons that don't throw (name already taken, the
@@ -128,5 +116,18 @@ public class ItemImportService {
 
     private String getField(CSVRecord record, String column) {
         return record.isMapped(column) ? record.get(column) : null;
+    }
+
+    // If the given image URL is already hosted in our own S3 bucket,
+    // extract its object key so a later admin delete can also remove the
+    // file from S3 - same field a Cloudinary public_id used to live in.
+    // Any other URL (or none) just leaves this null, matching S3Service's
+    // graceful no-op on a null/blank key.
+    private String s3KeyIfOurBucket(String imageUrl) {
+        if (imageUrl == null || imageUrl.isBlank()) {
+            return null;
+        }
+        String prefix = "https://" + s3Bucket + ".s3." + s3Region + ".amazonaws.com/";
+        return imageUrl.startsWith(prefix) ? imageUrl.substring(prefix.length()) : null;
     }
 }
