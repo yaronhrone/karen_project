@@ -37,6 +37,14 @@ public class OrderService {
     public String addToOrder(String email ,int productId) {
           int orderId;
           int quantity = 1;
+          // Check the product exists before touching any order state - a
+          // nonexistent/deleted productId used to NPE straight through
+          // .getPrice() below (only after possibly already creating a new
+          // empty order for the customer).
+          Item product = itemService.getItemById(productId);
+          if (product == null) {
+              return "Item not found";
+          }
           List<Order> openOrders = orderRepository.getAllOrderOpen(email);
            if (openOrders.isEmpty()) {
              orderId =  createOrder(email);
@@ -54,7 +62,7 @@ public class OrderService {
            orderItem.setProductId(productId);
            orderItem.setOrderId(orderId);
            orderItem.setQuantity(quantity);
-           orderItem.setPrice(itemService.getItemById(productId).getPrice());
+           orderItem.setPrice(product.getPrice());
            orderRepository.addOrderItem(orderItem);
            updateOrderTotal(orderId);
         return "Order item added successfully";

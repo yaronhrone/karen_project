@@ -26,6 +26,9 @@ public class OrderController {
     public ResponseEntity<String> addItemOrder(Authentication authentication, @PathVariable (value = "item_id") int  itemId) {
         try {
             String response = orderService.addToOrder(authentication.getName(), itemId);
+            if (response.contains("not found")) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
+            }
             return ResponseEntity.ok().body(response);
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(e.getMessage());
