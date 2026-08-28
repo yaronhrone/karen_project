@@ -49,10 +49,17 @@ public class ItemService {
 
       Item existing = itemClient.getItem(name);
         if (existing != null) {
-            Map deleteResult = cloudinaryConfig.getCloudinary()
-                    .uploader()
-                    .destroy(existing.getImage(), ObjectUtils.emptyMap());
-            System.out.println(deleteResult + " delete result name");
+            // Was existing.getImage() (the full secure_url) - Cloudinary's
+            // destroy() takes a public_id, not a URL, so this silently
+            // no-op'd and every "delete by name" left the image orphaned on
+            // Cloudinary forever. getDeleteImgId() is the actual public_id,
+            // same field deleteItemById() below already uses correctly.
+            if (existing.getDeleteImgId() != null) {
+                Map deleteResult = cloudinaryConfig.getCloudinary()
+                        .uploader()
+                        .destroy(existing.getDeleteImgId(), ObjectUtils.emptyMap());
+                System.out.println(deleteResult + " delete result name");
+            }
 
             return itemClient.deleteItem(name);
     } return "Item not found";

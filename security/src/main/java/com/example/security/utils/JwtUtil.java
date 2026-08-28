@@ -2,13 +2,15 @@ package com.example.security.utils;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
+import io.jsonwebtoken.io.Decoders;
+import io.jsonwebtoken.security.Keys;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 import org.springframework.security.core.GrantedAuthority;
 
+import java.security.Key;
 import java.util.List;
 import java.util.*;
 import java.util.function.Function;
@@ -19,6 +21,14 @@ public class JwtUtil {
 
     @Value("${jwt.secret}")
     private String SECRET_KEY;
+
+    // jwt.secret is base64-encoded (matches the deprecated setSigningKey(String)/
+    // signWith(alg, String) API this replaces, which treated the string the
+    // same way) - decode once into the Key type the modern jjwt API wants.
+    private Key getSignInKey() {
+        byte[] keyBytes = Decoders.BASE64.decode(SECRET_KEY);
+        return Keys.hmacShaKeyFor(keyBytes);
+    }
 
     @Value("${jwt.expiration}")
     private Long EXPIRATION_TIME;
@@ -49,7 +59,7 @@ public class JwtUtil {
     }
 
     private Claims extractAllClaims(String token) {
-        return Jwts.parser().setSigningKey(SECRET_KEY).parseClaimsJws(token).getBody();
+        return Jwts.parserBuilder().setSigningKey(getSignInKey()).build().parseClaimsJws(token).getBody();
     }
 
     private Boolean isTokenExpired(String token) {
@@ -71,7 +81,7 @@ public class JwtUtil {
                 .setClaims(claims)
                 .setIssuedAt(new Date(System.currentTimeMillis()))
                 .setExpiration(new Date(System.currentTimeMillis() + EXPIRATION_TIME))
-                .signWith(SignatureAlgorithm.HS256, SECRET_KEY)
+                .signWith(getSignInKey())
                 .compact();
     }
 

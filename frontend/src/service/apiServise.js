@@ -35,7 +35,6 @@ export const register = async (user) => {
     console.log(user.first_name + " from apiService");
     const {data} = await axios.post(`${BASE_URL}/users/register`, user);
     const token = data.jwt;
-    console.log(token + " data from apiService");
     setAuthHeader(token);
     return data;
     } catch (error) {
@@ -47,7 +46,6 @@ export const loging = async(Credentials) => {
 
     const {data} = await axios.post(`${BASE_URL}/authenticate`, Credentials);
     const token = data.jwt;
-    console.log(token + " from apiService");
 
     setAuthHeader(token);
 
@@ -103,9 +101,6 @@ export const getItemByName = async (name) => {
     return data;
 }
 export const createItem = (formData) => {
-  
-    
-    console.log(getAuthHeader().Authorization+ " from apiService");
   const result =  axios.post(`${BASE_URL}/admin/item`,formData,  {
   headers: {
       ...getAuthHeader(),

@@ -3,9 +3,12 @@ package com.example.karen_project.security;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.io.Decoders;
+import io.jsonwebtoken.security.Keys;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
+import java.security.Key;
 import java.util.Date;
 import java.util.List;
 
@@ -21,6 +24,14 @@ public class JwtUtil {
     @Value("${jwt.secret}")
     private String secretKey;
 
+    // jwt.secret is base64-encoded (matches the deprecated setSigningKey(String)
+    // API this replaces, and must match the users/security service's own
+    // decoding - see that service's JwtUtil for the same helper).
+    private Key getSignInKey() {
+        byte[] keyBytes = Decoders.BASE64.decode(secretKey);
+        return Keys.hmacShaKeyFor(keyBytes);
+    }
+
     public String extractUsername(String token) {
         return extractAllClaims(token).getSubject();
     }
@@ -31,7 +42,7 @@ public class JwtUtil {
     }
 
     private Claims extractAllClaims(String token) {
-        return Jwts.parser().setSigningKey(secretKey).parseClaimsJws(token).getBody();
+        return Jwts.parserBuilder().setSigningKey(getSignInKey()).build().parseClaimsJws(token).getBody();
     }
 
     public boolean isTokenValid(String token) {

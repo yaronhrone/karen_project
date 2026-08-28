@@ -12,11 +12,6 @@ spring:
   h2:
     console:
       enabled: true
-  redis:
-    host: localhost
-    port: 6379
-    ttl: 300 # 5 minutes
-    is-redis-server-active: true
 
 # Must match jwt.secret in the users/security service (8081) - both services
 # validate tokens issued by that service. No default on purpose: this used to
@@ -27,13 +22,3 @@ spring:
 # a bare `mvnw spring-boot:run` export it in your shell first).
 jwt:
   secret: ${JWT_SECRET}
-
-management:
-  health:
-    # spring-data-redis being on the classpath auto-registers a Redis health
-    # indicator regardless of the app's own is-redis-server-active flag above -
-    # Redis is never actually called from any request path today (see
-    # docker-compose.yml), so with no Redis container running this would
-    # otherwise permanently report /actuator/health as DOWN.
-    redis:
-      enabled: false

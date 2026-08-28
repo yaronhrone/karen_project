@@ -119,8 +119,12 @@ function Admin() {
             setError('All fields are required');
             return;
         }
+        if (Number(itemsFrom.price) <= 0) {
+            setError('Price must be greater than 0');
+            return;
+        }
         const formData = new FormData();
-if (!file instanceof File) {
+if (!(file instanceof File)) {
     setError('Invalid file');
     return;
 }
@@ -196,6 +200,9 @@ console.log(realFile + "file ");
         setImporting(false);
     };
     const deleteItem = async (id) => {
+        if (!window.confirm('למחוק את המוצר הזה? הפעולה בלתי הפיכה.')) {
+            return;
+        }
         try {
             await deleteItemById(id);
             setItem(item.filter(item => item.id !== id));
@@ -215,6 +222,10 @@ console.log(realFile + "file ");
     };
     const updateItemId = async (e) => {
         e.preventDefault();
+        if (Number(itemsFrom.price) <= 0) {
+            setError('Price must be greater than 0');
+            return;
+        }
         try {
             await updateItem({ ...itemsFrom, id: updateId });
             setItem(prev => prev.map(i => i.id === updateId ? { ...itemsFrom, id: updateId } : i));
@@ -227,6 +238,9 @@ console.log(realFile + "file ");
         };
     }
     const deleteUser = async (email) => {
+        if (!window.confirm(`למחוק את המשתמש ${email}? הפעולה בלתי הפיכה.`)) {
+            return;
+        }
         try {
             const { data } = await deltedUser(email);
             setUsers(prev => prev.filter(user => user.email !== email));
@@ -331,7 +345,7 @@ console.log(realFile + "file ");
                         <CardItem item={item} />
                         <button className='btn' type='button' onClick={() => deleteItem(item.id)}>Delete</button>
                         <button className='btn' type='button' onClick={() => toggleupdate(item.id)}>
-                            {updateItemId === item.id ? 'Cancel' : 'Update'}
+                            {updateId === item.id ? 'Cancel' : 'Update'}
                         </button>
                         {updateId === item.id && (
                             <form onSubmit={updateItemId} className='form_item'>

@@ -48,9 +48,14 @@ public class ItemService {
 
     }
     public String deleteItem(String name){
-//        if (itemRepository.getItemByName(name) == null) {
-//            return "The chocolate is not exists";
-//        }
+        // getItemByName returns an empty List (not null) when nothing
+        // matches - same gotcha noted in createItem() above. Without this
+        // check, deleting a name that doesn't exist still ran a no-op
+        // DELETE and reported success either way.
+        List<Items> existing = itemRepository.getItemByName(name);
+        if (existing == null || existing.isEmpty()) {
+            return "The item is not exists";
+        }
         return itemRepository.deleteItem(name);
     }
     public String deleteItemById(int id){

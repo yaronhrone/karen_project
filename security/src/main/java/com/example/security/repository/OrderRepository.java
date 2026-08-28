@@ -58,7 +58,12 @@ public class OrderRepository {
     }
     public List<Order> getAllOrderByEmail(String userEmail) {
 
-        String sql = "SELECT * FROM " + ORDER_TABLE + " WHERE user_email = ? ";
+        // ORDER BY added - without it, SQL row order is unspecified, but
+        // Order.jsx assumes the LAST element of this list is the customer's
+        // current/open order. id ASC (insertion order) makes that
+        // deterministic instead of depending on incidental query-plan/vacuum
+        // behavior.
+        String sql = "SELECT * FROM " + ORDER_TABLE + " WHERE user_email = ? ORDER BY id ASC";
         return jdbcTemplate.query(sql, new OrderMapper(), userEmail);
     }
     public String changeOrderStatusToReceived(String userEmail) {

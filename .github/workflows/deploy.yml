@@ -73,4 +73,13 @@ jobs:
             echo "${{ secrets.GHCR_PAT }}" | docker login ghcr.io -u yaronhrone --password-stdin || echo "GHCR login failed - continuing, packages are public"
             docker compose -f docker-compose.yml -f docker-compose.prod.yml pull
             docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d --remove-orphans
+            # `up -d` only touches containers whose compose SERVICE DEFINITION
+            # changed - proxy's never does (it's the same image/config every
+            # deploy), so a Caddyfile-only edit was silently never picked up:
+            # Caddy reads its config once at process start and never reloads,
+            # and proxy just kept running un-restarted with yesterday's file
+            # in memory even though the bind-mounted file on disk was already
+            # current. Restart it unconditionally so a config-only change
+            # can't silently fail to deploy again.
+            docker compose -f docker-compose.yml -f docker-compose.prod.yml restart proxy
             docker image prune -f

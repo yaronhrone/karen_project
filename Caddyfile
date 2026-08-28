@@ -17,6 +17,21 @@ kerendiamonds.xubi.org {
         Content-Security-Policy "frame-ancestors 'self'"
     }
 
+    # /order, /favorite, and /admin are both React Router's own SPA pages
+    # AND this service's REST paths at the exact same prefixes. A hard
+    # refresh/direct link/bookmark of one of those pages is a real browser
+    # navigation - Accept: text/html - and needs the SPA shell, not the API;
+    # the frontend's own axios calls to these same paths ask for
+    # application/json instead. Route the html-navigation case to the SPA so
+    # its client-side router can take over (which then makes its own JSON
+    # request to the same path and correctly reaches the API on that second,
+    # separate request); everything else - every non-GET, and every
+    # JSON-accepting GET - reaches the real API as before.
+    @spa_navigation {
+        method GET
+        header Accept *text/html*
+    }
+
     handle /api/items/* {
         reverse_proxy items-service:8080
     }
@@ -27,13 +42,28 @@ kerendiamonds.xubi.org {
         reverse_proxy users-service:8081
     }
     handle /order* {
-        reverse_proxy users-service:8081
+        handle @spa_navigation {
+            reverse_proxy frontend:80
+        }
+        handle {
+            reverse_proxy users-service:8081
+        }
     }
     handle /favorite* {
-        reverse_proxy users-service:8081
+        handle @spa_navigation {
+            reverse_proxy frontend:80
+        }
+        handle {
+            reverse_proxy users-service:8081
+        }
     }
     handle /admin* {
-        reverse_proxy users-service:8081
+        handle @spa_navigation {
+            reverse_proxy frontend:80
+        }
+        handle {
+            reverse_proxy users-service:8081
+        }
     }
     handle {
         reverse_proxy frontend:80

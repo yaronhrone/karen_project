@@ -17,7 +17,10 @@ public class OrderMapper implements RowMapper<Order> {
         order.setAddressShipping(rs.getString("address_shipping"));
         order.setStatus(Status.valueOf(rs.getString("order_status")));
         order.setOrderDate(rs.getDate("order_date").toLocalDate());
-        order.setTotalPrice(BigDecimal.valueOf(rs.getDouble("total_price")));
+        // Was rs.getDouble()+BigDecimal.valueOf() - a binary float round-trip
+        // on a DECIMAL(10,2) money column, unlike OrderItemsMapper/ItemMapper
+        // which correctly read the same column type via getBigDecimal().
+        order.setTotalPrice(rs.getBigDecimal("total_price"));
         return order;
     }
 }

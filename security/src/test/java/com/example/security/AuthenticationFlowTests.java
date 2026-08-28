@@ -24,7 +24,7 @@ import static org.assertj.core.api.Assertions.assertThat;
         // supplied here for the context to boot; this value is test-only.
         properties = {
                 "spring.datasource.url=jdbc:h2:mem:authFlowTestDb",
-                "jwt.secret=test-only-secret-not-used-in-production-0123456789abcdef"
+                "jwt.secret=fZSqH+uXR6rlIy8iA8i4pjExx+Z/wnI1jUmQYXxgBwE="
         })
 class AuthenticationFlowTests {
 

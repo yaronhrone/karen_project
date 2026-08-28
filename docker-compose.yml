@@ -57,10 +57,6 @@ services:
       # CORS allowed origin - defaults to localhost:3000 in the app itself;
       # set to the real deployed frontend URL in production's .env.
       FRONTEND_URL: ${FRONTEND_URL:-http://localhost:3000}
-      # Redis is wired into the code but never actually called from any
-      # request path today - skipped here rather than running an idle
-      # container. Flip to true (and add a redis service) if that changes.
-      SPRING_REDIS_IS_REDIS_SERVER_ACTIVE: "false"
     ports:
       - "8080:8080"
 

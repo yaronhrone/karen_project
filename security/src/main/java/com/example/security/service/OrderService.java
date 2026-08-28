@@ -35,20 +35,18 @@ public class OrderService {
         return orderRepository.createOrder(order);
     }
     public String addToOrder(String email ,int productId) {
-          int orderId = 0;
+          int orderId;
           int quantity = 1;
-           if (orderRepository.getAllOrderOpen(email).isEmpty()) {
+          List<Order> openOrders = orderRepository.getAllOrderOpen(email);
+           if (openOrders.isEmpty()) {
              orderId =  createOrder(email);
 
-
            } else {
-               orderId = orderRepository.getAllOrderOpen(email).getFirst().getId();
+               orderId = openOrders.getFirst().getId();
 
                if (orderRepository.getProductQuantityFromOrder(orderId, productId) != 0) {
                    orderRepository.addQuantityToOrderItem(orderId,productId);
-                   System.out.println(orderRepository.getProductQuantityFromOrder(orderId, productId));
-                   List<Order> order = getAllOrderByEmail(email);
-                   orderRepository.updateTotalPriceInOrder(calculateTotalPrice(order.getLast().getOrderItems()) , orderId);
+                   updateOrderTotal(orderId);
                    return " The item added successfully";
                }
            }
@@ -58,9 +56,18 @@ public class OrderService {
            orderItem.setQuantity(quantity);
            orderItem.setPrice(itemService.getItemById(productId).getPrice());
            orderRepository.addOrderItem(orderItem);
-           List<Order> order = getAllOrderByEmail(email);
-           orderRepository.updateTotalPriceInOrder(calculateTotalPrice(order.getLast().getOrderItems()) , orderId);
+           updateOrderTotal(orderId);
         return "Order item added successfully";
+    }
+
+    // Was: both call sites above reloaded the customer's ENTIRE order
+    // history (getAllOrderByEmail - one query per past order plus a 5x
+    // Feign fan-out per item in each, see allOrderItemsInfo) just to read
+    // the total of the single order that changed. Recomputes only that
+    // order's own items instead.
+    private void updateOrderTotal(int orderId) {
+        List<OrderItem> items = allOrderItemsInfo(orderRepository.getOrderItemsByOrderId(orderId));
+        orderRepository.updateTotalPriceInOrder(calculateTotalPrice(items), orderId);
     }
     public String removeItemFromOrder(String email ,int productId) {
         if (orderRepository.getAllOrderOpen(email).isEmpty()) {
@@ -161,20 +168,23 @@ for (Order order : orders) {
     }
     public List<OrderItem> allOrderItemsInfo(List<OrderItem> order) {
 
-
+        // Was 5 separate Feign calls to items-service per order item (one
+        // each for name/image/description/veg/price) - fetch once and reuse.
         for (OrderItem item : order) {
-
-
-            item.setName(itemService.getItemById(item.getProductId()).getName());
-//            item.setPrice(itemService.getItemById(item.getProductId()).getPrice());
-            item.setImage(itemService.getItemById(item.getProductId()).getImage());
-            item.setDescription(itemService.getItemById(item.getProductId()).getDescription());
-            item.setVeg(itemService.getItemById(item.getProductId()).getVeg());
-            item.setTotalPrice(itemService.getItemById(item.getProductId()).getPrice().multiply( BigDecimal.valueOf(item.getQuantity())));
-//            item.setQuantity(orderRepository.getProductQuantityFromOrder(item.getOrderId(),item.getProductId()));
+            Item product = itemService.getItemById(item.getProductId());
+            // ItemsClientFallback returns null when items-service is briefly
+            // unreachable (Feign circuit breaker) - skip enriching this line
+            // rather than NPE the whole order view over one transient hiccup.
+            if (product == null) {
+                continue;
             }
+            item.setName(product.getName());
+            item.setImage(product.getImage());
+            item.setDescription(product.getDescription());
+            item.setVeg(product.getVeg());
+            item.setTotalPrice(product.getPrice().multiply(BigDecimal.valueOf(item.getQuantity())));
+        }
 
-        System.out.println(order + " order items");
         return order;
 
     }
