@@ -19,7 +19,13 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest(
         webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT,
-        properties = "spring.datasource.url=jdbc:h2:mem:authFlowTestDb")
+        // jwt.secret has no default in application.yaml anymore (it used to fall back to a
+        // hardcoded, publicly-committed value - see application.yaml's comment), so it must be
+        // supplied here for the context to boot; this value is test-only.
+        properties = {
+                "spring.datasource.url=jdbc:h2:mem:authFlowTestDb",
+                "jwt.secret=test-only-secret-not-used-in-production-0123456789abcdef"
+        })
 class AuthenticationFlowTests {
 
     @Autowired

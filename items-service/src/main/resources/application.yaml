@@ -19,10 +19,14 @@ spring:
     is-redis-server-active: true
 
 # Must match jwt.secret in the users/security service (8081) - both services
-# validate tokens issued by that service. Override with the JWT_SECRET env
-# var in production instead of relying on the default below.
+# validate tokens issued by that service. No default on purpose: this used to
+# fall back to a hardcoded, publicly-committed value whenever JWT_SECRET was
+# unset, which would have let anyone who read the repo forge an ADMIN token
+# accepted by both services. Missing the env var now fails startup instead of
+# silently degrading - set JWT_SECRET (docker-compose reads it from .env; for
+# a bare `mvnw spring-boot:run` export it in your shell first).
 jwt:
-  secret: ${JWT_SECRET:your/jwt/secret/key123456789/012345678901234567890123456789}
+  secret: ${JWT_SECRET}
 
 management:
   health:

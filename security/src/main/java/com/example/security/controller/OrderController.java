@@ -82,9 +82,14 @@ public class OrderController {
         try {
             String jwtToken = token.substring(7);
             String email = jwtUtil.extractEmail(jwtToken);
-            String result = orderService.deleteOrder(id);
+            boolean isAdmin = jwtUtil.extractAuthorities(jwtToken).stream()
+                    .anyMatch(a -> a.getAuthority().equals("ADMIN"));
+            String result = orderService.deleteOrder(id, email, isAdmin);
             if (result.contains("not found")) {
                 return new ResponseEntity(result, HttpStatus.BAD_REQUEST);
+            }
+            if (result.contains("Not authorized")) {
+                return new ResponseEntity(result, HttpStatus.FORBIDDEN);
             }
 
         return new ResponseEntity<>(result,HttpStatus.OK);

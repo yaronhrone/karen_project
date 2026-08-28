@@ -33,9 +33,10 @@ public class UserService {
 
         user.setPassword(passwordEncoder.encode(user.getPassword()));
 
-        if (user.getRole() == null) {
-            user.setRole(Role.USER);
-        }
+        // Always USER, regardless of what the client sent - public self-registration
+        // must never be able to assign a role (there is no admin-promotion endpoint;
+        // an ADMIN account can only be created directly in the database).
+        user.setRole(Role.USER);
         if (user.getAuthProvider() == null) {
             user.setAuthProvider("LOCAL");
         }

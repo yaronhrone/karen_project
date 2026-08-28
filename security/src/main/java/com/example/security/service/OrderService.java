@@ -127,10 +127,13 @@ public class OrderService {
         }
         return orders;
     }
-    public String deleteOrder(int orderId) {
+    public String deleteOrder(int orderId, String callerEmail, boolean isAdmin) {
         Order order = orderRepository.getOrderById(orderId);
         if (order == null) {
             return "Order not found";
+        }
+        if (!isAdmin && !order.getUserEmail().equals(callerEmail)) {
+            return "Not authorized to delete this order";
         }
         orderRepository.deleteAllOrderItemsByOrderId(orderId);
         return orderRepository.deleteOrder(orderId);
