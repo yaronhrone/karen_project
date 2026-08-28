@@ -9,14 +9,21 @@ import FavoriteIcon from '@mui/icons-material/Favorite';
 import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder';
 import { FavoriteContext } from '../../contexts/FavoriteContext';
 import { cartContext } from '../../contexts/CartContext';
-function CardItem({ item, isFavoriteDefault }) {
+import { useNavigate } from 'react-router-dom';
+
+// categoryPath: when set (Home's preview lists pass e.g. "/chocolates"), the
+// cart button no longer orders the item directly - it routes to the item's
+// dedicated category page instead. That page owns the real ordering flow
+// (for chocolates specifically, the box-size package-builder), which a
+// direct add-to-order here would silently bypass.
+function CardItem({ item, isFavoriteDefault, categoryPath }) {
     const { currentUser, isRequstToGetCurrentUserDone } = useContext(UserContext);
     const { toggleFavoriteContext } = useContext(FavoriteContext);
+    const navigate = useNavigate();
     const [error, setError] = useState("");
     const [clicked, setClicked] = useState(false);
     const [isFavorite, setIsFavorite] = useState(isFavoriteDefault);
     const{addToCart} = useContext(cartContext);
-    const [chocolateState, setChocolate] = useState(0);
 
     useEffect(() => {
 
@@ -67,10 +74,10 @@ function CardItem({ item, isFavoriteDefault }) {
     }
 
     const addToOrder = async () => {
-        // if (item.category === 'chocolate') {
-        //     setChocolate(chocolateState + 1);
-        //     return;
-        // }
+        if (categoryPath) {
+            navigate(categoryPath);
+            return;
+        }
         if (currentUser === null) {
          
             setClicked(true);

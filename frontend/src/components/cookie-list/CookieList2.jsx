@@ -61,7 +61,7 @@ function CookieList2() {
                     <ArrowBackIcon onClick={handleNextPage} className='arrow' />
                     {cookies.map((cookie, index) => (
                         <div key={cookie.id} className="card-wrapper" style={{ animationDelay: `${index * 0.3}s` }}>
-                            <CardItem key={cookie.id} item={cookie} isFavoriteDefault={favorites.includes(cookie.id)}/>
+                            <CardItem key={cookie.id} item={cookie} isFavoriteDefault={favorites.includes(cookie.id)} categoryPath="/cookies" />
                         </div>))}
                     <ArrowForwardIcon onClick={handlePreviousPage} disabled={page === 1} className='arrow' />
                 </div>

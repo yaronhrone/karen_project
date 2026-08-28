@@ -64,7 +64,7 @@ function ChocolateList2() {
                     <ArrowBackIcon onClick={handleNextPage} className='arrow' />
                     {chocolates.map((chocolate, index) => (
                         <div key={chocolate.id} className="card-wrapper" style={{ animationDelay: `${index * 0.3}s` }}>
-                            <CardItem key={chocolate.id} item={chocolate} isFavoriteDefault={favorites?.includes(chocolate.id)} />
+                            <CardItem key={chocolate.id} item={chocolate} isFavoriteDefault={favorites?.includes(chocolate.id)} categoryPath="/chocolates" />
                         </div>))}
                     <ArrowForwardIcon onClick={handlePreviousPage} disabled={page === 1} className='arrow' />
                 </div>

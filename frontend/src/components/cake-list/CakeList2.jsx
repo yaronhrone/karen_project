@@ -61,7 +61,7 @@ function CakeList2() {
                     <ArrowBackIcon onClick={handleNextPage} className='arrow' />
                     {cakes.map((cake, index) => (
                         <div key={cake.id} className="card-wrapper" style={{ animationDelay: `${index * 0.3}s` }}>
-                            <CardItem key={cake.id} item={cake} isFavoriteDefault={favorites.includes(cake.id)}/>
+                            <CardItem key={cake.id} item={cake} isFavoriteDefault={favorites.includes(cake.id)} categoryPath="/cakes" />
                         </div>))}
                     <ArrowForwardIcon onClick={handlePreviousPage} disabled={page === 1} className='arrow' />
                 </div>
