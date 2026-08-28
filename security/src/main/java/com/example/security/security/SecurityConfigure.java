@@ -42,7 +42,7 @@ public class SecurityConfigure {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/authenticate", "/authenticate/google", "/users/register",
                                 "/h2-console/**", "/actuator/health").permitAll() // Public endpoints
-                        .requestMatchers("/users/**", "/favorite**", "/chocolate/**", "/cake/**", "/order/**").hasAnyAuthority("USER", "ADMIN")
+                        .requestMatchers("/users/**", "/favorite/**", "/chocolate/**", "/cake/**", "/order/**").hasAnyAuthority("USER", "ADMIN")
                         .requestMatchers("/admin/**").hasAuthority("ADMIN") // Admin-only routes
                         .anyRequest().authenticated() // Require authentication for all other requests
                 )

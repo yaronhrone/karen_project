@@ -4,11 +4,12 @@ package com.example.security.controller;
 import com.example.security.model.Order;
 import com.example.security.model.ProductRequest;
 import com.example.security.service.OrderService;
-import com.example.security.utils.JwtUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -19,17 +20,12 @@ import java.util.List;
 public class OrderController {
     @Autowired
     private OrderService orderService;
-    @Autowired
-    private JwtUtil jwtUtil;
 
     @PostMapping("/{item_id}")
     @PreAuthorize("hasAnyAuthority('USER','ADMIN')")
-    public ResponseEntity<String> addItemOrder(@RequestHeader("Authorization") String token , @PathVariable (value = "item_id") int  itemId) {
+    public ResponseEntity<String> addItemOrder(Authentication authentication, @PathVariable (value = "item_id") int  itemId) {
         try {
-            String jwtToken = token.substring(7);
-            String email = jwtUtil.extractEmail(jwtToken);
-
-            String response = orderService.addToOrder(email, itemId);
+            String response = orderService.addToOrder(authentication.getName(), itemId);
             return ResponseEntity.ok().body(response);
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(e.getMessage());
@@ -38,22 +34,18 @@ public class OrderController {
     }
     @GetMapping
     @PreAuthorize("hasAnyAuthority('USER','ADMIN')")
-    public ResponseEntity<List<Order>> getOrder(@RequestHeader("Authorization") String token) {
+    public ResponseEntity<List<Order>> getOrder(Authentication authentication) {
         try {
-            String jwtToken = token.substring(7);
-            String email = jwtUtil.extractEmail(jwtToken);
-            return ResponseEntity.ok().body(orderService.getAllOrderByEmail(email));
+            return ResponseEntity.ok().body(orderService.getAllOrderByEmail(authentication.getName()));
         } catch (Exception e) {
             return new ResponseEntity(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
     @PutMapping
     @PreAuthorize("hasAnyAuthority('USER','ADMIN')")
-    public ResponseEntity<String> updateOrder(@RequestHeader("Authorization") String token  ) {
+    public ResponseEntity<String> updateOrder(Authentication authentication) {
         try {
-            String jwtToken = token.substring(7);
-            String email = jwtUtil.extractEmail(jwtToken);
-            String response = orderService.changeOrderStatus(email);
+            String response = orderService.changeOrderStatus(authentication.getName());
 
             return ResponseEntity.ok().body(response);
         }  catch (Exception e) {
@@ -63,11 +55,9 @@ public class OrderController {
     }
     @DeleteMapping("item/{item_id}")
     @PreAuthorize("hasAnyAuthority('USER','ADMIN')")
-    public ResponseEntity<String> removeOrderItem(@RequestHeader("Authorization") String token, @PathVariable (value = "item_id" ) int itemId) {
+    public ResponseEntity<String> removeOrderItem(Authentication authentication, @PathVariable (value = "item_id" ) int itemId) {
         try {
-            String jwtToken = token.substring(7);
-            String email = jwtUtil.extractEmail(jwtToken);
-            String response = orderService.removeItemFromOrder(email, itemId);
+            String response = orderService.removeItemFromOrder(authentication.getName(), itemId);
             if (response.contains("not found")) {
                 return new ResponseEntity(response, HttpStatus.BAD_REQUEST);
             }
@@ -78,13 +68,12 @@ public class OrderController {
     }
         @DeleteMapping("/{id}")
         @PreAuthorize("hasAnyAuthority('USER','ADMIN')")
-        public ResponseEntity<String> deleteOrder(@RequestHeader("Authorization") String token, @PathVariable int id){
+        public ResponseEntity<String> deleteOrder(Authentication authentication, @PathVariable int id){
         try {
-            String jwtToken = token.substring(7);
-            String email = jwtUtil.extractEmail(jwtToken);
-            boolean isAdmin = jwtUtil.extractAuthorities(jwtToken).stream()
-                    .anyMatch(a -> a.getAuthority().equals("ADMIN"));
-            String result = orderService.deleteOrder(id, email, isAdmin);
+            boolean isAdmin = authentication.getAuthorities().stream()
+                    .map(GrantedAuthority::getAuthority)
+                    .anyMatch(a -> a.equals("ADMIN"));
+            String result = orderService.deleteOrder(id, authentication.getName(), isAdmin);
             if (result.contains("not found")) {
                 return new ResponseEntity(result, HttpStatus.BAD_REQUEST);
             }

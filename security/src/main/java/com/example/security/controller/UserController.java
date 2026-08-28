@@ -5,19 +5,16 @@ import com.example.security.model.AuthenticationResponse;
 import com.example.security.model.CustomUser;
 import com.example.security.service.AuthenticationService;
 import com.example.security.service.UserService;
-import com.example.security.utils.JwtUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping(value = "/users")
 public class UserController {
-
-    @Autowired
-    private JwtUtil jwtUtil;
 
     @Autowired
     private UserService userService;
@@ -42,11 +39,9 @@ public class UserController {
 
     @PreAuthorize("hasAnyAuthority('USER','ADMIN')")
     @GetMapping
-    public ResponseEntity<CustomUser> getCurrentUser(@RequestHeader(value = "Authorization") String token) {
+    public ResponseEntity<CustomUser> getCurrentUser(Authentication authentication) {
         try {
-            String jwtToken = token.substring(7);
-            String email = jwtUtil.extractEmail(jwtToken);
-            CustomUser user = userService.getUserByEmail(email);
+            CustomUser user = userService.getUserByEmail(authentication.getName());
             return ResponseEntity.ok(user);
         } catch (Exception e) {
             return new ResponseEntity(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
@@ -55,10 +50,9 @@ public class UserController {
 
     @PreAuthorize("hasAnyAuthority('USER','ADMIN')")
     @PutMapping
-    public ResponseEntity<CustomUser> updateUser(@RequestHeader(value = "Authorization") String token, @RequestBody CustomUser updatedUser) {
+    public ResponseEntity<CustomUser> updateUser(Authentication authentication, @RequestBody CustomUser updatedUser) {
         try {
-            String jwtToken = token.substring(7);
-            String currentEmail = jwtUtil.extractEmail(jwtToken);
+            String currentEmail = authentication.getName();
             if (updatedUser.getFirstName() == null || updatedUser.getLastName() == null || updatedUser.getEmail() == null) {
                 return new ResponseEntity("User not updated, first name, last name and email are required", HttpStatus.BAD_REQUEST);
             }
@@ -84,11 +78,9 @@ public class UserController {
 
     @PreAuthorize("hasAnyAuthority('USER','ADMIN')")
     @DeleteMapping
-    public ResponseEntity<String> deleteUser(@RequestHeader(value = "Authorization") String token) {
+    public ResponseEntity<String> deleteUser(Authentication authentication) {
         try {
-            String jwtToken = token.substring(7);
-            String email = jwtUtil.extractEmail(jwtToken);
-            String result = userService.deleteUser(email);
+            String result = userService.deleteUser(authentication.getName());
             if (result.contains("successfully")) {
                 return new ResponseEntity(result, HttpStatus.OK);
             }

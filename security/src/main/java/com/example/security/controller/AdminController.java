@@ -6,7 +6,6 @@ import com.example.security.service.ItemImportService;
 import com.example.security.service.ItemService;
 import com.example.security.service.OrderService;
 import com.example.security.service.UserService;
-import com.example.security.utils.JwtUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -30,8 +29,6 @@ public class AdminController {
     private ItemService itemService;
     @Autowired
     private OrderService orderService;
-    @Autowired
-    private JwtUtil jwtUtil;
     @Autowired
     private CloudinaryConfig cloudinaryConfig;
     @Autowired

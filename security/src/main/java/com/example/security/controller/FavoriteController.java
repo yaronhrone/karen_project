@@ -2,11 +2,11 @@ package com.example.security.controller;
 
 import com.example.security.model.Item;
 import com.example.security.service.FavoriteService;
-import com.example.security.utils.JwtUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -16,16 +16,12 @@ import java.util.List;
 public class FavoriteController {
     @Autowired
     private FavoriteService favoriteService;
-    @Autowired
-    private JwtUtil jwtUtil;
 
     @PostMapping("/item/{id}")
     @PreAuthorize("hasAnyAuthority('USER','ADMIN')")
-    public ResponseEntity<String> addFavorite(@RequestHeader(value = "Authorization") String token, @PathVariable int id) {
+    public ResponseEntity<String> addFavorite(Authentication authentication, @PathVariable int id) {
         try {
-            String jwtToken = token.substring(7);
-            String email = jwtUtil.extractEmail(jwtToken);
-            String result = favoriteService.addItemFavorite(email, id);
+            String result = favoriteService.addItemFavorite(authentication.getName(), id);
             if (result.contains("successfully")) {
                 return new ResponseEntity(result, HttpStatus.OK);
             }
@@ -38,11 +34,9 @@ public class FavoriteController {
 
     @DeleteMapping("/item/{id}")
     @PreAuthorize("hasAnyAuthority('USER','ADMIN')")
-    public ResponseEntity<String> removeItemFromFavorite(@RequestHeader(value = "Authorization") String token, @PathVariable int id) {
+    public ResponseEntity<String> removeItemFromFavorite(Authentication authentication, @PathVariable int id) {
         try {
-            String jwtToken = token.substring(7);
-            String email = jwtUtil.extractEmail(jwtToken);
-            String result = favoriteService.removeItemFavorite(email, id);
+            String result = favoriteService.removeItemFavorite(authentication.getName(), id);
             if (result.contains("successfully")) {
                 return new ResponseEntity(result, HttpStatus.OK);
             }
@@ -55,11 +49,9 @@ public class FavoriteController {
 
     @GetMapping ("/item")
     @PreAuthorize("hasAnyAuthority('USER','ADMIN')")
-    public ResponseEntity<String> getFavorite(@RequestHeader(value = "Authorization") String token) {
+    public ResponseEntity<String> getFavorite(Authentication authentication) {
         try {
-            String jwtToken = token.substring(7);
-            String email = jwtUtil.extractEmail(jwtToken);
-            List<Item> result = favoriteService.getItemFavorite(email);
+            List<Item> result = favoriteService.getItemFavorite(authentication.getName());
 
                 return new ResponseEntity(result, HttpStatus.OK);
         } catch (Exception e) {
@@ -69,11 +61,9 @@ public class FavoriteController {
     }
     @DeleteMapping("/item")
     @PreAuthorize("hasAnyAuthority('USER','ADMIN')")
-    public ResponseEntity<String> deleteAllFavorite(@RequestHeader(value = "Authorization") String token) {
+    public ResponseEntity<String> deleteAllFavorite(Authentication authentication) {
         try {
-            String jwtToken = token.substring(7);
-            String email = jwtUtil.extractEmail(jwtToken);
-            String result = favoriteService.deleteAllItemFavorites(email);
+            String result = favoriteService.deleteAllItemFavorites(authentication.getName());
             if (result.contains("successfully")) {
                 return new ResponseEntity(result, HttpStatus.OK);
             }

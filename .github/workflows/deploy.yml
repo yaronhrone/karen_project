@@ -56,6 +56,12 @@ jobs:
   deploy:
     needs: build-and-push
     runs-on: ubuntu-latest
+    # Unlike build-and-push above, this job never actually calls the GitHub
+    # API (it uses secrets.EC2_*/GHCR_PAT for SSH+GHCR instead) - explicit
+    # minimal scope anyway, so a future step added here doesn't silently
+    # inherit whatever broader default GITHUB_TOKEN permissions this repo has.
+    permissions:
+      contents: read
     steps:
       - name: Deploy to EC2
         uses: appleboy/ssh-action@v1.0.3

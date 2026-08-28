@@ -90,8 +90,6 @@ if (item.isEmpty()){
     private ResponseEntity<List<Items>> getAll(@RequestParam (defaultValue = "1") int page ,@RequestParam (defaultValue = "10") int size){
         try {
 List<Items> items = itemService.getAll(page, size);
-            for(Items item : items ){
-            System.out.println( item + " get all");}
         return new ResponseEntity<>(items,HttpStatus.OK);
         } catch (Exception e) {
             System.out.println(e.getMessage());

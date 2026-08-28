@@ -20,7 +20,6 @@ public class OrderRepository {
     private final static String ORDER_ITEM_TABLE = "order_items";
 
     public Integer createOrder(Order order) {
-        System.out.println(order.toString() + " order");
         String sql = "INSERT INTO " + ORDER_TABLE + " (user_email, order_status, total_price , address_shipping) VALUES (?,?, ?, ?)";
         jdbcTemplate.update(sql,order.getUserEmail(), order.getStatus().name(), order.getTotalPrice(),order.getAddressShipping());
         return getAllOrderOpen(order.getUserEmail()).getFirst().getId();

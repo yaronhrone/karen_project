@@ -19,6 +19,14 @@ public class ItemService {
 
 
     public String createItem(Items item){
+        // ItemImportService's CSV path already validates price > 0 - the
+        // single-item create/update paths (this method and updateItem below)
+        // didn't, so a negative/zero price could reach the public catalog
+        // and order-total math through this route even though the admin
+        // frontend form also checks it (a direct API call skips that).
+        if (item.getPrice() == null || item.getPrice().signum() <= 0) {
+            return "Price must be greater than 0";
+        }
         // Was inverted: getItemByName never actually returns null in the
         // normal case (it returns an empty List when nothing matches, only
         // null on a genuine query exception) - so this condition was true
@@ -70,7 +78,9 @@ public class ItemService {
         return itemRepository.getItemById(id);
     }
     public String updateItem(Items item){
-        System.out.println(itemRepository.getItemById(item.getId()) + "item update from service" );
+        if (item.getPrice() == null || item.getPrice().signum() <= 0) {
+            return "Price must be greater than 0";
+        }
         if (itemRepository.getItemById(item.getId()) == null) {
             return "The item is not exists";
         }
