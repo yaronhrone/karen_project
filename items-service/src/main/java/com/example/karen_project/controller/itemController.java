@@ -87,7 +87,15 @@ if (item.isEmpty()){
     }
 
     @GetMapping("/all/")
-    private ResponseEntity<List<Items>> getAll(@RequestParam (defaultValue = "1") int page ,@RequestParam (defaultValue = "10") int size){
+    // Was `private` - harmless before @EnableMethodSecurity, but that
+    // annotation (added alongside @PreAuthorize on the write endpoints
+    // below) makes Spring Security AOP-proxy this whole bean via CGLIB
+    // subclassing, which cannot override a private method. Calls routed
+    // through the proxy to a private method don't reach the properly
+    // dependency-injected target instance, so itemService came back null -
+    // a live 500 on the public catalog endpoint. Every other method here is
+    // already public; this one just needs to match.
+    public ResponseEntity<List<Items>> getAll(@RequestParam (defaultValue = "1") int page ,@RequestParam (defaultValue = "10") int size){
         try {
 List<Items> items = itemService.getAll(page, size);
         return new ResponseEntity<>(items,HttpStatus.OK);
