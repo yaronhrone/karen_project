@@ -20,6 +20,20 @@ spring:
     openfeign:
       circuitbreaker:
         enabled: true # required for @FeignClient(fallback = ...) to actually be used
+  # "Forgot password" reset emails via Gmail SMTP - see MailService. host is
+  # a fixed value (not a secret); only username/password are placeholder-
+  # gated the same way google.client-id/green-api.* already are below.
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: ${GMAIL_ADDRESS:PASTE_YOUR_GMAIL_ADDRESS_HERE}
+    password: ${GMAIL_APP_PASSWORD:PASTE_YOUR_GMAIL_APP_PASSWORD_HERE}
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
 
 # Spring Cloud Circuitbreaker's Resilience4j default TimeLimiter is 1 second -
 # fine for a single call, but the CSV bulk import can fire off a couple dozen
@@ -84,6 +98,12 @@ green-api:
   id-instance: ${GREEN_API_ID_INSTANCE:PASTE_YOUR_GREEN_API_ID_INSTANCE_HERE}
   api-token-instance: ${GREEN_API_TOKEN_INSTANCE:PASTE_YOUR_GREEN_API_TOKEN_HERE}
   keren-phone: ${KEREN_WHATSAPP_NUMBER:PASTE_KEREN_PHONE_HERE}
+
+# How long a "forgot password" email link stays valid - see
+# PasswordResetService. Long enough to receive/open the email (possibly on
+# another device), short enough to bound exposure if it's later compromised.
+password-reset:
+  token-expiry-minutes: 30
 
 
 

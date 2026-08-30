@@ -7,6 +7,8 @@ import CakeList from './components/cake-list/CakeList';
 import Home from './components/home/Home';
 import NavBar from './components/navbar/NavBar';
 import Login from './components/login/Login';
+import ForgotPassword from './components/login/ForgotPassword';
+import ResetPassword from './components/login/ResetPassword';
 import Order from './components/order/Order';
 import Register from './components/register/Register';
 import NotFound from './components/not found/NotFound';
@@ -70,6 +72,8 @@ function App() {
                 <Route path="/favorite" element={<Favorite />} />
                 <Route path="/order" element={<Order />} />
                 <Route path="/login" element={<Login />} />
+                <Route path="/forgot-password" element={<ForgotPassword />} />
+                <Route path="/reset-password/:token" element={<ResetPassword />} />
                 <Route path="/register" element={<Register />} />
                 <Route path="*" element={<NotFound />} />
                 <Route path="/admin" element={<Admin />}>

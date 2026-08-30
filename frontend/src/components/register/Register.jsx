@@ -9,6 +9,7 @@ import UserContext from '../../contexts/UserContext';
 import { cartContext } from '../../contexts/CartContext';
 import { FavoriteContext } from '../../contexts/FavoriteContext';
 import { GoogleLogin } from '@react-oauth/google';
+import { passwordRegex } from '../../utils/validation';
 function Register() {
   const { currentUser, updateCurrentUserContext } = useContext(UserContext);
   const { cartItems, clearCart } = useContext(cartContext);
@@ -29,7 +30,6 @@ function Register() {
   const [errors, setErrors] = useState({});
   const [isValid, setIsValid] = useState(false);
 
-  const passwordRegex = /^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-]).{8,}$/;
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
   const phoneRegex = /^[0-9]{10}$/;
 

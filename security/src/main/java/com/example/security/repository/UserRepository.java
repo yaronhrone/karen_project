@@ -50,4 +50,12 @@ public class UserRepository {
         jdbcTemplate.update(sql, email);
         return "User deleted successfully";
     }
+
+    // Separate from updateUser on purpose - that method has no business
+    // ever silently accepting a password change via the general
+    // profile-update path. Only PasswordResetService calls this.
+    public void updatePassword(String email, String newHashedPassword) {
+        String sql = String.format("UPDATE %s SET password = ? WHERE email = ?", USERS_TABLE);
+        jdbcTemplate.update(sql, newHashedPassword, email);
+    }
 }

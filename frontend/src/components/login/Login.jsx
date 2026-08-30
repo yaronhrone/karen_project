@@ -4,7 +4,7 @@ import { mergeGuestDataToAccount } from '../../service/mergeGuestData';
 import UserContext from '../../contexts/UserContext';
 import { cartContext } from '../../contexts/CartContext';
 import { FavoriteContext } from '../../contexts/FavoriteContext';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { GoogleLogin } from '@react-oauth/google';
 import './Login.css'
 import VisibilityIcon from '@mui/icons-material/Visibility';
@@ -82,6 +82,7 @@ function Login() {
 
                 <button type="submit" className='btnLogin'>כניסה</button>
             </form>
+            <Link to="/forgot-password" style={{ marginTop: "0.75rem", color: "var(--color-accent)" }}>שכחתי סיסמה?</Link>
             <div style={{ marginTop: "1rem" }}>
                 <GoogleLogin onSuccess={handleGoogleLogin} onError={() => setError('הכניסה עם Google נכשלה, נסה/י שוב')} />
             </div>

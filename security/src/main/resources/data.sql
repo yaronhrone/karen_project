@@ -38,6 +38,23 @@ CREATE TABLE favorites (
     FOREIGN KEY (user_email) REFERENCES users (email)
     );
 
+-- "Forgot password" reset links. token_hash is SHA-256 of the raw token
+-- emailed to the user - never store the raw token at rest. used_at makes a
+-- token single-use; expires_at bounds how long a link stays valid. A new
+-- request deletes any prior unused row for that email (see
+-- PasswordResetTokenRepository.deleteAllForEmail) rather than allowing more
+-- than one live token per user.
+CREATE TABLE password_reset_tokens (
+    id INT AUTO_INCREMENT,
+    token_hash VARCHAR(64) NOT NULL UNIQUE,
+    user_email VARCHAR(255) NOT NULL,
+    expires_at TIMESTAMP NOT NULL,
+    used_at TIMESTAMP,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (id),
+    FOREIGN KEY (user_email) REFERENCES users (email)
+);
+
 
 -- Local dev/test seed accounts only. Password hashes are kept unchanged so
 -- existing local logins keep working; real names/emails/phones/addresses

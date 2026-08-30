@@ -41,6 +41,7 @@ public class SecurityConfigure {
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/authenticate", "/authenticate/google", "/users/register",
+                                "/users/forgot-password", "/users/reset-password",
                                 "/h2-console/**", "/actuator/health").permitAll() // Public endpoints
                         .requestMatchers("/users/**", "/favorite/**", "/chocolate/**", "/cake/**", "/order/**").hasAnyAuthority("USER", "ADMIN")
                         .requestMatchers("/admin/**").hasAuthority("ADMIN") // Admin-only routes

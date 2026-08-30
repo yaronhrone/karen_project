@@ -56,6 +56,15 @@ export const loginWithGoogle = async (idToken) => {
     setAuthHeader(data.jwt);
     return data;
 }
+// Both intentionally unauthenticated - no token exists yet at this point in
+// the flow. forgot-password always resolves the same way regardless of
+// whether the email exists - see UserController's no-leak contract.
+export const requestPasswordReset = (email) => {
+    return axios.post(`${BASE_URL}/users/forgot-password`, { email });
+}
+export const resetPassword = (token, newPassword) => {
+    return axios.post(`${BASE_URL}/users/reset-password`, { token, newPassword });
+}
 
 
 export const updateCurrentUser = (updatedCurrentUser) => {

@@ -46,6 +46,22 @@ CREATE TABLE IF NOT EXISTS favorites (
     FOREIGN KEY (user_email) REFERENCES users (email)
 );
 
+-- "Forgot password" reset links - see data.sql (H2 variant) for the full
+-- explanation. token_hash is SHA-256 of the raw emailed token, never the
+-- raw value; used_at makes a token single-use; a new request deletes any
+-- prior unused row for that email rather than allowing more than one live
+-- token per user.
+CREATE TABLE IF NOT EXISTS password_reset_tokens (
+    id INT GENERATED ALWAYS AS IDENTITY,
+    token_hash VARCHAR(64) NOT NULL UNIQUE,
+    user_email VARCHAR(255) NOT NULL,
+    expires_at TIMESTAMP NOT NULL,
+    used_at TIMESTAMP,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (id),
+    FOREIGN KEY (user_email) REFERENCES users (email)
+);
+
 -- Local dev/test seed accounts only. See data.sql (the H2/default variant) for
 -- the full explanation - same placeholders, same hashes.
 INSERT INTO users (first_name, last_name, email, phone, address, password, role, auth_provider) VALUES
