@@ -95,6 +95,25 @@
   color: var(--color-accent-hover);
 }
 
+/* .links .custom-link.active (near the top of this file) sets white text -
+   correct for the top-bar links that sit directly on the dark navbar
+   background, but this dropdown's own background is --color-surface (light).
+   Both rules have the same specificity (three classes), so without this,
+   whichever the browser picks wins by source order alone - the currently
+   active category (e.g. "עוגות" while already on /cakes) rendered as white
+   text on a light dropdown, invisible. Same highlighted look as :hover
+   above, so the active item reads as "you are here" instead of disappearing. */
+.items_Open .custom-link.active,
+.items_Close .custom-link.active {
+  background: var(--color-accent-soft);
+  color: var(--color-accent-hover);
+}
+
+.items_Open .custom-link.active svg,
+.items_Close .custom-link.active svg {
+  color: var(--color-accent-hover);
+}
+
 .items_Open .custom-link + .custom-link,
 .items_Close .custom-link + .custom-link {
   border-top: 1px solid var(--color-bg-alt);
