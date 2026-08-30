@@ -90,3 +90,49 @@
     font-weight: bold;
     font-size: 20px;
 }
+
+/* Tab bar between the 3 admin sub-pages (AdminNav) - same dark background as
+   the main NavBar's .links so it reads as "still the admin chrome", with
+   CustomeLink's own .active class doing the highlighting. */
+.admin-nav{
+    display: flex;
+    gap: 24px;
+    padding: 12px 24px;
+    background: var(--color-heading);
+    border-radius: var(--radius-md);
+    width: 90%;
+    justify-content: center;
+}
+.admin-nav .custom-link{
+    color: rgba(255, 255, 255, 0.9);
+    padding: 6px 4px;
+}
+.admin-nav .custom-link.active,
+.admin-nav .custom-link:hover{
+    color: #fff;
+}
+
+/* Orders board (AdminOrders) - 3 status sections, each its own card. */
+.admin-orders{
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    width: 90%;
+}
+.order_group{
+    background-color: var(--color-surface);
+    box-shadow: var(--shadow-sm);
+    border-radius: var(--radius-md);
+    padding: 16px 20px;
+}
+.order_row{
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+    padding: 12px 0;
+    border-bottom: 1px solid var(--color-bg-alt);
+}
+.order_row:last-child{
+    border-bottom: none;
+}

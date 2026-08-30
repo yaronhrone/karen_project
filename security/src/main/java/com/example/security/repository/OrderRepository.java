@@ -79,8 +79,13 @@ public class OrderRepository {
     // Keren's "active orders" inbox in Admin - orders she still needs to act
     // on (already sent by the customer, not yet marked ready/shipped).
     public List<Order> getOrdersByStatuses(List<String> statuses) {
+        // order_date is a plain DATE (see OrderMapper's .toLocalDate()), so
+        // same-day orders had no deterministic relative order before - id
+        // DESC as a tie-breaker makes "newest first" actually true within a
+        // day too (id is auto-increment, a reliable recency signal - same
+        // reasoning already applied to getAllOrderByEmail).
         String placeholders = String.join(",", statuses.stream().map(s -> "?").toArray(String[]::new));
-        String sql = "SELECT * FROM " + ORDER_TABLE + " WHERE order_status IN (" + placeholders + ") ORDER BY order_date DESC";
+        String sql = "SELECT * FROM " + ORDER_TABLE + " WHERE order_status IN (" + placeholders + ") ORDER BY order_date DESC, id DESC";
         return jdbcTemplate.query(sql, new OrderMapper(), statuses.toArray());
     }
 

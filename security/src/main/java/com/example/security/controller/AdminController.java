@@ -185,13 +185,13 @@ public class AdminController {
 
     }
 
-    // Orders already sent by a customer (RECEIVED/IN_PROGRESS) that still
-    // need Keren's attention, across all users - the inbox view in Admin.
+    // Every order on Keren's admin board (RECEIVED/IN_PROGRESS/READY),
+    // across all users - AdminOrders.jsx groups these into its 3 sections.
     @PreAuthorize("hasAuthority('ADMIN')")
-    @GetMapping("/orders/active")
-    public ResponseEntity<List<Order>> getActiveOrders() {
+    @GetMapping("/orders/board")
+    public ResponseEntity<List<Order>> getOrdersForAdminBoard() {
         try {
-            return ResponseEntity.ok().body(orderService.getActiveOrders());
+            return ResponseEntity.ok().body(orderService.getOrdersForAdminBoard());
         } catch (Exception e) {
             return new ResponseEntity(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }

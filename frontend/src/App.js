@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import './App.css';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import UserContext from './contexts/UserContext';
 import ChocolateList from './components/chocolate-list/ChocolateList';
 import CakeList from './components/cake-list/CakeList';
@@ -14,6 +14,9 @@ import Favorite from './components/Favorite/Favorite';
 import { fetchCurrentUser } from './service/apiServise';
 import CookieList from './components/cookie-list/CookieList';
 import Admin from './components/admin/Admin';
+import AdminOrders from './components/admin/AdminOrders';
+import AdminProducts from './components/admin/AdminProducts';
+import AdminUsers from './components/admin/AdminUsers';
 import Footer from './components/footer/Footer';
 import SearchPage from './components/searchPage/SearchPage';
 import Header from './components/header/Header';
@@ -69,7 +72,12 @@ function App() {
                 <Route path="/login" element={<Login />} />
                 <Route path="/register" element={<Register />} />
                 <Route path="*" element={<NotFound />} />
-                <Route path="/admin/*" element={<Admin />} />
+                <Route path="/admin" element={<Admin />}>
+                  <Route index element={<Navigate to="orders" replace />} />
+                  <Route path="orders" element={<AdminOrders />} />
+                  <Route path="products" element={<AdminProducts />} />
+                  <Route path="users" element={<AdminUsers />} />
+                </Route>
                 <Route path='/search/:id' element={<SearchPage />} />
               </Routes>
               <Footer />

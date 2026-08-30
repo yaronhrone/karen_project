@@ -153,10 +153,10 @@ export const updateOrder = () => {
 export const deleteOrderById = (id) => {
     return axios.delete(`${BASE_URL}/order/${id}` ,  { headers: getAuthHeader() })
 }
-// Keren's "active orders" inbox in Admin - orders already sent by a
-// customer (RECEIVED/IN_PROGRESS) that still need her attention.
-export const getActiveOrders = () => {
-    return axios.get(`${BASE_URL}/admin/orders/active`, { headers: getAuthHeader() });
+// Keren's admin order board - RECEIVED/IN_PROGRESS/READY orders, grouped by
+// status client-side (see AdminOrders.jsx).
+export const getAdminOrdersBoard = () => {
+    return axios.get(`${BASE_URL}/admin/orders/board`, { headers: getAuthHeader() });
 }
 export const advanceOrderStatus = (orderId, status) => {
     return axios.put(`${BASE_URL}/admin/order/${orderId}/status?status=${status}`, null, { headers: getAuthHeader() });

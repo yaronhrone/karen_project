@@ -21,7 +21,10 @@ public class OrderService {
     @Autowired
     private WhatsAppNotificationService whatsAppNotificationService;
 
-    private static final List<String> ACTIVE_ORDER_STATUSES = List.of("RECEIVED", "IN_PROGRESS");
+    // Admin's order board (AdminOrders.jsx groups these 3 into their own
+    // sections client-side: RECEIVED = "open", IN_PROGRESS = "in prep",
+    // READY = "closed").
+    private static final List<String> ADMIN_BOARD_STATUSES = List.of("RECEIVED", "IN_PROGRESS", "READY");
     private static final List<String> ADVANCEABLE_STATUSES = List.of("IN_PROGRESS", "READY");
 
 
@@ -132,10 +135,11 @@ public class OrderService {
         return "Order status updated successfully";
     }
 
-    // Keren's "active orders" inbox - orders already sent by a customer that
-    // still need her attention (not yet marked ready/shipped).
-    public List<Order> getActiveOrders() {
-        List<Order> orders = orderRepository.getOrdersByStatuses(ACTIVE_ORDER_STATUSES);
+    // Every order Keren's admin board shows, across all 3 of its sections -
+    // AdminOrders.jsx groups these by status client-side, one request
+    // instead of three.
+    public List<Order> getOrdersForAdminBoard() {
+        List<Order> orders = orderRepository.getOrdersByStatuses(ADMIN_BOARD_STATUSES);
         for (Order order : orders) {
             order.setOrderItems(allOrderItemsInfo(orderRepository.getOrderItemsByOrderId(order.getId())));
             order.setTotalPrice(calculateTotalPrice(order.getOrderItems()));
