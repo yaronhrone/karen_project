@@ -105,5 +105,20 @@ green-api:
 password-reset:
   token-expiry-minutes: 30
 
+# spring-boot-starter-mail auto-configures a MailHealthIndicator that opens a
+# real SMTP connection as part of /actuator/health - with no Gmail
+# credentials set yet (placeholder defaults above) that connection fails,
+# which flips the WHOLE service's health to DOWN, which fails the Docker
+# healthcheck, which stops frontend from ever starting (it depends_on
+# users-service: condition: service_healthy) - took down the entire site on
+# first deploy of this feature. MailService already has its own
+# isConfigured() guard for the one thing that actually matters (not sending
+# real mail when unconfigured); the built-in indicator's opinion about SMTP
+# reachability has no business gating the app's liveness.
+management:
+  health:
+    mail:
+      enabled: false
+
 
 
