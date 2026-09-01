@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useRef, useState } from 'react'
 import { Link } from 'react-router-dom';
 import { requestPasswordReset } from '../../service/apiServise';
 import './Login.css'
@@ -13,15 +13,29 @@ const GENERIC_MESSAGE = 'אם קיים חשבון עם האימייל הזה, נ
 function ForgotPassword() {
     const [email, setEmail] = useState('');
     const [submitted, setSubmitted] = useState(false);
+    const [submitting, setSubmitting] = useState(false);
+    // A ref alongside the state: setSubmitting(true) doesn't take effect
+    // (and re-render/disable the button) until after this handler returns,
+    // so a very fast double-click could still fire twice before that -
+    // the ref is checked+set synchronously and closes that gap. The
+    // backend also has its own 60s cooldown per email as a second layer,
+    // in case the request ever fires twice anyway (e.g. two tabs).
+    const submittingRef = useRef(false);
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+        if (submittingRef.current) {
+            return;
+        }
+        submittingRef.current = true;
+        setSubmitting(true);
         try {
             await requestPasswordReset(email);
         } catch (err) {
             console.log(err);
         } finally {
             setSubmitted(true);
+            setSubmitting(false);
         }
     }
 
@@ -35,7 +49,7 @@ function ForgotPassword() {
                     <div>
                         <input type="email" name="email" required onChange={(e) => setEmail(e.target.value)} placeholder='אימייל' style={{ width: "90%", marginRight: "1rem" }} />
                     </div>
-                    <button type="submit" className='btnLogin'>שלח קישור לאיפוס</button>
+                    <button type="submit" className='btnLogin' disabled={submitting}>שלח קישור לאיפוס</button>
                 </form>
             )}
             <Link to="/login" style={{ marginTop: "1rem", color: "var(--color-accent)" }}>חזרה לכניסה</Link>

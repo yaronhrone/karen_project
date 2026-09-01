@@ -23,6 +23,16 @@ public class PasswordResetTokenRepository {
         jdbcTemplate.update(sql, email);
     }
 
+    // Cooldown check - see PasswordResetService.requestReset. Catches both
+    // an accidental double-click (fires within ~1s) and basic repeat-request
+    // spam, with no new infra: created_at already exists on the table.
+    public boolean hasRecentRequest(String email, int cooldownSeconds) {
+        String sql = String.format("SELECT COUNT(*) FROM %s WHERE user_email = ? AND created_at > ?", TABLE);
+        Timestamp cutoff = Timestamp.from(java.time.Instant.now().minusSeconds(cooldownSeconds));
+        Integer count = jdbcTemplate.queryForObject(sql, Integer.class, email, cutoff);
+        return count != null && count > 0;
+    }
+
     public void insert(PasswordResetToken token) {
         String sql = String.format("INSERT INTO %s (token_hash, user_email, expires_at) VALUES (?, ?, ?)", TABLE);
         jdbcTemplate.update(sql, token.getTokenHash(), token.getUserEmail(), token.getExpiresAt());

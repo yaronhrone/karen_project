@@ -40,6 +40,12 @@ public class PasswordResetService {
     private String frontendUrl;
 
     private static final SecureRandom SECURE_RANDOM = new SecureRandom();
+    // Minimum gap between two reset emails to the same address - catches an
+    // accidental double-click on "שלח קישור לאיפוס" (fires within ~1s) and
+    // acts as a basic anti-spam guard, without any new infrastructure
+    // (Redis, a scheduled job, etc. would all be overkill for a single-
+    // instance app - the existing created_at column is enough).
+    private static final int RESEND_COOLDOWN_SECONDS = 60;
     // Same strength rule already enforced client-side in Register.jsx -
     // enforced here too since this is a brand-new password-setting path,
     // not an existing one that already relied on client-only validation.
@@ -53,6 +59,12 @@ public class PasswordResetService {
     public void requestReset(String email) {
         CustomUser user = userRepository.findUserByEmail(email);
         if (user == null) {
+            return;
+        }
+        // Silently skip if we already sent one within the cooldown window -
+        // same response either way to the caller, so this stays invisible
+        // and doesn't become a second enumeration signal of its own.
+        if (tokenRepository.hasRecentRequest(email, RESEND_COOLDOWN_SECONDS)) {
             return;
         }
 
