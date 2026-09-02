@@ -27,12 +27,36 @@ services:
       timeout: 5s
       retries: 10
 
+  redis:
+    image: redis:7-alpine
+    restart: unless-stopped
+    # Product catalog cache only (see ItemCacheService) - Postgres remains
+    # the source of truth, so losing this on a restart is a non-event, just
+    # temporary cache misses. No persistent volume on purpose.
+    # maxmemory: this is a t3.micro (1GB RAM) in production, already running
+    # Postgres + two JVMs + Caddy + the frontend. ItemRepository's
+    # clampPage() only has a lower bound (page >= 1), no upper bound, so an
+    # unbounded ?page= could otherwise grow the keyspace indefinitely with
+    # empty-array cache entries. allkeys-lru is safe specifically because
+    # Redis is never the system of record here - eviction under memory
+    # pressure only ever forces a cache miss, never loses real data.
+    command: redis-server --maxmemory 128mb --maxmemory-policy allkeys-lru
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    ports:
+      - "6379:6379"
+
   items-service:
     build:
       context: ./items-service
     restart: unless-stopped
     depends_on:
       postgres:
+        condition: service_healthy
+      redis:
         condition: service_healthy
     healthcheck:
       test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://127.0.0.1:8080/actuator/health"]
@@ -57,6 +81,10 @@ services:
       # CORS allowed origin - defaults to localhost:3000 in the app itself;
       # set to the real deployed frontend URL in production's .env.
       FRONTEND_URL: ${FRONTEND_URL:-http://localhost:3000}
+      # Container-network hostname, not localhost - see ItemCacheService/
+      # RedisConfig. Not a secret, safe as a plain default.
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
     ports:
       - "8080:8080"
 

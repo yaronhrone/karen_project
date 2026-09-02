@@ -12,6 +12,41 @@ spring:
   h2:
     console:
       enabled: true
+  # Product catalog cache - see ItemCacheService. localhost:6379 default is
+  # for a bare `mvnw spring-boot:run` with a manually-started local Redis;
+  # docker-compose overrides both to the `redis` service. Docker-internal
+  # traffic only - short timeouts on purpose: without them, a Redis that's
+  # up but unresponsive (not cleanly connection-refused) would make every
+  # product-page request block for Lettuce's 60s default before falling
+  # through to Postgres - exactly the opposite of the fail-open design.
+  data:
+    redis:
+      host: ${REDIS_HOST:localhost}
+      port: ${REDIS_PORT:6379}
+      timeout: 2s
+      connect-timeout: 2s
+
+# spring-boot-starter-data-redis + the actuator (already a dependency) auto-
+# configures a Redis health indicator that participates in /actuator/health -
+# the exact same shape of problem as MailHealthIndicator caused for
+# spring-boot-starter-mail in the security service (see that service's
+# application.yaml comment, and the real incident it caused: took the whole
+# site down on first deploy). A Redis blip would flip this service's health
+# to DOWN, fail its Docker healthcheck, and could block/hang users-service +
+# frontend from starting (both depend on this service being healthy) -
+# completely undoing ItemCacheService's own fail-open guard. Disabled for
+# the same reason it was disabled there.
+management:
+  health:
+    redis:
+      enabled: false
+
+# How long a cached product-catalog page/item stays valid - see
+# ItemCacheService. Writes (create/update/delete) evict the relevant entries
+# immediately regardless of this value; this is only the ceiling for how
+# stale an unwritten-to entry can get.
+product-cache:
+  ttl-hours: 12
 
 # Must match jwt.secret in the users/security service (8081) - both services
 # validate tokens issued by that service. No default on purpose: this used to

@@ -99,6 +99,12 @@
 			<artifactId>jackson-databind</artifactId>
 			<version>2.18.0</version>
 		</dependency>
+		<!-- Product catalog cache (12h TTL) - see ItemCacheService. Lettuce client by
+		     default, no separate driver dependency needed. -->
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-data-redis</artifactId>
+		</dependency>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-test</artifactId>

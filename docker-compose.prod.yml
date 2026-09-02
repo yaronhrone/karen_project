@@ -15,6 +15,12 @@ services:
   postgres:
     ports: !reset []
 
+  # Product catalog cache - internal-only, no legitimate reason for it to
+  # ever be reachable from outside the compose network, same reasoning as
+  # postgres above.
+  redis:
+    ports: !reset []
+
   items-service:
     image: ghcr.io/yaronhrone/karen-project-items-service:latest
     build: !reset null

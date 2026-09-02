@@ -16,6 +16,8 @@ public class ItemService {
 
     @Autowired
     public ItemRepository itemRepository;
+    @Autowired
+    private ItemCacheService itemCacheService;
 
 
     public String createItem(Items item){
@@ -38,13 +40,23 @@ public class ItemService {
             return "The item is exists";
         }
 
-        return itemRepository.createItem(item);
+        String result = itemRepository.createItem(item);
+        // Only reached once the insert actually happened (both guard checks
+        // above passed) - safe to evict unconditionally here.
+        itemCacheService.evictCategory(item.getCategory());
+        return result;
     }
     public List<Items> getAll(int page,int size){
       return   itemRepository.getAll(page,size);
     }
     public List<Items> getItemsByCategory(String category , int page,int size){
-        return itemRepository.getItemsByCategory(category, page,size);
+        List<Items> cached = itemCacheService.getCategoryPage(category, page, size);
+        if (cached != null) {
+            return cached;
+        }
+        List<Items> result = itemRepository.getItemsByCategory(category, page,size);
+        itemCacheService.putCategoryPage(category, page, size, result);
+        return result;
     }
     public List<Items> getItemsByCategoryAndName(String category,String name){
         return itemRepository.getItemsByCategoryAndName(category,name);
@@ -64,26 +76,64 @@ public class ItemService {
         if (existing == null || existing.isEmpty()) {
             return "The item is not exists";
         }
-        return itemRepository.deleteItem(name);
+        String result = itemRepository.deleteItem(name);
+        // getItemByName above is a case-insensitive SUBSTRING match
+        // ("LIKE '%name%'"), but the actual DELETE is an exact match - so
+        // `existing` can contain more rows than were really deleted (e.g.
+        // deleting "Pizza" while "Margherita Pizza" also exists returns
+        // both, but only one row is dropped). Evicting every item in
+        // `existing`, not just the deleted one, is the safe/defensive
+        // choice: over-eviction just costs an extra cache miss, but
+        // under-eviction would let a genuinely-deleted item's stale cache
+        // entry keep serving from Redis for up to 12h.
+        for (Items possiblyDeleted : existing) {
+            itemCacheService.evictCategory(possiblyDeleted.getCategory());
+            itemCacheService.evictById(possiblyDeleted.getId());
+        }
+        return result;
     }
     public String deleteItemById(int id){
-        if (itemRepository.getItemById(id) == null) {
+        Items existing = itemRepository.getItemById(id);
+        if (existing == null) {
             return "The item is not exists";
         }
-        return itemRepository.deleteItemById(id);
+        String result = itemRepository.deleteItemById(id);
+        itemCacheService.evictCategory(existing.getCategory());
+        itemCacheService.evictById(id);
+        return result;
     }
 
     public Items getItemById(int id){
-
-        return itemRepository.getItemById(id);
+        Items cached = itemCacheService.getById(id);
+        if (cached != null) {
+            return cached;
+        }
+        Items result = itemRepository.getItemById(id);
+        itemCacheService.putById(id, result);
+        return result;
     }
     public String updateItem(Items item){
         if (item.getPrice() == null || item.getPrice().signum() <= 0) {
             return "Price must be greater than 0";
         }
-        if (itemRepository.getItemById(item.getId()) == null) {
+        // Deliberately itemRepository.getItemById, not this class's own
+        // getItemById - that method is cache-wrapped, and routing this
+        // existence/pre-update-state check through it would risk reading a
+        // stale cached copy right at the one place meant to establish
+        // ground truth (the item's category before the update, used below
+        // for eviction).
+        Items existing = itemRepository.getItemById(item.getId());
+        if (existing == null) {
             return "The item is not exists";
         }
-        return itemRepository.updateItem(item);
+        String result = itemRepository.updateItem(item);
+        // Evict both the old category (in case this update changed it) and
+        // the new one - either could now hold stale cached pages.
+        itemCacheService.evictCategory(existing.getCategory());
+        if (!existing.getCategory().equals(item.getCategory())) {
+            itemCacheService.evictCategory(item.getCategory());
+        }
+        itemCacheService.evictById(item.getId());
+        return result;
     }
 }
