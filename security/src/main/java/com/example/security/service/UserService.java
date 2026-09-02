@@ -19,6 +19,8 @@ public class UserService {
     @Autowired
     private OrderService orderService;
     @Autowired
+    private PasswordResetService passwordResetService;
+    @Autowired
     private PasswordEncoder passwordEncoder;
 
     public String register(CustomUser user) {
@@ -62,6 +64,7 @@ public class UserService {
         }
         favoriteService.deleteAllItemFavorites(registeredUser.getEmail());
         orderService.deleteAllOrders(registeredUser.getEmail());
+        passwordResetService.deleteAllTokensForEmail(registeredUser.getEmail());
         return userRepository.deleteUser(registeredUser.getEmail());
     }
 

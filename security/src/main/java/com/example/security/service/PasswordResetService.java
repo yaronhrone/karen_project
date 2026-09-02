@@ -89,6 +89,13 @@ public class PasswordResetService {
         }
     }
 
+    // Called from UserService.deleteUser - password_reset_tokens.user_email has
+    // a FK on users.email with no cascade, so a leftover row (from anyone who
+    // ever requested a reset, used or not) blocks the DELETE outright.
+    public void deleteAllTokensForEmail(String email) {
+        tokenRepository.deleteAllForEmail(email);
+    }
+
     public boolean resetPassword(String rawToken, String newPassword) {
         if (rawToken == null || newPassword == null || !PASSWORD_REGEX.matcher(newPassword).matches()) {
             return false;
