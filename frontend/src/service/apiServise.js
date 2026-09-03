@@ -118,10 +118,12 @@ export const createItem = (formData) => {
 return result;
 }
 
-export const updateItem = (item) => {
-    console.log(item + " from apiService");
-    
-    return axios.put(`${BASE_URL}/admin/update_item`, item, { headers: getAuthHeader() });
+// Multipart now, mirroring createItem above - a new photo is optional (see
+// AdminProducts.jsx's updateItemId, which only appends a 'file' part when
+// one was actually picked). No explicit Content-Type - axios sets the
+// multipart boundary itself from the FormData instance.
+export const updateItem = (formData) => {
+    return axios.put(`${BASE_URL}/admin/update_item`, formData, { headers: getAuthHeader() });
 }
 
 export const deleteItemById = (id) => {

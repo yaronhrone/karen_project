@@ -122,18 +122,47 @@ public class AdminController {
         }
     }
 
+    // Multipart, mirroring createItem below - a new photo is optional (a
+    // text-only edit sends no "file" part at all, and the existing
+    // image/delete_img_id just carry forward unchanged). When a new file IS
+    // provided, it's uploaded to S3 before the old object is deleted - if
+    // the upload throws, the item keeps its original image instead of
+    // ending up with none.
     @PreAuthorize("hasAuthority('ADMIN')")
-    @PutMapping(value = "/update_item")
-    public ResponseEntity<String> updateItem(@RequestBody Item item) {
-
+    @PutMapping(value = "/update_item", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
+    public ResponseEntity<String> updateItem(@RequestPart("item") ItemUpdateRequest itemRequest,
+                                              @RequestPart(value = "file", required = false) MultipartFile file) {
         try {
+            Item existing = itemService.getItemById(itemRequest.getId());
+            if (existing == null) {
+                return ResponseEntity.badRequest().body("The item is not exists");
+            }
+
+            Item item = new Item();
+            item.setId(itemRequest.getId());
+            item.setName(itemRequest.getName());
+            item.setCategory(itemRequest.getCategory());
+            item.setDescription(itemRequest.getDescription());
+            item.setPrice(itemRequest.getPrice());
+            item.setVeg(itemRequest.isVeg());
+
+            if (file != null && !file.isEmpty()) {
+                S3Service.UploadResult uploadResult = s3Service.upload(file);
+                item.setImage(uploadResult.url());
+                item.setDeleteImgId(uploadResult.key());
+                s3Service.delete(existing.getDeleteImgId());
+            } else {
+                item.setImage(existing.getImage());
+                item.setDeleteImgId(existing.getDeleteImgId());
+            }
+
             String result = itemService.updateItem(item);
             if (result.contains("updated")) {
-                return new ResponseEntity<>(result, HttpStatus.OK);
+                return ResponseEntity.ok().body(result);
             }
-            return new ResponseEntity<>(result, HttpStatus.BAD_REQUEST);
+            return ResponseEntity.badRequest().body(result);
         } catch (Exception e) {
-            return new ResponseEntity(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+            return ResponseEntity.badRequest().body(e.getMessage());
         }
     }
     @PreAuthorize("hasAuthority('ADMIN')")

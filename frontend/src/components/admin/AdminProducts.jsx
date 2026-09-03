@@ -9,6 +9,10 @@ function AdminProducts() {
     const [error, setError] = useState('');
     const [item, setItem] = useState([]);
     const [file, setFile] = useState(null);
+    // Separate from `file` (the create form's) on purpose - sharing one
+    // state let a stale File picked earlier in the create form leak into an
+    // unrelated later edit that never touched the photo.
+    const [updateFile, setUpdateFile] = useState(null);
     const [csvFile, setCsvFile] = useState(null);
     const [importResult, setImportResult] = useState(null);
     const [importing, setImporting] = useState(false);
@@ -136,6 +140,9 @@ console.log(realFile + "file ");
     }
     const toggleupdate = (id) => {
         setUpdateId(id === updateId ? null : id);
+        // Opening a different edit, or canceling one - either way, any
+        // photo picked for a previous edit session must not carry over.
+        setUpdateFile(null);
         const itemToEdite = item.find(item => item.id === id);
         if (itemToEdite) {
             setItemsFrom({ ...itemToEdite })
@@ -147,10 +154,40 @@ console.log(realFile + "file ");
             setError('Price must be greater than 0');
             return;
         }
+        // A new photo is optional here (unlike create) - only attach a
+        // 'file' part when the admin actually picked one this edit; its
+        // absence tells the backend to keep the item's existing image
+        // untouched.
+        if (updateFile && !(updateFile instanceof File)) {
+            setError('Invalid file');
+            return;
+        }
+        const formData = new FormData();
+        if (updateFile) {
+            const realFile = new File([updateFile], "upload.jpg", { type: updateFile.type || "image/jpeg" });
+            formData.append('file', realFile);
+        }
+        formData.append('item', new Blob([JSON.stringify({
+            id: updateId,
+            name: itemsFrom.name.trim(),
+            category: itemsFrom.category.trim(),
+            description: itemsFrom.description.trim(),
+            price: Number(itemsFrom.price),
+            veg: itemsFrom.veg
+        })], { type: 'application/json' }));
         try {
-            await updateItem({ ...itemsFrom, id: updateId });
-            setItem(prev => prev.map(i => i.id === updateId ? { ...itemsFrom, id: updateId } : i));
+            await updateItem(formData);
             setUpdateId(null);
+            setUpdateFile(null);
+            // Re-fetch rather than merge itemsFrom locally - itemsFrom still
+            // holds the OLD image URL (copied in toggleupdate before any
+            // replace happened), so a local merge would keep showing the
+            // old photo until a manual page refresh even though the
+            // replace actually succeeded. Same refresh pattern already used
+            // after a CSV import below.
+            setItem([]);
+            setPageItem(1);
+            handelItems();
         } catch (error) {
             console.log(error);
             if (error.response?.status === 400 || error.response?.status === 500) {
@@ -232,7 +269,7 @@ console.log(realFile + "file ");
                                 <input type="text" placeholder="Name" value={itemsFrom.name} onChange={(e) => setItemsFrom({ ...itemsFrom, name: e.target.value })} />
                                 <input type="text" placeholder="Description" value={itemsFrom.description} onChange={(e) => setItemsFrom({ ...itemsFrom, description: e.target.value })} />
                                 <input type="number" placeholder="Price" value={itemsFrom.price} onChange={(e) => setItemsFrom({ ...itemsFrom, price: parseFloat(e.target.value) })} />
-                                <input type="file" placeholder="Upload Image" onChange={(e) => setFile({ image: e.target.files[0] })} />
+                                <input type="file" placeholder="Upload Image" accept="image/*" onChange={(e) => setUpdateFile(e.target.files[0])} />
                                 <select value={itemsFrom.category} onChange={(e) => setItemsFrom({ ...itemsFrom, category: e.target.value })}>
                                     <option value="">Select Category</option>
                                     <option value="chocolate">Chocolate</option>
