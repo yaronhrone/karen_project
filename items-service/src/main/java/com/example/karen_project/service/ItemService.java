@@ -27,7 +27,7 @@ public class ItemService {
         // and order-total math through this route even though the admin
         // frontend form also checks it (a direct API call skips that).
         if (item.getPrice() == null || item.getPrice().signum() <= 0) {
-            return "Price must be greater than 0";
+            return "המחיר חייב להיות גדול מ-0";
         }
         // Was inverted: getItemByName never actually returns null in the
         // normal case (it returns an empty List when nothing matches, only
@@ -37,7 +37,7 @@ public class ItemService {
         // to the insert instead of being blocked. Both directions backwards.
         List<Items> existing = itemRepository.getItemByName(item.getName());
         if (existing != null && !existing.isEmpty()) {
-            return "The item is exists";
+            return "מוצר בשם הזה כבר קיים במערכת";
         }
 
         String result = itemRepository.createItem(item);
@@ -74,7 +74,7 @@ public class ItemService {
         // DELETE and reported success either way.
         List<Items> existing = itemRepository.getItemByName(name);
         if (existing == null || existing.isEmpty()) {
-            return "The item is not exists";
+            return "המוצר לא קיים במערכת";
         }
         String result = itemRepository.deleteItem(name);
         // getItemByName above is a case-insensitive SUBSTRING match
@@ -95,7 +95,7 @@ public class ItemService {
     public String deleteItemById(int id){
         Items existing = itemRepository.getItemById(id);
         if (existing == null) {
-            return "The item is not exists";
+            return "המוצר לא קיים במערכת";
         }
         String result = itemRepository.deleteItemById(id);
         itemCacheService.evictCategory(existing.getCategory());
@@ -114,7 +114,7 @@ public class ItemService {
     }
     public String updateItem(Items item){
         if (item.getPrice() == null || item.getPrice().signum() <= 0) {
-            return "Price must be greater than 0";
+            return "המחיר חייב להיות גדול מ-0";
         }
         // Deliberately itemRepository.getItemById, not this class's own
         // getItemById - that method is cache-wrapped, and routing this
@@ -124,7 +124,7 @@ public class ItemService {
         // for eviction).
         Items existing = itemRepository.getItemById(item.getId());
         if (existing == null) {
-            return "The item is not exists";
+            return "המוצר לא קיים במערכת";
         }
         String result = itemRepository.updateItem(item);
         // Evict both the old category (in case this update changed it) and

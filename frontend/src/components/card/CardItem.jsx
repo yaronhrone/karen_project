@@ -127,7 +127,7 @@ function CardItem({ item, isFavoriteDefault, categoryPath }) {
                         <div className="details">
                             {error && <div className="error">{error}</div>}
                             <h3>{item.name} </h3>
-                            <h3>${item.price}</h3>
+                            <h3>₪{item.price}</h3>
                         </div>
 
                         <div>

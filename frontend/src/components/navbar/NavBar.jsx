@@ -76,7 +76,7 @@ const handleSearch =  (e) => {
   {error && <p>{error}</p>}
 {items?.length > 0 &&  items.map((item) => (
   <p key={item.id} onClick={() => {  setSearch('');
-  setIsSearch(false); setItems([]); navigate(`/search/${item.id}`);} } className='item_info'> {item.name} , {item.price}$ מחיר </p>
+  setIsSearch(false); setItems([]); navigate(`/search/${item.id}`);} } className='item_info'> {item.name} , {item.price}₪ מחיר </p>
 ))
 }
 </div>

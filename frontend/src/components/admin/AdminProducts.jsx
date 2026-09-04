@@ -198,7 +198,26 @@ console.log(realFile + "file ");
 
     return (
         <div className='admin-products'>
-            {error && <p>{error}</p>}
+            {error && <p className='admin-error'>{error}</p>}
+
+            <form onSubmit={handleCreateItem} className='form_item'>
+                <h2 className='tital'>הוספת מוצר</h2>
+                <input type="text" placeholder="שם במוצר" value={itemsFrom.name} onChange={(e) => setItemsFrom({ ...itemsFrom, name: e.target.value })} />
+                <input type="text" placeholder="תיאור" value={itemsFrom.description} onChange={(e) => setItemsFrom({ ...itemsFrom, description: e.target.value })} />
+                <input type="number" placeholder="מחיר" value={itemsFrom.price} onChange={(e) => setItemsFrom({ ...itemsFrom, price: parseFloat(e.target.value) })} />
+                <input type="file" placeholder="העלאת תמונה"   accept="image/*"  onChange={(e) => setFile(  e.target.files[0] )} />
+                <select value={itemsFrom.category} onChange={(e) => setItemsFrom({ ...itemsFrom, category: e.target.value })}>
+                    <option value="">בחר קטגוריה</option>
+                    <option value="chocolate">שוקולד</option>
+                    <option value="cake">עוגה</option>
+                    <option value="cookie">עוגיה</option>
+                </select>
+                <label>
+                    Veg:
+                    <input type="checkbox" checked={itemsFrom.veg} onChange={(e) => setItemsFrom({ ...itemsFrom, veg: e.target.checked })} />
+                </label>
+                <button className='btn' type="submit">Add Item</button>
+            </form>
 
             <form onSubmit={handleImportCsv} className='form_item'>
                 <h2 className='tital'>ייבוא מוצרים מקובץ CSV</h2>
@@ -233,25 +252,6 @@ console.log(realFile + "file ");
                         )}
                     </div>
                 )}
-            </form>
-
-            <form onSubmit={handleCreateItem} className='form_item'>
-                <h2 className='tital'>הוספת מוצר</h2>
-                <input type="text" placeholder="שם במוצר" value={itemsFrom.name} onChange={(e) => setItemsFrom({ ...itemsFrom, name: e.target.value })} />
-                <input type="text" placeholder="תיאור" value={itemsFrom.description} onChange={(e) => setItemsFrom({ ...itemsFrom, description: e.target.value })} />
-                <input type="number" placeholder="מחיר" value={itemsFrom.price} onChange={(e) => setItemsFrom({ ...itemsFrom, price: parseFloat(e.target.value) })} />
-                <input type="file" placeholder="העלאת תמונה"   accept="image/*"  onChange={(e) => setFile(  e.target.files[0] )} />
-                <select value={itemsFrom.category} onChange={(e) => setItemsFrom({ ...itemsFrom, category: e.target.value })}>
-                    <option value="">בחר קטגוריה</option>
-                    <option value="chocolate">שוקולד</option>
-                    <option value="cake">עוגה</option>
-                    <option value="cookie">עוגיה</option>
-                </select>
-                <label>
-                    Veg:
-                    <input type="checkbox" checked={itemsFrom.veg} onChange={(e) => setItemsFrom({ ...itemsFrom, veg: e.target.checked })} />
-                </label>
-                <button className='btn' type="submit">Add Item</button>
             </form>
             <h2 className='tital'>מוצרים</h2>
             <div className='items_container'>

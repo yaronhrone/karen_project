@@ -115,9 +115,18 @@ services:
       SPRING_SQL_INIT_DATA_LOCATIONS: classpath:data-postgresql.sql
       JWT_SECRET: ${JWT_SECRET}
       GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID}
-      # No AWS credentials here on purpose - the S3 SDK picks up the EC2
-      # instance's IAM role automatically (see application.yaml). Override
-      # AWS_S3_BUCKET/AWS_S3_REGION only if not using the defaults.
+      # In production these are unset on purpose - the S3 SDK picks up the
+      # EC2 instance's IAM role automatically (see application.yaml). A
+      # local container has no equivalent IAM role, so real S3
+      # upload/replace testing here needs actual credentials - set
+      # AWS_ACCESS_KEY_ID/AWS_SECRET_ACCESS_KEY in your local .env (e.g. from
+      # `aws configure list`/~/.aws/credentials) if you want product-image
+      # uploads to actually work locally. Leave unset and the SDK's default
+      # credential chain just fails cleanly (image upload errors, nothing
+      # else breaks) - same empty-default pattern as GreenAPI/Gmail below.
+      AWS_ACCESS_KEY_ID: ${AWS_ACCESS_KEY_ID:-}
+      AWS_SECRET_ACCESS_KEY: ${AWS_SECRET_ACCESS_KEY:-}
+      # Override AWS_S3_BUCKET/AWS_S3_REGION only if not using the defaults.
       GREEN_API_ID_INSTANCE: ${GREEN_API_ID_INSTANCE:-}
       GREEN_API_TOKEN_INSTANCE: ${GREEN_API_TOKEN_INSTANCE:-}
       KEREN_WHATSAPP_NUMBER: ${KEREN_WHATSAPP_NUMBER:-}

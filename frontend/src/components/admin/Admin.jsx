@@ -26,7 +26,7 @@ function Admin() {
     }
     return (
         <div className='admin'>
-            <h2 className='tital'>Admin page</h2>
+            <h2 className='tital'>דף מנהל</h2>
             <AdminNav />
             <Outlet />
         </div>

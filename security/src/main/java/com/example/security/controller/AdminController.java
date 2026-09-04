@@ -64,7 +64,7 @@ public class AdminController {
 
             try {
                 if(file.isEmpty()) {
-                    return ResponseEntity.badRequest().body("Please upload a file");
+                    return ResponseEntity.badRequest().body("יש להעלות תמונה");
                 }
         // העלאה ל-S3
         S3Service.UploadResult uploadResult = s3Service.upload(file);
@@ -135,7 +135,7 @@ public class AdminController {
         try {
             Item existing = itemService.getItemById(itemRequest.getId());
             if (existing == null) {
-                return ResponseEntity.badRequest().body("The item is not exists");
+                return ResponseEntity.badRequest().body("המוצר לא קיים במערכת");
             }
 
             Item item = new Item();

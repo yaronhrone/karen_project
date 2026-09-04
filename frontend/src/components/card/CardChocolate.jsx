@@ -105,7 +105,7 @@ const CardChocolate = ({ item, isFavoriteDefault, addToList, removeFromList, rem
                         <div className="details">
                             {error && <div className="error">{error}</div>}
                             <h3>{item.name} </h3>
-                            <h3>${item.price}</h3>
+                            <h3>₪{item.price}</h3>
                         </div>
 
                         <div>
