@@ -1,6 +1,7 @@
 import React, { useState } from 'react'
 import { createItem, deleteItemById, getAllItems, importItemsCsv, updateItem } from '../../service/apiServise';
 import CardItem from '../card/CardItem';
+import Modal from '../modal/Modal';
 import './Admin.css';
 
 function AdminProducts() {
@@ -124,19 +125,24 @@ console.log(realFile + "file ");
         }
         setImporting(false);
     };
-    const deleteItem = async (id) => {
-        if (!window.confirm('למחוק את המוצר הזה? הפעולה בלתי הפיכה.')) {
+    // Was window.confirm() - a native browser popup, not styled at all.
+    // Now opens the shared Modal (same one PhoneNumberPrompt already uses)
+    // instead - deleteTarget holds the pending item's id while it's open.
+    const [deleteTarget, setDeleteTarget] = useState(null);
+    const confirmDelete = async () => {
+        if (deleteTarget == null) {
             return;
         }
         try {
-            await deleteItemById(id);
-            setItem(item.filter(item => item.id !== id));
+            await deleteItemById(deleteTarget);
+            setItem(item.filter(i => i.id !== deleteTarget));
         } catch (error) {
             console.log(error);
             if (error.response?.status === 400 || error.response?.status === 500) {
                 setError(error.response.data);
             }
         }
+        setDeleteTarget(null);
     }
     const toggleupdate = (id) => {
         setUpdateId(id === updateId ? null : id);
@@ -213,10 +219,10 @@ console.log(realFile + "file ");
                     <option value="cookie">עוגיה</option>
                 </select>
                 <label>
-                    Veg:
+                    צמחוני:
                     <input type="checkbox" checked={itemsFrom.veg} onChange={(e) => setItemsFrom({ ...itemsFrom, veg: e.target.checked })} />
                 </label>
-                <button className='btn' type="submit">Add Item</button>
+                <button className='btn' type="submit">תוסיף מוצר</button>
             </form>
 
             <form onSubmit={handleImportCsv} className='form_item'>
@@ -259,25 +265,25 @@ console.log(realFile + "file ");
                 {item.length > 0 && item.map(item => (
                     <div key={item.id} >
                         <CardItem item={item} />
-                        <button className='btn' type='button' onClick={() => deleteItem(item.id)}>Delete</button>
+                        <button className='btn' type='button' onClick={() => setDeleteTarget(item.id)}>מחיקה</button>
                         <button className='btn' type='button' onClick={() => toggleupdate(item.id)}>
-                            {updateId === item.id ? 'Cancel' : 'Update'}
+                            {updateId === item.id ? 'ביטול' : 'עריכה'}
                         </button>
                         {updateId === item.id && (
                             <form onSubmit={updateItemId} className='form_item'>
 
-                                <input type="text" placeholder="Name" value={itemsFrom.name} onChange={(e) => setItemsFrom({ ...itemsFrom, name: e.target.value })} />
-                                <input type="text" placeholder="Description" value={itemsFrom.description} onChange={(e) => setItemsFrom({ ...itemsFrom, description: e.target.value })} />
-                                <input type="number" placeholder="Price" value={itemsFrom.price} onChange={(e) => setItemsFrom({ ...itemsFrom, price: parseFloat(e.target.value) })} />
-                                <input type="file" placeholder="Upload Image" accept="image/*" onChange={(e) => setUpdateFile(e.target.files[0])} />
+                                <input type="text" placeholder="שם המוצר" value={itemsFrom.name} onChange={(e) => setItemsFrom({ ...itemsFrom, name: e.target.value })} />
+                                <input type="text" placeholder="תיאור" value={itemsFrom.description} onChange={(e) => setItemsFrom({ ...itemsFrom, description: e.target.value })} />
+                                <input type="number" placeholder="מחיר" value={itemsFrom.price} onChange={(e) => setItemsFrom({ ...itemsFrom, price: parseFloat(e.target.value) })} />
+                                <input type="file" placeholder="העלאת תמונה" accept="image/*" onChange={(e) => setUpdateFile(e.target.files[0])} />
                                 <select value={itemsFrom.category} onChange={(e) => setItemsFrom({ ...itemsFrom, category: e.target.value })}>
-                                    <option value="">Select Category</option>
-                                    <option value="chocolate">Chocolate</option>
-                                    <option value="cake">Cake</option>
-                                    <option value="cookie">Cookie</option>
+                                    <option value="">בחר קטגוריה</option>
+                                    <option value="chocolate">שוקולד</option>
+                                    <option value="cake">עוגה</option>
+                                    <option value="cookie">עוגיה</option>
                                 </select>
-                                <label>  Veg:  <input className='veg' type="checkbox" checked={itemsFrom.veg} onChange={(e) => setItemsFrom({ ...itemsFrom, veg: e.target.checked })} /> </label>
-                                <button className='btn' type="submit">Save</button>
+                                <label>  צמחוני:  <input className='veg' type="checkbox" checked={itemsFrom.veg} onChange={(e) => setItemsFrom({ ...itemsFrom, veg: e.target.checked })} /> </label>
+                                <button className='btn' type="submit">שמירה</button>
                             </form>
 
                         )}
@@ -286,6 +292,19 @@ console.log(realFile + "file ");
 
             </div>
             <button className='btn' onClick={handelItems}>קבל מוצרים</button>
+            <Modal
+                isOpen={deleteTarget !== null}
+                onClose={() => setDeleteTarget(null)}
+                title="מחיקת מוצר"
+                footer={
+                    <>
+                        <button className='btn' type='button' onClick={() => setDeleteTarget(null)}>ביטול</button>
+                        <button className='btn btn-cancel' type='button' onClick={confirmDelete}>מחיקה</button>
+                    </>
+                }
+            >
+                <p>למחוק את המוצר הזה? הפעולה בלתי הפיכה.</p>
+            </Modal>
         </div>
     )
 }

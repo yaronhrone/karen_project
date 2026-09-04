@@ -16,8 +16,8 @@
 }
 
 .icon_f {
-  width: 28px;
-  height: 28px;
+  width: 35px;
+  height: 35px;
   color: #fff;
   transition: transform var(--transition), color var(--transition);
 }
