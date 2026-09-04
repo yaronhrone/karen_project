@@ -23,11 +23,19 @@ CREATE TABLE IF NOT EXISTS orders (
     user_email VARCHAR(255) NOT NULL,
     order_status VARCHAR(255) NOT NULL,
     order_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    ready_by TIMESTAMP,
     address_shipping VARCHAR(255) NOT NULL,
     total_price DECIMAL(10,2) NOT NULL,
     PRIMARY KEY (id),
     FOREIGN KEY (user_email) REFERENCES users (email)
 );
+
+-- CREATE TABLE IF NOT EXISTS above is a no-op against the orders table
+-- that already exists in every deployed environment - this is what
+-- actually adds the column there. Optional - set only when Keren advances
+-- an order to IN_PROGRESS (see OrderService.advanceOrderStatus); must
+-- never be overwritten by a later status change (READY/CANCELLED) once set.
+ALTER TABLE orders ADD COLUMN IF NOT EXISTS ready_by TIMESTAMP;
 
 CREATE TABLE IF NOT EXISTS order_items (
     id INT GENERATED ALWAYS AS IDENTITY,

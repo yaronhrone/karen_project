@@ -25,7 +25,10 @@ public class OrderService {
     // sections client-side: RECEIVED = "open", IN_PROGRESS = "in prep",
     // READY = "closed").
     private static final List<String> ADMIN_BOARD_STATUSES = List.of("RECEIVED", "IN_PROGRESS", "READY");
-    private static final List<String> ADVANCEABLE_STATUSES = List.of("IN_PROGRESS", "READY");
+    // Every status advanceOrderStatus is allowed to set - not just forward
+    // steps anymore now that CANCELLED is settable from RECEIVED or
+    // IN_PROGRESS too (see AdminOrders.jsx for when each button shows).
+    private static final List<String> SETTABLE_STATUSES = List.of("IN_PROGRESS", "READY", "CANCELLED");
 
 
     public Integer createOrder(String email) {
@@ -127,11 +130,19 @@ public class OrderService {
         return result;
     }
 
-    public String advanceOrderStatus(int orderId, String newStatus) {
-        if (!ADVANCEABLE_STATUSES.contains(newStatus)) {
+    public String advanceOrderStatus(int orderId, String newStatus, java.time.LocalDate readyBy) {
+        if (!SETTABLE_STATUSES.contains(newStatus)) {
             return "Invalid status";
         }
-        orderRepository.updateOrderStatus(orderId, newStatus);
+        // readyBy only ever gets written on the RECEIVED -> IN_PROGRESS
+        // transition - every other target status uses the plain update,
+        // which never touches ready_by (see OrderRepository comment on
+        // updateOrderStatusAndReadyBy for why that separation matters).
+        if ("IN_PROGRESS".equals(newStatus)) {
+            orderRepository.updateOrderStatusAndReadyBy(orderId, newStatus, readyBy);
+        } else {
+            orderRepository.updateOrderStatus(orderId, newStatus);
+        }
         return "Order status updated successfully";
     }
 

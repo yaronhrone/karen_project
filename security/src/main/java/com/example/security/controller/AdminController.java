@@ -214,8 +214,10 @@ public class AdminController {
 
     }
 
-    // Every order on Keren's admin board (RECEIVED/IN_PROGRESS/READY),
-    // across all users - AdminOrders.jsx groups these into its 3 sections.
+    // Every order on Keren's admin board (RECEIVED/IN_PROGRESS/READY) -
+    // AdminOrders.jsx groups these into its 3 sections. A CANCELLED order
+    // drops off this list entirely once its status changes (by design -
+    // history stays in the DB, not surfaced as a 4th board section).
     @PreAuthorize("hasAuthority('ADMIN')")
     @GetMapping("/orders/board")
     public ResponseEntity<List<Order>> getOrdersForAdminBoard() {
@@ -228,9 +230,12 @@ public class AdminController {
 
     @PreAuthorize("hasAuthority('ADMIN')")
     @PutMapping("/order/{id}/status")
-    public ResponseEntity<String> advanceOrderStatus(@PathVariable int id, @RequestParam String status) {
+    public ResponseEntity<String> advanceOrderStatus(@PathVariable int id, @RequestParam String status,
+                                                       @RequestParam(required = false) String readyBy) {
         try {
-            String result = orderService.advanceOrderStatus(id, status);
+            java.time.LocalDate parsedReadyBy = (readyBy != null && !readyBy.isBlank())
+                    ? java.time.LocalDate.parse(readyBy) : null;
+            String result = orderService.advanceOrderStatus(id, status, parsedReadyBy);
             if ("Invalid status".equals(result)) {
                 return ResponseEntity.badRequest().body(result);
             }

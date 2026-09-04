@@ -169,8 +169,9 @@ export const deleteOrderById = (id) => {
 export const getAdminOrdersBoard = () => {
     return axios.get(`${BASE_URL}/admin/orders/board`, { headers: getAuthHeader() });
 }
-export const advanceOrderStatus = (orderId, status) => {
-    return axios.put(`${BASE_URL}/admin/order/${orderId}/status?status=${status}`, null, { headers: getAuthHeader() });
+export const advanceOrderStatus = (orderId, status, readyBy) => {
+    const readyByParam = readyBy ? `&readyBy=${readyBy}` : '';
+    return axios.put(`${BASE_URL}/admin/order/${orderId}/status?status=${status}${readyByParam}`, null, { headers: getAuthHeader() });
 }
 // Bulk product import - see ItemImportService.java for the expected CSV
 // columns (name, description, price, category, veg, image_url).

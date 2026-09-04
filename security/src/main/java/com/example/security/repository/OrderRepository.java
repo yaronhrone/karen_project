@@ -76,6 +76,17 @@ public class OrderRepository {
         jdbcTemplate.update(sql, status, orderId);
     }
 
+    // Separate from updateOrderStatus above on purpose - only the
+    // RECEIVED -> IN_PROGRESS transition ever calls this. If a later
+    // transition (e.g. IN_PROGRESS -> READY) also wrote ready_by, it would
+    // silently overwrite an already-set value back to whatever was passed
+    // (usually null) - updateOrderStatus staying untouched is what protects
+    // against that.
+    public void updateOrderStatusAndReadyBy(int orderId, String status, java.time.LocalDate readyBy) {
+        String sql = "UPDATE " + ORDER_TABLE + " SET order_status = ?, ready_by = ? WHERE id = ?";
+        jdbcTemplate.update(sql, status, readyBy, orderId);
+    }
+
     // Keren's "active orders" inbox in Admin - orders she still needs to act
     // on (already sent by the customer, not yet marked ready/shipped).
     public List<Order> getOrdersByStatuses(List<String> statuses) {

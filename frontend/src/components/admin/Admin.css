@@ -159,3 +159,31 @@
 .order_row:last-child{
     border-bottom: none;
 }
+.ready-by-input{
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 14px;
+    color: var(--color-text);
+}
+.ready-by-input input{
+    border: 1px solid var(--color-bg-alt);
+    border-radius: var(--radius-sm);
+    padding: 6px 8px;
+    background: var(--color-bg);
+    color: var(--color-text);
+}
+.order_row_actions{
+    display: flex;
+    gap: 10px;
+}
+/* Compound selector (not just .btn-cancel) so this reliably beats .btn's
+   own background-color regardless of CSS import order between index.css
+   (global) and this component-scoped stylesheet. */
+.btn.btn-cancel{
+    background-color: var(--color-danger);
+    color: #fff;
+}
+.btn.btn-cancel:hover{
+    filter: brightness(0.9);
+}

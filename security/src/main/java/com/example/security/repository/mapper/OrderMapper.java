@@ -17,6 +17,9 @@ public class OrderMapper implements RowMapper<Order> {
         order.setAddressShipping(rs.getString("address_shipping"));
         order.setStatus(Status.valueOf(rs.getString("order_status")));
         order.setOrderDate(rs.getDate("order_date").toLocalDate());
+        // Nullable - most orders never get one (see Order.java comment).
+        java.sql.Date readyBy = rs.getDate("ready_by");
+        order.setReadyBy(readyBy != null ? readyBy.toLocalDate() : null);
         // Was rs.getDouble()+BigDecimal.valueOf() - a binary float round-trip
         // on a DECIMAL(10,2) money column, unlike OrderItemsMapper/ItemMapper
         // which correctly read the same column type via getBigDecimal().

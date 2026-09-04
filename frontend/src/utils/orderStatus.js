@@ -6,6 +6,7 @@ const STATUS_LABELS = {
   RECEIVED: 'התקבלה',
   IN_PROGRESS: 'בהכנה',
   READY: 'מוכן / נשלח',
+  CANCELLED: 'בוטלה',
   // Legacy - orders placed before the 3-stage flow existed still have this
   // in the DB (Status.java keeps it defined for exactly that reason).
   CLOSE: 'הושלם',

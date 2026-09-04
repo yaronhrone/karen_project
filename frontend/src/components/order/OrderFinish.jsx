@@ -9,6 +9,7 @@ function OrderFinish({ order }) {
             <div className='orderHeader'>
                 <h3>מצב הזמנה: {getOrderStatusLabel(order.status)}</h3>
                 <h3>תאריך הזמנה: {order.order_date}</h3>
+                {order.ready_by && <h3>מוכן ב-: {order.ready_by}</h3>}
                 <h3>מחיר כולל: ₪{order.total_price}</h3>
             </div>
             <div className='orderItemContainer'>

@@ -16,6 +16,11 @@ CREATE TABLE orders (
     user_email VARCHAR(255) NOT NULL,
     order_status VARCHAR(255) NOT NULL,
     order_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    -- Optional - set only when Keren advances an order to IN_PROGRESS (see
+    -- OrderService.advanceOrderStatus). Nullable on purpose: most orders
+    -- never get one, and it must never be overwritten by a later status
+    -- change (READY/CANCELLED) once set.
+    ready_by TIMESTAMP,
     address_shipping VARCHAR(255) NOT NULL,
     total_price DECIMAL(10,2) NOT NULL,
     PRIMARY KEY (id),

@@ -13,6 +13,10 @@ public class Order {
     private Status status;
     @JsonProperty("order_date")
     private LocalDate orderDate;
+    // Optional - set only when advanced to IN_PROGRESS (see
+    // OrderService.advanceOrderStatus). Null for most orders.
+    @JsonProperty("ready_by")
+    private LocalDate readyBy;
     @JsonProperty("total_price")
     private BigDecimal totalPrice;
     @JsonProperty("address_shipping")
@@ -85,6 +89,14 @@ public class Order {
         this.orderDate = orderDate;
     }
 
+    public LocalDate getReadyBy() {
+        return readyBy;
+    }
+
+    public void setReadyBy(LocalDate readyBy) {
+        this.readyBy = readyBy;
+    }
+
     public BigDecimal getTotalPrice() {
         return totalPrice;
     }
@@ -100,6 +112,7 @@ public class Order {
                 ", userEmail='" + userEmail + '\'' +
                 ", status=" + status +
                 ", orderDate=" + orderDate +
+                ", readyBy=" + readyBy +
                 ", totalPrice=" + totalPrice +
                 ", addressShipping='" + addressShipping + '\'' +
                 ", orderItems=" + orderItems +

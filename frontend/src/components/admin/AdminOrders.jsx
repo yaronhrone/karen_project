@@ -24,6 +24,10 @@ const GROUPS = [
 function AdminOrders() {
     const [orders, setOrders] = useState([]);
     const [error, setError] = useState('');
+    // Draft "ready by" date per order, while it's still RECEIVED - only
+    // sent along when actually advancing that specific order to
+    // IN_PROGRESS (see handleAdvanceStatus below).
+    const [readyByDrafts, setReadyByDrafts] = useState({});
 
     const loadOrders = async () => {
         try {
@@ -50,10 +54,27 @@ function AdminOrders() {
             return;
         }
         try {
-            await advanceOrderStatus(order.id, nextStatus);
+            await advanceOrderStatus(order.id, nextStatus, readyByDrafts[order.id]);
             // The order moves to a different section (or drops off the
             // board entirely once READY -> nothing further) - just reload
             // rather than patch one row across groups.
+            loadOrders();
+        } catch (error) {
+            console.log(error);
+            if (error.response?.status === 400 || error.response?.status === 500) {
+                setError(error.response.data);
+            }
+        }
+    };
+
+    // CANCELLED isn't part of the forward NEXT_STATUS map (it's not a "next
+    // step" for any status) - available from RECEIVED/IN_PROGRESS only, not
+    // READY (already fulfilled/handed off by then).
+    const handleCancelStatus = async (order) => {
+        try {
+            await advanceOrderStatus(order.id, 'CANCELLED');
+            // Cancelled orders drop off the board entirely (by design - see
+            // OrderService/AdminController comments) - same reload as above.
             loadOrders();
         } catch (error) {
             console.log(error);
@@ -76,11 +97,28 @@ function AdminOrders() {
                             : groupOrders.map(order => (
                                 <div key={order.id} className='order_row'>
                                     <OrderFinish order={order} />
-                                    {NEXT_STATUS[order.status] && (
-                                        <button className='btn' type='button' onClick={() => handleAdvanceStatus(order)}>
-                                            העבר ל"{getOrderStatusLabel(NEXT_STATUS[order.status])}"
-                                        </button>
+                                    {order.status === 'RECEIVED' && (
+                                        <label className='ready-by-input'>
+                                            מוכן עד (אופציונלי):
+                                            <input
+                                                type='date'
+                                                value={readyByDrafts[order.id] || ''}
+                                                onChange={(e) => setReadyByDrafts({ ...readyByDrafts, [order.id]: e.target.value })}
+                                            />
+                                        </label>
                                     )}
+                                    <div className='order_row_actions'>
+                                        {NEXT_STATUS[order.status] && (
+                                            <button className='btn' type='button' onClick={() => handleAdvanceStatus(order)}>
+                                                העבר ל"{getOrderStatusLabel(NEXT_STATUS[order.status])}"
+                                            </button>
+                                        )}
+                                        {(order.status === 'RECEIVED' || order.status === 'IN_PROGRESS') && (
+                                            <button className='btn btn-cancel' type='button' onClick={() => handleCancelStatus(order)}>
+                                                ביטול הזמנה
+                                            </button>
+                                        )}
+                                    </div>
                                 </div>
                             ))}
                     </div>
