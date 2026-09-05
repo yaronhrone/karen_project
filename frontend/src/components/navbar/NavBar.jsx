@@ -6,6 +6,7 @@ import { useNavigate } from 'react-router-dom';
 import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
 import {  getItemByName, logout } from '../../service/apiServise';
 import SearchIcon from '@mui/icons-material/Search';
+import ChocolateLoader from '../loading/ChocolateLoader';
 
 function NavBar() {
 const {currentUser,updateCurrentUserContext ,isRequstToGetCurrentUserDone} = useContext(UserContext);
@@ -100,9 +101,7 @@ const handleSearch =  (e) => {
 {currentUser?.role?.includes('ADMIN') && <CustomeLink to={'/admin'}>מנהל</CustomeLink>}
 </div>
 }
-{!isRequstToGetCurrentUserDone && <div style={{color:'black'}}>Loading...
- </div>
-}
+{!isRequstToGetCurrentUserDone && <ChocolateLoader />}
     </div>
 
   )

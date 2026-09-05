@@ -3,6 +3,7 @@ import UserContext from '../../contexts/UserContext';
 import { useNavigate, Outlet } from 'react-router-dom';
 import AdminNav from './AdminNav';
 import './Admin.css';
+import ChocolateLoader from '../loading/ChocolateLoader';
 
 // Was one 400-line monolith rendering orders/products/users all on one
 // scrolling page - now a thin layout: does the auth check once, then
@@ -14,7 +15,7 @@ function Admin() {
     const isAdmin = currentUser?.role?.includes('ADMIN');
 
     if (!isRequstToGetCurrentUserDone) {
-        return <div>Loading...</div>;
+        return <div className='center'><ChocolateLoader /></div>;
     }
     if (!isAdmin) {
         return (<div className='center'>

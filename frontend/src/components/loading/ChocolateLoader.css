@@ -1,0 +1,43 @@
+.chocolate-loader {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    direction: rtl;
+}
+
+.chocolate-loader-bar {
+    display: flex;
+    gap: 3px;
+    padding: 3px;
+    background: var(--color-accent-hover);
+    border-radius: var(--radius-sm);
+    box-shadow: var(--shadow-sm);
+}
+
+.chocolate-loader-square {
+    width: 10px;
+    height: 14px;
+    background: var(--color-accent);
+    border-radius: 2px;
+    animation: chocolate-bite 1.4s ease-in-out infinite;
+}
+
+/* Each square shrinks away like a bitten-off piece, then reappears once the
+   whole bar has cycled - loops forever without ever looking "finished". */
+@keyframes chocolate-bite {
+    0%, 55% { transform: scale(1); opacity: 1; }
+    70%, 85% { transform: scale(0.15); opacity: 0; }
+    100% { transform: scale(1); opacity: 1; }
+}
+
+.chocolate-loader-label {
+    color: var(--color-text-muted);
+    font-size: 14px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .chocolate-loader-square {
+        animation: none;
+        opacity: 0.6;
+    }
+}
