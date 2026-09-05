@@ -15,6 +15,12 @@ public class Item {
         private String category;
         @JsonProperty("delete_img_id")
         private String deleteImgId;
+        // Set only by FavoriteService.getItemFavorite as a stand-in for a
+        // favorited item whose product was since deleted from the catalog -
+        // false (the default) for every item that came from the real
+        // catalog. Lets the frontend show "פריט זה חסר" instead of either
+        // crashing on a bare null or just silently dropping the favorite.
+        private boolean missing = false;
 
         public Item() {
         }
@@ -105,6 +111,14 @@ public class Item {
 
         public void setImage(String image) {
             this.image = image;
+        }
+
+        public boolean isMissing() {
+            return missing;
+        }
+
+        public void setMissing(boolean missing) {
+            this.missing = missing;
         }
     }
 

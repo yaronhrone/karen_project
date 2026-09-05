@@ -41,6 +41,16 @@ public class FavoriteRepository {
         return "Favorites deleted successfully";
     }
 
+    // Called when an item is deleted from the catalog, across every user who
+    // favorited it - not scoped to one email like the methods above. Without
+    // this, deleting an item left a dangling favorites row behind for anyone
+    // who'd favorited it (that's what "פריט זה חסר" now covers for the rows
+    // that were already orphaned before this existed).
+    public void deleteFavoritesByItemId(int itemId) {
+        String sql = "DELETE FROM " + FAVORITE_TABLE + " WHERE item_id = ?";
+        jdbcTemplate.update(sql, itemId);
+    }
+
 
 
 }

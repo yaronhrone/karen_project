@@ -54,11 +54,20 @@ public class FavoriteService {
             // it renders this list directly, has no null-guard, and no
             // error boundary, so one stale favorite blanked the whole page
             // (favorites tab, and the category pages' heart-fill lookup
-            // that reads this same endpoint). Skip it instead - it's a
-            // dangling reference at that point, nothing to show.
+            // that reads this same endpoint). Stand in with a placeholder
+            // instead - the favorite itself still exists, only the product
+            // behind it is gone, so the frontend can show "פריט זה חסר"
+            // rather than either crashing or silently making the favorite
+            // disappear with no explanation.
             Item found = itemService.getItemById(id);
             if (found != null) {
                 item.add(found);
+            } else {
+                Item missing = new Item();
+                missing.setId(id);
+                missing.setName("פריט זה חסר");
+                missing.setMissing(true);
+                item.add(missing);
             }
         }
         return item;
@@ -68,6 +77,13 @@ public class FavoriteService {
             return "User not found";
         }
         return favoriteRepository.deleteAllItemFavorites(email);
+    }
+
+    // Called by ItemService right after an item is actually deleted from the
+    // catalog - cleans up every user's favorite pointing at it, not just one
+    // user's, so it never needs a user-existence check like the methods above.
+    public void deleteFavoritesByItemId(int itemId) {
+        favoriteRepository.deleteFavoritesByItemId(itemId);
     }
 
 

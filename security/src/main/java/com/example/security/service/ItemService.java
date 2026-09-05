@@ -14,6 +14,8 @@ public class ItemService {
     private ItemsClient itemClient;
     @Autowired
     private S3Service s3Service;
+    @Autowired
+    private FavoriteService favoriteService;
 
 
 
@@ -46,8 +48,12 @@ public class ItemService {
             // delete_img_id holds the S3 object key (see S3Service) - the
             // same field a Cloudinary public_id used to live in.
             s3Service.delete(existing.getDeleteImgId());
-
-            return itemClient.deleteItem(name);
+            String result = itemClient.deleteItem(name);
+            // Otherwise every customer who'd favorited this item is left
+            // with a dangling favorites row - see FavoriteService's
+            // "פריט זה חסר" handling for what that looked like unfixed.
+            favoriteService.deleteFavoritesByItemId(existing.getId());
+            return result;
     } return "Item not found";
     }
     public String updateItem(Item item) {
@@ -61,6 +67,11 @@ public class ItemService {
         if (existing != null) {
             s3Service.delete(existing.getDeleteImgId());
         }
-            return itemClient.deleteItemById(id);
+        String result = itemClient.deleteItemById(id);
+        // Otherwise every customer who'd favorited this item is left with a
+        // dangling favorites row - see FavoriteService's "פריט זה חסר"
+        // handling for what that looked like unfixed.
+        favoriteService.deleteFavoritesByItemId(id);
+        return result;
     }
 }
