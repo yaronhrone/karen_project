@@ -186,7 +186,13 @@
   z-index: 999;
 }
 
-.search-area:hover .items_search {
+/* The "Open"/"Close" class NavBar.jsx already sets from state (results
+   arrived, or the input regained focus) was never actually wired to
+   anything here - only :hover showed the dropdown, so typed results stayed
+   invisible until the mouse happened to be over the search box. Drive
+   visibility from that class; keep :hover too as a harmless fallback. */
+.search-area:hover .items_search,
+.items_search.Open {
   opacity: 1;
   transform: translateY(0);
   pointer-events: auto;

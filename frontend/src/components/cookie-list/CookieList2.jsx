@@ -15,9 +15,16 @@ function CookieList2() {
 
     const fetchCookies = async (pageNumber) => {
         try {
+            // Favorites are a nice-to-have (which hearts show filled) - a hiccup
+            // fetching them used to throw out of this whole function and
+            // silently skip the actual product fetch below.
             if (currentUser && isRequstToGetCurrentUserDone) {
-                const { data: fav } = await getAllFavoriteItems();
-                setFavorites(fav.map(fav => fav.id));
+                try {
+                    const { data: fav } = await getAllFavoriteItems();
+                    setFavorites(fav.map(fav => fav.id));
+                } catch {
+                    setFavorites(favoriteItems);
+                }
             } else {
                 setFavorites(favoriteItems);
             }
