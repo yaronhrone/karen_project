@@ -20,23 +20,29 @@ public class FavoriteService {
 
     public String addItemFavorite(String email, int itemId) {
         if (userService.getUserByEmail(email) == null) {
-            return "User not found";
+            return "משתמש לא נמצא";
         }
         if (favoriteRepository.getItemFavorite(email) != null) {
 
             if (favoriteRepository.getItemFavorite(email).contains(itemId) ) {
-                return "Item already exists";
+                return "הפריט כבר נמצא במועדפים";
             }
         }
+        // Kept in English on purpose - AdminController/FavoriteController check
+        // this exact string via .contains("successfully") to decide OK vs
+        // BAD_REQUEST. Translating it would silently break that check; the
+        // frontend never shows the success string to the user anyway, only
+        // the error branches above (which is what was actually leaking
+        // English to the UI).
         return favoriteRepository.addItemFavorite(email, itemId);
     }
     public String removeItemFavorite(String email, int itemId) {
         if (userService.getUserByEmail(email) == null) {
-            return "User not found";
+            return "משתמש לא נמצא";
         }
 
         if (!favoriteRepository.getItemFavorite(email).contains(itemId)) {
-            return "Item not found";
+            return "הפריט לא נמצא ברשימת המועדפים";
         }
         return favoriteRepository.removeItemFavorite(email, itemId);
     }
@@ -56,16 +62,19 @@ public class FavoriteService {
             // (favorites tab, and the category pages' heart-fill lookup
             // that reads this same endpoint). Stand in with a placeholder
             // instead - the favorite itself still exists, only the product
-            // behind it is gone, so the frontend can show "פריט זה חסר"
-            // rather than either crashing or silently making the favorite
-            // disappear with no explanation.
+            // behind it is gone, so the frontend can show "המוצר כבר לא
+            // במלאי" rather than either crashing or silently making the
+            // favorite disappear with no explanation. Deliberately never
+            // auto-removed from the favorites table on item deletion - the
+            // customer decides whether to clear it (Favorite.jsx's "הסר
+            // ממועדפים" button), not the admin deleting the product.
             Item found = itemService.getItemById(id);
             if (found != null) {
                 item.add(found);
             } else {
                 Item missing = new Item();
                 missing.setId(id);
-                missing.setName("פריט זה חסר");
+                missing.setName("המוצר כבר לא במלאי");
                 missing.setMissing(true);
                 item.add(missing);
             }
@@ -74,18 +83,9 @@ public class FavoriteService {
     }
     public String deleteAllItemFavorites(String email) {
         if (userService.getUserByEmail(email) == null) {
-            return "User not found";
+            return "משתמש לא נמצא";
         }
         return favoriteRepository.deleteAllItemFavorites(email);
     }
-
-    // Called by ItemService right after an item is actually deleted from the
-    // catalog - cleans up every user's favorite pointing at it, not just one
-    // user's, so it never needs a user-existence check like the methods above.
-    public void deleteFavoritesByItemId(int itemId) {
-        favoriteRepository.deleteFavoritesByItemId(itemId);
-    }
-
-
 
 }

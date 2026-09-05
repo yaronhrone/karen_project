@@ -72,7 +72,7 @@ function Favorite() {
           {favoriteItems.map((item) => (
             item.missing ? (
               <div key={item.id} className='favorite-missing'>
-                <span>פריט זה חסר</span>
+                <span>המוצר כבר לא במלאי</span>
                 <button className='btn' type='button' onClick={() => removeMissing(item.id)}>הסר ממועדפים</button>
               </div>
             ) : (

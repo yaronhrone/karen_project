@@ -18,7 +18,7 @@ public class Item {
         // Set only by FavoriteService.getItemFavorite as a stand-in for a
         // favorited item whose product was since deleted from the catalog -
         // false (the default) for every item that came from the real
-        // catalog. Lets the frontend show "פריט זה חסר" instead of either
+        // catalog. Lets the frontend show "המוצר כבר לא במלאי" instead of either
         // crashing on a bare null or just silently dropping the favorite.
         private boolean missing = false;
 
