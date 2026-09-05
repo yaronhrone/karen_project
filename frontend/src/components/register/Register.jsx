@@ -70,7 +70,6 @@ function Register() {
   }
 
   const handleChange = async (e) => {
-    console.log(e.target.name + " " + e.target.value);
 
     const { name, value } = e.target;
     setFormData({
@@ -99,7 +98,6 @@ function Register() {
       }, 200);
 
     } catch (err) {
-      console.log(err + " " + err.response?.data + " " + err.code);
       if (err.response?.status == 400 || err.response?.status == 500) {
         setErrorFromServer(err.response.data);
       } if (err.code === "ERR_NETWORK") {

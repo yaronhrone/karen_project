@@ -61,7 +61,6 @@ function CardItem({ item, isFavoriteDefault, categoryPath }) {
                 setIsFavorite(true);
             }
         } catch (error) {
-            console.log(error);
             if (error.response && error.response.data) {
                 setError(error.response.data);
             }
@@ -89,7 +88,6 @@ function CardItem({ item, isFavoriteDefault, categoryPath }) {
             await addItemToOrder(item.id);
             setClicked(true);
         } catch (error) {
-            console.log(error);
             if (error.response && error.response.data) {
                 setError(error.response.data);
 
@@ -104,7 +102,6 @@ function CardItem({ item, isFavoriteDefault, categoryPath }) {
         try {
             await removeItemFromOredr(item.id);
         } catch (error) {
-            console.log(error);
             if (error.response && error.response.data) {
 
                 setError(error.response.data);

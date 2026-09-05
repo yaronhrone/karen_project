@@ -26,7 +26,6 @@ function Favorite() {
       const { data } = await getAllFavoriteItems();
       setFavoriteItems(data);
     } catch (err) {
-     console.log(err + " " + err.response?.data + " " + err.code);
       if (err.response?.status == 400 || err.response?.status == 500) {
         setErrorFromServer(err.response.data);
       } if (err.code === "ERR_NETWORK") {

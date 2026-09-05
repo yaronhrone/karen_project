@@ -124,7 +124,6 @@ public class OrderService {
                 whatsAppNotificationService.sendNewOrderNotification(justSent, customer);
             }
         } catch (Exception e) {
-            System.out.println(e.getMessage() + " - failed to send WhatsApp new-order notification");
         }
 
         return result;

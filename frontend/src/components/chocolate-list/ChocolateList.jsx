@@ -40,7 +40,6 @@ function ChocolateList() {
       setPage(page + 1);
     }
     catch (err) {
-      console.log(err + " " + err.response?.data + " " + err.code);
       if (err.response?.status == 400 || err.response?.status == 500) {
         setErrorFromServer(err.response.data);
       } if (err.code === "ERR_NETWORK") {
@@ -53,12 +52,10 @@ function ChocolateList() {
   };
 
   const addToListChocolate = (item) => {
-    console.log("Added chocolate with ID:", item);
     setChocolateList([...chocolateList, item]);
 
   }
   const removeFromListChocolate = (item) => {
-    console.log("Removed chocolate with ID:", item);
     setChocolateList(chocolateList.filter(chocId => chocId.id !== item.id));
   }
 
@@ -178,7 +175,6 @@ function ChocolateList() {
           await addItemToOrder(choc.id);
         }
       } catch (err) {
-        console.log(err + " " + err.response?.data + " " + err.code);
         if (err.response?.status == 400 || err.response?.status == 500) {
           setErrorFromServer(err.response.data);
         } if (err.code === "ERR_NETWORK") {

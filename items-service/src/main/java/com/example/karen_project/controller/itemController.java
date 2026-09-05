@@ -23,7 +23,6 @@ public class itemController {
     @PreAuthorize("hasAuthority('ADMIN')")
     public ResponseEntity<String> createItem(@RequestBody Items item) {
         try {
-            System.out.println(item + "item");
                 String result = itemService.createItem(item);
                 // Always 200, even for the "already exists" business rejection
                 // (not just the real create). This is only ever called through
@@ -38,7 +37,6 @@ public class itemController {
                 // is what carries the real outcome now, not the HTTP status.
                 return new ResponseEntity<>(result, HttpStatus.OK);
             } catch (Exception e) {
-                System.out.println(e.getMessage());
                 return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
             }
         }
@@ -53,7 +51,6 @@ public class itemController {
             }
             return new ResponseEntity<>(result,HttpStatus.OK);
         } catch (Exception e) {
-            System.out.println(e.getMessage());
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
@@ -66,13 +63,11 @@ public class itemController {
             }
             return new ResponseEntity<>(result,HttpStatus.OK);
         } catch (Exception e) {
-            System.out.println(e.getMessage());
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
     @GetMapping("/{name}")
     public ResponseEntity<List<Items>> getItemBYName(@PathVariable String name){
-        System.out.println(name + "name get by name");
         try {
             List<Items> item = itemService.getItemByName(name);
 
@@ -81,7 +76,6 @@ if (item.isEmpty()){
 }
         return new ResponseEntity<>( item,HttpStatus.OK);
         } catch (Exception e) {
-            System.out.println(e.getMessage());
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
@@ -100,7 +94,6 @@ if (item.isEmpty()){
 List<Items> items = itemService.getAll(page, size);
         return new ResponseEntity<>(items,HttpStatus.OK);
         } catch (Exception e) {
-            System.out.println(e.getMessage());
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
@@ -114,7 +107,6 @@ List<Items> items = itemService.getAll(page, size);
             }
                 return new ResponseEntity<>(r,HttpStatus.NOT_FOUND);
         } catch (Exception e) {
-            System.out.println(e.getMessage());
             return new ResponseEntity<>(e.getMessage(),HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
@@ -123,13 +115,11 @@ List<Items> items = itemService.getAll(page, size);
     public ResponseEntity<String> deleteItemById(@PathVariable int id){
         try {
             String r = itemService.deleteItemById(id);
-            System.out.println(r + "delete by id");
             if (r.contains("deleted")){
                 return new ResponseEntity<>(r,HttpStatus.OK);
             }
             return new ResponseEntity<>(r,HttpStatus.NOT_FOUND);
         } catch (Exception e) {
-            System.out.println(e.getMessage());
             return new ResponseEntity<>(e.getMessage(),HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
@@ -151,7 +141,6 @@ List<Items> items = itemService.getAll(page, size);
     @PreAuthorize("hasAuthority('ADMIN')")
     public ResponseEntity<String> updateItem(@RequestBody Items item){
         try {
-            System.out.println(item + "item update");
             String result = itemService.updateItem(item);
             if (result.contains("updated")) {
                 return new ResponseEntity<>(result,HttpStatus.OK);

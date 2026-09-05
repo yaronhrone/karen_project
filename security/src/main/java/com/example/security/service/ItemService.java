@@ -18,7 +18,6 @@ public class ItemService {
 
 
     public Item getItem(String name) {
-        System.out.println(name + "name item from service");
         return itemClient.getItem(name);
     }
     public Item getItemById(int id) {
@@ -32,7 +31,6 @@ public class ItemService {
 //        if (existing != null) {
 //            return "Item already exists";
 //        }
-        System.out.println(item + "item from service back from microservice");
         // Pass items-service's own result straight through - it was
         // previously always prefixed with "Chocolate created ", which made
         // AdminController's `result.contains("created")` success check
@@ -53,7 +51,6 @@ public class ItemService {
     } return "Item not found";
     }
     public String updateItem(Item item) {
-        System.out.println(itemClient.getItemById(item.getId()) + "item from service back from microservice");
 
         return itemClient.updateItem(item);
 

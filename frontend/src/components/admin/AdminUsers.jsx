@@ -16,7 +16,6 @@ function AdminUsers() {
             setPageUser(prev => prev + 1);
             setUsers(prev => [...prev, ...data]);
         } catch (error) {
-            console.log(error);
             if (error.response?.status === 400 || error.response?.status === 500) {
                 setError(error.response.data);
             }
@@ -29,7 +28,6 @@ function AdminUsers() {
 
             setUserOrder(data);
         } catch (error) {
-            console.log(error);
             if (error.response?.status === 400 || error.response?.status === 500) {
                 setError(error.response.data);
             }
@@ -43,7 +41,6 @@ function AdminUsers() {
             await deltedUser(email);
             setUsers(prev => prev.filter(user => user.email !== email));
         } catch (error) {
-            console.log(error);
             if (error.response?.status === 400 || error.response?.status === 500) {
                 setError(error.response.data);
             }

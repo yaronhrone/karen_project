@@ -32,13 +32,11 @@ export const logout = () => {
 }
 export const register = async (user) => {
     try {
-    console.log(user.first_name + " from apiService");
     const {data} = await axios.post(`${BASE_URL}/users/register`, user);
     const token = data.jwt;
     setAuthHeader(token);
     return data;
     } catch (error) {
-        console.log(error + " error from apiService");
         throw error;
     }
 }
@@ -102,10 +100,8 @@ export const getItemById =async (id) => {
     return data;
 }
 export const getItemByName = async (name) => {
-    console.log(name + " from apiService");
     
     const {data} = await axios.get(`${BASE_URL_PROTUCT}/${name}`);
-    console.log(data + " from apiService");
     
     return data;
 }
@@ -134,7 +130,6 @@ export const deleteItemByName = (name) => {
 }
 // favorite
 export const addItemToFavorite =async (id) => {
-    console.log("item id: " + id);
     return await axios.post(`${BASE_URL}/favorite/item/${id}`,null,{ headers: getAuthHeader() });
 }
 

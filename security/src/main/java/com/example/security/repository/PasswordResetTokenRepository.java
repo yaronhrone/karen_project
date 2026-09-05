@@ -43,7 +43,6 @@ public class PasswordResetTokenRepository {
             String sql = String.format("SELECT * FROM %s WHERE token_hash = ?", TABLE);
             return jdbcTemplate.queryForObject(sql, new PasswordResetTokenMapper(), tokenHash);
         } catch (Exception e) {
-            System.out.println(e.getMessage());
             return null;
         }
     }

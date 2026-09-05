@@ -17,17 +17,14 @@ function ChocolateList2() {
         try {
             if (currentUser && isRequstToGetCurrentUserDone) {
                 const { data: fav } = await getAllFavoriteItems();
-                console.log(fav);
                 setFavorites(fav.map(fav => fav.id ));
             }else{
-                console.log(favoriteItems);
                 setFavorites(favoriteItems);
             }
 
             const { data } = await getAllChocolate(pageNumber, 3);
             setChocolates(data);
         } catch (error) {
-            console.log(error);
         }
     }
 

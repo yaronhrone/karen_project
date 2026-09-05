@@ -20,7 +20,6 @@ export const mergeGuestDataToAccount = async (cartItems, favorites, { clearCart,
     try {
       await addItemToOrder(itemId);
     } catch (err) {
-      console.log(err + " - failed to merge guest cart item " + itemId);
     }
   }
 
@@ -29,7 +28,6 @@ export const mergeGuestDataToAccount = async (cartItems, favorites, { clearCart,
     try {
       await addItemToFavorite(itemId);
     } catch (err) {
-      console.log(err + " - failed to merge guest favorite " + itemId);
     }
   }
 

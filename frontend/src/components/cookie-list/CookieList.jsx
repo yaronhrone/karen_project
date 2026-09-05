@@ -17,17 +17,14 @@ export const CookieList = () => {
     try {
       if (currentUser && isRequstToGetCurrentUserDone) {
         const { data: fav } = await getAllFavoriteItems();
-        console.log(fav);
         setFavorites(fav.map(fav => fav.id));
       } else {
-        console.log(favoriteItems);
         setFavorites(favoriteItems);
       }
       const { data } = await getAllCookie(page, 20);
       setCookie([...cookie, ...data]);
       setPage(page + 1);
     } catch (err) {
-        console.log(err + " " + err.response?.data + " " + err.code);
       if (err.response?.status == 400 || err.response?.status == 500) {
         setErrorFromServer(err.response.data);
       } if (err.code === "ERR_NETWORK") {

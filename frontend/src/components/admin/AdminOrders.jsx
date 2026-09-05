@@ -34,7 +34,6 @@ function AdminOrders() {
             const { data } = await getAdminOrdersBoard();
             setOrders(data);
         } catch (error) {
-            console.log(error);
             if (error.response?.status === 400 || error.response?.status === 500) {
                 setError(error.response.data);
             }
@@ -60,7 +59,6 @@ function AdminOrders() {
             // rather than patch one row across groups.
             loadOrders();
         } catch (error) {
-            console.log(error);
             if (error.response?.status === 400 || error.response?.status === 500) {
                 setError(error.response.data);
             }
@@ -77,7 +75,6 @@ function AdminOrders() {
             // OrderService/AdminController comments) - same reload as above.
             loadOrders();
         } catch (error) {
-            console.log(error);
             if (error.response?.status === 400 || error.response?.status === 500) {
                 setError(error.response.data);
             }

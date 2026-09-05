@@ -85,7 +85,6 @@ public class PasswordResetService {
             // mail-sending failure must never surface differently than
             // "email not found" (no enumeration oracle), and must never
             // block anything else this request does.
-            System.out.println(e.getMessage() + " - failed to send password-reset email");
         }
     }
 

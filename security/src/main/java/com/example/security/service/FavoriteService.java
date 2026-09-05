@@ -45,7 +45,6 @@ public class FavoriteService {
             return null;
         }
         List<Integer> ids = favoriteRepository.getItemFavorite(email);
-        System.out.println(ids + " ids item");
         List<Item> item = new ArrayList<>();
         for (Integer id : ids ) {
             item.add( itemService.getItemById(id));

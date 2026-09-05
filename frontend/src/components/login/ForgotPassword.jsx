@@ -32,7 +32,6 @@ function ForgotPassword() {
         try {
             await requestPasswordReset(email);
         } catch (err) {
-            console.log(err);
         } finally {
             setSubmitted(true);
             setSubmitting(false);

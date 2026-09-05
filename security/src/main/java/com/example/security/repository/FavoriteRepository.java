@@ -32,7 +32,6 @@ public class FavoriteRepository {
             String sql = "SELECT item_id FROM " + FAVORITE_TABLE + " WHERE user_email = ?";
             return jdbcTemplate.queryForList(sql, Integer.class, email);
         } catch (Exception e) {
-            System.out.println(e.getMessage());
             return null;
         }
     }

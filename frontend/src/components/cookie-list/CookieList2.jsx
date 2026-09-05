@@ -17,16 +17,13 @@ function CookieList2() {
         try {
             if (currentUser && isRequstToGetCurrentUserDone) {
                 const { data: fav } = await getAllFavoriteItems();
-                console.log(fav);
                 setFavorites(fav.map(fav => fav.id));
             } else {
-                console.log(favoriteItems);
                 setFavorites(favoriteItems);
             }
             const { data } = await getAllCookie(pageNumber, 3);
             setCookies(data);
         } catch (error) {
-            console.log(error);
         }
     }
 

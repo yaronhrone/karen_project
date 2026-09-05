@@ -57,7 +57,6 @@ const CardChocolate = ({ item, isFavoriteDefault, addToList, removeFromList, rem
                 setIsFavorite(true);
             }
         } catch (error) {
-            console.log(error);
             if (error.response && error.response.data) {
                 setError(error.response.data);
             }
@@ -71,7 +70,6 @@ const CardChocolate = ({ item, isFavoriteDefault, addToList, removeFromList, rem
     const addToOrder = () => {
         const quantity = 1;
         const chocolateWithQuantity = { ...item, quantity };
-        console.log(chocolateWithQuantity + " chocolate withe quentity");
 
         addToList(chocolateWithQuantity);
         setClicked(true);

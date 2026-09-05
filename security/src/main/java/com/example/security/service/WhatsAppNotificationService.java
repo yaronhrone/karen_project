@@ -39,7 +39,6 @@ public class WhatsAppNotificationService {
 
     public void sendNewOrderNotification(Order order, CustomUser customer) {
         if (!isConfigured()) {
-            System.out.println("GreenAPI not configured yet - skipping WhatsApp notification for order " + order.getId());
             return;
         }
 

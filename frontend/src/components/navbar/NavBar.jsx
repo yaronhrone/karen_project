@@ -43,11 +43,9 @@ const handleSearch =  (e) => {
      try {
        const data =  await getItemByName(value);
        setItems(data);
-       console.log(data + " from apiService");
        
        setIsSearch(true);
       } catch (error) {
-        console.log(error);
         if (error.response?.status === 400 || error.response?.status === 500) {
           setError(error.response.data);
         }

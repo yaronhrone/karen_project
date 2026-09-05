@@ -29,7 +29,6 @@ function Order() {
       const { data } = await getAllOrders();
       setOrder(data);
     } catch (err) {
-    console.log(err + " " + err.response?.data + " " + err.code);
       if (err.response?.status == 400 || err.response?.status == 500) {
         setErrorFromServer(err.response.data);
       } if (err.code === "ERR_NETWORK") {
@@ -58,7 +57,6 @@ function Order() {
       }));
       setGuestCartDetails(details);
     } catch (err) {
-      console.log(err + " " + err.response?.data + " " + err.code);
     }
   };
 
@@ -76,7 +74,7 @@ const remove = async (id) => {
         try {
             await removeItemFromOredr(id )
             fetchOrders();
-        } catch (err) { console.log(err) };
+        } catch (err) {};
     }
     const add = async (id) => {
 
@@ -84,14 +82,13 @@ const remove = async (id) => {
         try {
             await addItemToOrder(id )
             fetchOrders();
-        } catch (err) { console.log(err) };
+        } catch (err) {};
     }
     const deleteOrder = async (id) => {
         try {
             await deleteOrderById(id);
             fetchOrders();
         } catch (err) {
-       console.log(err + " " + err.response?.data + " " + err.code);
       if (err.response?.status == 400 || err.response?.status == 500) {
         setErrorFromServer(err.response.data);
       } if (err.code === "ERR_NETWORK") {
@@ -110,7 +107,6 @@ const remove = async (id) => {
             // already the confirmation that it went through.
             fetchOrders();
         }catch(err){
-      console.log(err + " " + err.response?.data + " " + err.code);
       if (err.response?.status == 400 || err.response?.status == 500) {
         setErrorFromServer(err.response.data);
       } if (err.code === "ERR_NETWORK") {

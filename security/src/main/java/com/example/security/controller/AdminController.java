@@ -77,9 +77,7 @@ public class AdminController {
                     item.setPrice(itemRequest.getPrice());
                     item.setImage(uploadResult.url());
                     item.setVeg(itemRequest.isVeg());
-                    System.out.println(item + " item from create item");
                     String result = itemService.createItem(item);
-                System.out.println(result);
                     if (result.contains("created")) {
 
                         return ResponseEntity.ok().body(result);
@@ -178,7 +176,6 @@ public class AdminController {
     @DeleteMapping("delete_by_id/{id}")
     public ResponseEntity<String> deleteItemById(@PathVariable int id) {
         try {
-            System.out.println("delete" + id);
             String result = itemService.deleteItemById(id);
             if (result.contains("deleted")) {
                 return new ResponseEntity<>(result, HttpStatus.OK);

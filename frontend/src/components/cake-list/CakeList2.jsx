@@ -17,16 +17,13 @@ function CakeList2() {
         try {
             if (currentUser && isRequstToGetCurrentUserDone) {
                 const { data: fav } = await getAllFavoriteItems();
-                console.log(fav);
                 setFavorites(fav.map(fav => fav.id));
             } else {
-                console.log(favoriteItems);
                 setFavorites(favoriteItems);
             }
             const { data } = await getAllCake(pageNumber, 3);
             setCakes(data);
         } catch (error) {
-            console.log(error);
         }
     }
 

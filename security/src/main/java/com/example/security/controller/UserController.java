@@ -108,7 +108,6 @@ public class UserController {
         try {
             passwordResetService.requestReset(request.getEmail());
         } catch (Exception e) {
-            System.out.println(e.getMessage() + " - forgot-password request failed internally");
         }
         return ResponseEntity.ok(FORGOT_PASSWORD_RESPONSE);
     }

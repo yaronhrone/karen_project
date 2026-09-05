@@ -44,7 +44,6 @@ function Login() {
             await goToHomeAfterLogin();
         } catch (err) {
             setError('אימייל או סיסמה שגויים');
-            console.log(err);
 
         }
     }
@@ -54,7 +53,6 @@ function Login() {
             await goToHomeAfterLogin();
         } catch (err) {
             setError('הכניסה עם Google נכשלה, נסה/י שוב');
-            console.log(err);
         }
     }
     const [showPassword, setShowPassword] = useState(false);

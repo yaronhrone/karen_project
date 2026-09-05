@@ -25,7 +25,6 @@ function PhoneNumberPrompt() {
             const { data } = await updateCurrentUser({ ...currentUser, phone });
             updateCurrentUserContext(data);
         } catch (err) {
-            console.log(err);
             setError('שמירת מספר הטלפון נכשלה, נסי/ה שוב');
         }
     };

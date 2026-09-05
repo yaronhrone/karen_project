@@ -30,7 +30,6 @@ public class ItemRepository {
         String sql = String.format("SELECT *  FROM %s WHERE LOWER(name) LIKE LOWER(?)",ITEMS_TABLE);
     return  jdbcTemplate.query(sql, new ItemMapper(),"%"+name+"%");
         } catch (Exception e) {
-            System.out.println(e.getMessage());
             return null;
         }
     }
@@ -39,7 +38,6 @@ public class ItemRepository {
             String sql = String.format("SELECT *  FROM %s WHERE id = ?", ITEMS_TABLE);
             return     jdbcTemplate.queryForObject(sql, new ItemMapper(),id);
         } catch (Exception e) {
-            System.out.println(e.getMessage());
             return null;
         }
     }
@@ -81,7 +79,6 @@ public class ItemRepository {
             String sql = String.format("SELECT * FROM %s WHERE category = ? ORDER BY id DESC  LIMIT ? OFFSET ?",ITEMS_TABLE);
         return jdbcTemplate.query(sql,new ItemMapper(),category,size,offset);
         } catch (Exception e) {
-            System.out.println(e.getMessage());
             return null;
         }
     }
@@ -89,7 +86,6 @@ public class ItemRepository {
         try {  String sql = String.format("SELECT * FROM %s WHERE category = ? AND name = ? ",ITEMS_TABLE);
         return jdbcTemplate.query(sql,new ItemMapper(),category,name);
         } catch (Exception e) {
-            System.out.println(e.getMessage());
             return null;
         }
     }

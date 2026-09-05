@@ -31,7 +31,6 @@ function App() {
   const [currentUser, setCurrentUser] = useState(null);
   const [isRequstToGetCurrentUserDone, setIsRequstToGetCurrentUserDone] = useState(false);
   const updateCurrentUserContext = (user) => {
-    console.log(user + " user update");
 
     setCurrentUser(user);
   };
@@ -44,7 +43,6 @@ function App() {
 
       }
     } catch (error) {
-      console.log(error);
     } finally {
       setIsRequstToGetCurrentUserDone(true);
     }

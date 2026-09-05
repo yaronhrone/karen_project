@@ -112,7 +112,6 @@ public class OrderRepository {
         jdbcTemplate.update(sql, orderItem.getOrderId(), orderItem.getProductId(), orderItem.getQuantity(),orderItem.getPrice());
     }
     public void updateOrderItem(OrderItem orderItem) {
-        System.out.println(orderItem + " order item updated");
         String sql = "UPDATE " + ORDER_ITEM_TABLE + " SET  quantity = ? - 1  WHERE order_id = ? AND product_id = ? ";
         jdbcTemplate.update(sql, orderItem.getQuantity(), orderItem.getOrderId(), orderItem.getProductId());
 
@@ -131,7 +130,6 @@ public void deleteOrderItemsByOrderId(int orderId, int productId) {
         String sql = "SELECT quantity FROM " + ORDER_ITEM_TABLE + " WHERE order_id = ? AND product_id = ? ";
         return jdbcTemplate.queryForObject(sql, Integer.class, orderId, productId);
         } catch (Exception e) {
-            System.out.println(e.getMessage());
             return 0;
         }
     }

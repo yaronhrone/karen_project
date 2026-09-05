@@ -39,7 +39,6 @@ public class ItemCacheService {
             Object cached = redisTemplate.opsForValue().get(categoryKey(category, page, size));
             return (List<Items>) cached;
         } catch (Exception e) {
-            System.out.println(e.getMessage() + " - Redis get failed (category page), falling through to DB");
             return null;
         }
     }
@@ -55,7 +54,6 @@ public class ItemCacheService {
         try {
             redisTemplate.opsForValue().set(categoryKey(category, page, size), items, Duration.ofHours(ttlHours));
         } catch (Exception e) {
-            System.out.println(e.getMessage() + " - Redis put failed (category page)");
         }
     }
 
@@ -63,7 +61,6 @@ public class ItemCacheService {
         try {
             return (Items) redisTemplate.opsForValue().get(byIdKey(id));
         } catch (Exception e) {
-            System.out.println(e.getMessage() + " - Redis get failed (by id), falling through to DB");
             return null;
         }
     }
@@ -75,7 +72,6 @@ public class ItemCacheService {
         try {
             redisTemplate.opsForValue().set(byIdKey(id), item, Duration.ofHours(ttlHours));
         } catch (Exception e) {
-            System.out.println(e.getMessage() + " - Redis put failed (by id)");
         }
     }
 
@@ -96,7 +92,6 @@ public class ItemCacheService {
                 redisTemplate.delete(keys);
             }
         } catch (Exception e) {
-            System.out.println(e.getMessage() + " - Redis evictCategory failed for " + category);
         }
     }
 
@@ -104,7 +99,6 @@ public class ItemCacheService {
         try {
             redisTemplate.delete(byIdKey(id));
         } catch (Exception e) {
-            System.out.println(e.getMessage() + " - Redis evictById failed for " + id);
         }
     }
 

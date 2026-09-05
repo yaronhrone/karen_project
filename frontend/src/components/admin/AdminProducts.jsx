@@ -33,7 +33,6 @@ function AdminProducts() {
             setPageItem(prev => prev + 1);
             setItem(prev => [...prev, ...data]);
         } catch (error) {
-            console.log(error);
             if (error.response?.status === 400 || error.response?.status === 500) {
                 setError(error.response.data);
             }
@@ -55,7 +54,6 @@ if (!(file instanceof File)) {
     return;
 }
         const realFile = new File([file], "upload.jpg", { type: file.type || "image/jpeg" });
-console.log(realFile + "file ");
 
         formData.append('file', realFile);
         formData.append('item', new Blob([JSON.stringify({
@@ -65,13 +63,6 @@ console.log(realFile + "file ");
             price: Number(itemsFrom.price),
             veg: itemsFrom.veg
         })], { type: 'application/json' }));
-        for (const [key, value] of formData.entries()) {
-              if (value instanceof Blob && value.type === "application/json") {
-    value.text().then(text => console.log(key, text));
-  } else {
-    console.log(key, value);
-  }
-        }
         try {
 
 
@@ -89,7 +80,6 @@ console.log(realFile + "file ");
             handelItems();
 
         } catch (error) {
-            console.log(error);
             if (error.response?.status === 400 || error.response?.status === 500) {
                 setError(error.response.data);
             }
@@ -115,7 +105,6 @@ console.log(realFile + "file ");
             setPageItem(1);
             handelItems();
         } catch (error) {
-            console.log(error);
             if (error.response?.status === 400 || error.response?.status === 500) {
                 setError(error.response.data);
             }
@@ -137,7 +126,6 @@ console.log(realFile + "file ");
             await deleteItemById(deleteTarget);
             setItem(item.filter(i => i.id !== deleteTarget));
         } catch (error) {
-            console.log(error);
             if (error.response?.status === 400 || error.response?.status === 500) {
                 setError(error.response.data);
             }
@@ -195,7 +183,6 @@ console.log(realFile + "file ");
             setPageItem(1);
             handelItems();
         } catch (error) {
-            console.log(error);
             if (error.response?.status === 400 || error.response?.status === 500) {
                 setError(error.response.data);
             }

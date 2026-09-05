@@ -35,7 +35,6 @@ public class MailService {
 
     public void sendPasswordResetEmail(String toEmail, String resetLink) {
         if (!isConfigured()) {
-            System.out.println("Gmail not configured yet - skipping password-reset email to " + toEmail);
             return;
         }
         SimpleMailMessage message = new SimpleMailMessage();
