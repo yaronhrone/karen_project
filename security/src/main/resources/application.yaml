@@ -3,6 +3,17 @@ server:
 
 # Optional commented out H2 configuration
 spring:
+  # Spring Boot's default is max-file-size: 1MB, max-request-size: 10MB - a
+  # real phone photo (a few MB) blows past 1MB every time, throwing
+  # MaxUploadSizeExceededException on POST /admin/item. That's what was
+  # happening whenever Keren tried to add a product with a real product photo
+  # (reproduced 2026-09-05: logged twice in a row on the same upload attempt).
+  # 10MB covers a normal phone photo with room to spare; still far below the
+  # request-size ceiling.
+  servlet:
+    multipart:
+      max-file-size: 10MB
+      max-request-size: 10MB
   main:
     allow-circular-references: true
   datasource:
