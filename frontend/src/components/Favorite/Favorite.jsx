@@ -17,14 +17,21 @@ function Favorite() {
     if (!currentUser) {
       const items = [];
       for(let i = 0 ; i < favorites.length ; i++){
-      const data = await getItemById(favorites[i])
-      items.push(data);
+      // A guest-favorited item that's since been deleted 404s here - skip
+      // it instead of letting it throw and abort the rest of the list.
+      try {
+        const data = await getItemById(favorites[i]);
+        if (data) items.push(data);
+      } catch {}
       }
       setFavoriteItems(items);
     return;
     }
       const { data } = await getAllFavoriteItems();
-      setFavoriteItems(data);
+      // Defensive: the backend already filters out favorites pointing at a
+      // deleted item, but this list has no error boundary above it, so a
+      // stray null here would blank the whole page instead of just this one.
+      setFavoriteItems((data || []).filter(Boolean));
     } catch (err) {
       if (err.response?.status == 400 || err.response?.status == 500) {
         setErrorFromServer(err.response.data);

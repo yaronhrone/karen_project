@@ -18,6 +18,15 @@ const CardChocolate = ({ item, isFavoriteDefault, addToList, removeFromList, rem
     const [isFavorite, setIsFavorite] = useState(isFavoriteDefault);
     const { addToCart } = useContext(cartContext);
 
+    // See the matching fix in CardItem.jsx: useState's initial value is
+    // only used on first render, so if the parent's favorites list (fetched
+    // async) resolved AFTER this card already mounted with
+    // isFavoriteDefault=false, the heart stayed unfilled forever even for a
+    // genuinely favorited item. Re-sync whenever the parent passes a new value.
+    useEffect(() => {
+        setIsFavorite(isFavoriteDefault);
+    }, [isFavoriteDefault]);
+
 
 
 

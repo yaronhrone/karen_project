@@ -47,7 +47,19 @@ public class FavoriteService {
         List<Integer> ids = favoriteRepository.getItemFavorite(email);
         List<Item> item = new ArrayList<>();
         for (Integer id : ids ) {
-            item.add( itemService.getItemById(id));
+            // itemService.getItemById returns null (via ItemsClientFallback)
+            // when the item behind a favorite no longer exists - e.g. it was
+            // deleted from the catalog after being favorited. Adding that
+            // null straight into the response crashed the frontend outright:
+            // it renders this list directly, has no null-guard, and no
+            // error boundary, so one stale favorite blanked the whole page
+            // (favorites tab, and the category pages' heart-fill lookup
+            // that reads this same endpoint). Skip it instead - it's a
+            // dangling reference at that point, nothing to show.
+            Item found = itemService.getItemById(id);
+            if (found != null) {
+                item.add(found);
+            }
         }
         return item;
     }

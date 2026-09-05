@@ -25,11 +25,15 @@ function CardItem({ item, isFavoriteDefault, categoryPath }) {
     const [isFavorite, setIsFavorite] = useState(isFavoriteDefault);
     const{addToCart} = useContext(cartContext);
 
+    // Empty deps meant this only ever ran once, on mount - if the parent's
+    // favorites list (fetched async) resolved AFTER this card already
+    // rendered with isFavoriteDefault=false (the common case: products
+    // render before the favorites lookup returns), the heart got stuck
+    // unfilled forever even for genuinely favorited items. Re-sync whenever
+    // the parent actually passes a new value.
     useEffect(() => {
-
-
         setIsFavorite(isFavoriteDefault);
-    }, []);
+    }, [isFavoriteDefault]);
 
 
 

@@ -34,7 +34,7 @@ function ChocolateList() {
       if (currentUser && isRequstToGetCurrentUserDone) {
         try {
           const { data: fav } = await getAllFavoriteItems();
-          setFavorites(fav.map(fav => fav.id));
+          setFavorites(fav.filter(Boolean).map(fav => fav.id));
         } catch {
           setFavorites(favoriteItems);
         }
@@ -219,7 +219,7 @@ function ChocolateList() {
       return;
     }
     if (currentUser) {
-      getAllFavoriteItems().then(({ data }) => setFavorites(data.map(fav => fav.id)));
+      getAllFavoriteItems().then(({ data }) => setFavorites((data || []).filter(Boolean).map(fav => fav.id))).catch(() => {});
     } else {
       setFavorites(favoriteItems);
     }

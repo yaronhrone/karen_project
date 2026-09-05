@@ -21,7 +21,7 @@ function CookieList2() {
             if (currentUser && isRequstToGetCurrentUserDone) {
                 try {
                     const { data: fav } = await getAllFavoriteItems();
-                    setFavorites(fav.map(fav => fav.id));
+                    setFavorites(fav.filter(Boolean).map(fav => fav.id));
                 } catch {
                     setFavorites(favoriteItems);
                 }
