@@ -27,7 +27,12 @@ function Order() {
 
     try {
       const { data } = await getAllOrders();
-      setOrder(data);
+      // Defensive - a "TypeError: .map is not a function" crashed this whole
+      // page (before ErrorBoundary existed to catch it): orders.slice(0,-1)
+      // on a non-array (this endpoint's declared return type is List<Order>,
+      // so root cause is still server-side, not yet confirmed) returned
+      // something itself missing .map further down, at render time.
+      setOrder(Array.isArray(data) ? data : []);
     } catch (err) {
       if (err.response?.status == 400 || err.response?.status == 500) {
         setErrorFromServer(err.response.data);

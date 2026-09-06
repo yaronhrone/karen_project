@@ -41,6 +41,12 @@ public class OrderController {
         try {
             return ResponseEntity.ok().body(orderService.getAllOrderByEmail(authentication.getName()));
         } catch (Exception e) {
+            // Was silent - a customer hit a frontend crash traced back to
+            // this endpoint returning something other than an array, with
+            // zero server-side trace of why. Logging the actual exception
+            // (not just e.getMessage(), which is null for several common
+            // exception types) so a repeat is actually diagnosable.
+            e.printStackTrace();
             return new ResponseEntity(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }

@@ -1,6 +1,6 @@
 import React, { useContext, useEffect, useState } from 'react'
 import './ChocolateList.css';
-import { addItemToOrder, getAllChocolate, getAllFavoriteItems } from '../../service/apiServise';
+import { addItemToOrder, getAllChocolate, getAllFavoriteItems, getAllOrders } from '../../service/apiServise';
 import UserContext from '../../contexts/UserContext';
 import { FavoriteContext } from '../../contexts/FavoriteContext';
 import CardChocolate from '../card/CardChocolate';
@@ -25,6 +25,12 @@ function ChocolateList() {
   const { cartItems, addToCart, removeFromCart } = useContext(cartContext);
   const [errorFromServer, setErrorFromServer] = useState("");
   const [orderConfirmed, setOrderConfirmed] = useState(false);
+  // Chocolates already sitting in an open (not-yet-sent) order from a
+  // previous visit - the package math below needs to count these too, or
+  // completing a box across two visits looked wrong (picking 2 more here
+  // showed "need X more" with no idea 3 were already reserved, when the
+  // true combined total may already be a complete box).
+  const [existingOrderChocolateQty, setExistingOrderChocolateQty] = useState(0);
   const getChocolates = async () => {
     try {
       // Favorites are a nice-to-have (which hearts show filled) - a hiccup
@@ -104,7 +110,10 @@ function ChocolateList() {
 
 
 
-  const { packages, remaining, needToComplete  } = calculatePackages(totalQuantity);
+  // Package math runs on the combined total (already-reserved + new picks
+  // this session) - see the fetch effect above for why.
+  const combinedChocolateQuantity = totalQuantity + existingOrderChocolateQty;
+  const { packages, remaining, needToComplete } = calculatePackages(combinedChocolateQuantity);
 
   const clearList = () => {
     chocolateList.forEach(item => {
@@ -191,6 +200,28 @@ function ChocolateList() {
     }
   }, [chocolateList]);
 
+  // Same "auth check resolves after mount" reasoning as the favorites
+  // re-sync above - can't fetch a logged-in customer's order before we
+  // actually know they're logged in.
+  useEffect(() => {
+    if (!isRequstToGetCurrentUserDone || !currentUser) {
+      setExistingOrderChocolateQty(0);
+      return;
+    }
+    getAllOrders().then(({ data }) => {
+      const openOrder = (Array.isArray(data) ? data : []).find(o => o.status === 'OPEN');
+      const items = Array.isArray(openOrder?.order_items) ? openOrder.order_items : [];
+      const qty = items
+        .filter(oi => oi.category === 'chocolate')
+        .reduce((sum, oi) => sum + oi.quantity, 0);
+      setExistingOrderChocolateQty(qty);
+    }).catch(() => {
+      // Not critical - the package math just falls back to counting only
+      // this session's new picks, same as before this existed.
+      setExistingOrderChocolateQty(0);
+    });
+  }, [currentUser, isRequstToGetCurrentUserDone]);
+
   const hasSelection = chocolateList.length > 0;
 
   return (
@@ -244,8 +275,14 @@ function ChocolateList() {
               </ul>
 
               <div className="builder-summary">
+                {existingOrderChocolateQty > 0 && (
+                  <div className="builder-summary-row">
+                    <span>כבר בהזמנה פתוחה</span>
+                    <strong>{existingOrderChocolateQty}</strong>
+                  </div>
+                )}
                 <div className="builder-summary-row">
-                  <span>סה"כ פריטים</span>
+                  <span>סה"כ פריטים חדשים</span>
                   <strong>{totalQuantity}</strong>
                 </div>
                 <div className="builder-summary-row">
