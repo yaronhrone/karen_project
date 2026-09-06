@@ -18,6 +18,11 @@ public class OrderItem {
     private boolean isVeg;
     @JsonProperty("total_price")
     private BigDecimal totalPrice;
+    // Populated by OrderService.allOrderItemsInfo, same as name/image/
+    // description below - lets the frontend single out chocolate line items,
+    // the only category sold in fixed package sizes (5/6/9/12/22/30), to
+    // show package-completion status on the order/cart view.
+    private String category;
 
     public OrderItem() {
     }
@@ -109,6 +114,14 @@ public class OrderItem {
         this.orderId = orderId;
     }
 
+
+    public String getCategory() {
+        return category;
+    }
+
+    public void setCategory(String category) {
+        this.category = category;
+    }
 
     public int getQuantity() {
         return quantity;

@@ -204,6 +204,7 @@ for (Order order : orders) {
             item.setImage(product.getImage());
             item.setDescription(product.getDescription());
             item.setVeg(product.getVeg());
+            item.setCategory(product.getCategory());
             item.setTotalPrice(product.getPrice().multiply(BigDecimal.valueOf(item.getQuantity())));
         }
 

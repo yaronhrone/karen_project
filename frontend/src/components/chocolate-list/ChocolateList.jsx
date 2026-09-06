@@ -10,6 +10,7 @@ import RemoveIcon from '@mui/icons-material/Remove';
 import CloseIcon from '@mui/icons-material/Close';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import { useNavigate } from 'react-router-dom';
+import { calculatePackages } from '../../utils/chocolatePackaging';
 
 
 function ChocolateList() {
@@ -20,7 +21,6 @@ function ChocolateList() {
   const [page, setPage] = useState(1);
   const { favorites: favoriteItems } = useContext(FavoriteContext);
   const [chocolateList, setChocolateList] = useState([]);
-  const packageSizes = [30, 22, 12, 9, 6, 5];
   const [removedItemIdState, setRemovedItemId] = useState([]);
   const { cartItems, addToCart, removeFromCart } = useContext(cartContext);
   const [errorFromServer, setErrorFromServer] = useState("");
@@ -101,48 +101,6 @@ function ChocolateList() {
   }
 
   const totalQuantity = chocolateList.reduce((sum, item) => sum + item.quantity, 0);
-
-  const calculatePackages = (total) => {
-    let remaining = total;
-    const packages = [];
-    for (let size of packageSizes) {
-      while (remaining >= size) {
-        packages.push(size);
-        remaining -= size;
-      }
-    }
-    let needToComplete = 0;
-
-
-    if (remaining > 0) {
-
-      const possiblePackages = packageSizes.filter(s => s > remaining);
-      if (possiblePackages.length > 0) {
-        needToComplete = Math.min(...possiblePackages) - remaining;
-      } else {
-        needToComplete = 0;
-      }
-      if (calculateOptimalCompletion(total) < needToComplete) {
-        needToComplete = calculateOptimalCompletion(total);
-      }
-    }
-
-    return { packages, remaining, needToComplete};
-  }
-  const calculateOptimalCompletion = (total) => {
-
-
-    const possiblePackages = packageSizes.sort((a, b) => a - b).filter(size => size >= total);
-
-    if (possiblePackages.length === 0) {
-      return 0;
-    }
-
-    const closestPackage = possiblePackages[0];
-    const needToComplete = closestPackage - total;
-
-    return needToComplete;
-  };
 
 
 

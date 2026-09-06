@@ -77,8 +77,16 @@ function CardItem({ item, isFavoriteDefault, categoryPath }) {
     }
 
     const addToOrder = async () => {
-        if (categoryPath) {
-            navigate(categoryPath);
+        // Chocolates are only sold in fixed box sizes (see /chocolates'
+        // package builder) - adding one directly here, one unit at a time,
+        // bypassed that entirely. This is the generic "add to order" button
+        // used from search results, favorites, and anywhere else CardItem
+        // renders a chocolate without an explicit categoryPath - route it to
+        // the builder unconditionally rather than relying on every call site
+        // to remember to pass one.
+        const targetPath = categoryPath || (item.category === 'chocolate' ? '/chocolates' : null);
+        if (targetPath) {
+            navigate(targetPath);
             return;
         }
         if (currentUser === null) {

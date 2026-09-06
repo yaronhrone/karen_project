@@ -5,8 +5,20 @@ import RemoveIcon from '@mui/icons-material/Remove';
 import DeleteIcon from '@mui/icons-material/Delete';
 import SendIcon from '@mui/icons-material/Send';
 import { getOrderStatusLabel } from '../../utils/orderStatus';
+import { calculatePackages } from '../../utils/chocolatePackaging';
+import ChocolatePackageStatus from './ChocolatePackageStatus';
 
 function OrderCard({ order, remove, add, deleteOrder, sendOrder }) {
+    // Chocolates are the only category sold in fixed box sizes - the +/-
+    // steppers below adjust one unit at a time with no awareness of that, so
+    // this is what actually stops "שליחת הזמנה" once they no longer add up
+    // to a valid combination of boxes (same rule /chocolates enforces before
+    // an order is even created - this is what closes the same gap once
+    // chocolates are already in a real order and adjusted here instead).
+    const chocolateQuantity = order.order_items
+        .filter(oi => oi.category === 'chocolate')
+        .reduce((sum, oi) => sum + oi.quantity, 0);
+    const chocolatePackagingInvalid = chocolateQuantity > 0 && calculatePackages(chocolateQuantity).remaining > 0;
 
     return (
         <>
@@ -40,6 +52,8 @@ function OrderCard({ order, remove, add, deleteOrder, sendOrder }) {
                     ))}
                 </div>
 
+                <ChocolatePackageStatus totalQuantity={chocolateQuantity} />
+
                 <div className='orderTotal'>
                     <span className='label'>סה"כ לתשלום</span>
                     <span className='number'>₪{order.total_price}</span>
@@ -49,7 +63,12 @@ function OrderCard({ order, remove, add, deleteOrder, sendOrder }) {
                     <button className='btn btn-ghost' onClick={() => { deleteOrder(order.id) }}>
                         <DeleteIcon fontSize="small" /> מחיקת הזמנה
                     </button>
-                    <button className='btn btn-primary' onClick={() => { sendOrder() }}>
+                    <button
+                        className='btn btn-primary'
+                        onClick={() => { sendOrder() }}
+                        disabled={chocolatePackagingInvalid}
+                        title={chocolatePackagingInvalid ? 'כמות השוקולדים לא מתאימה למארז מלא - השלימו או הורידו כמות' : undefined}
+                    >
                         שליחת הזמנה <SendIcon fontSize="small" />
                     </button>
                 </div>
