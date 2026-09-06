@@ -124,6 +124,12 @@ public class OrderService {
                 whatsAppNotificationService.sendNewOrderNotification(justSent, customer);
             }
         } catch (Exception e) {
+            // Deliberately swallowed - the order itself must succeed even if
+            // the notification fails (GreenAPI down, bad credentials,
+            // network). But silent failure here means Keren never finds out
+            // an order came in, with zero trace anywhere - log it so a real
+            // misconfiguration is actually diagnosable instead of invisible.
+            System.err.println("Failed to send WhatsApp new-order notification: " + e.getMessage());
         }
 
         return result;

@@ -24,6 +24,7 @@ import SearchPage from './components/searchPage/SearchPage';
 import Header from './components/header/Header';
 import { CartProvider } from './contexts/CartContext';
 import PhoneNumberPrompt from './components/phone-prompt/PhoneNumberPrompt';
+import ErrorBoundary from './components/error/ErrorBoundary';
 
 
 
@@ -62,6 +63,13 @@ function App() {
               {isRequstToGetCurrentUserDone && currentUser && !currentUser.phone && <PhoneNumberPrompt />}
               <Header />
               <NavBar />
+              {/* A render crash anywhere in a routed page used to blank the
+                  entire app, nav/header/footer included, with zero
+                  indication anything went wrong (found this the hard way -
+                  a single bad favorite or a malformed order both did
+                  exactly this). Scoped to the routed content only, so a
+                  crash there still leaves navigation usable. */}
+              <ErrorBoundary>
               <Routes>
                 <Route path="/" element={<Home />} />
                 <Route path="/chocolates" element={<ChocolateList />} />
@@ -82,6 +90,7 @@ function App() {
                 </Route>
                 <Route path='/search/:id' element={<SearchPage />} />
               </Routes>
+              </ErrorBoundary>
               <Footer />
             </Router>
           </CartProvider>

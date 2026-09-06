@@ -7,8 +7,8 @@ function NotFound() {
     <div className='not-found-container'>
       <div className='not-found-content'>
         <h1 className='not-found-title'>404</h1>
-        <p className='not-found-message'>Oops! The page you are lokking for does not exist.</p>
-        <Link to={"/"} className='not-found-link'>Go back to Home Page</Link>
+        <p className='not-found-message'>אופס! העמוד שחיפשת לא קיים.</p>
+        <Link to={"/"} className='not-found-link'>חזרה לדף הבית</Link>
       </div>
     </div>
   )
