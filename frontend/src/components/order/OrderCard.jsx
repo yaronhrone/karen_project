@@ -9,13 +9,21 @@ import { calculatePackages } from '../../utils/chocolatePackaging';
 import ChocolatePackageStatus from './ChocolatePackageStatus';
 
 function OrderCard({ order, remove, add, deleteOrder, sendOrder }) {
+    // Defensive - a "TypeError: .map is not a function" crashed this whole
+    // page (before the ErrorBoundary existed to at least catch it) on an
+    // order whose order_items apparently wasn't an array at render time.
+    // Root cause not confirmed (server-side, order_items is always set to a
+    // list, never left null/undefined) - guarding here either way, same as
+    // the null-favorite crash fix, rather than leaving every render of this
+    // component one bad response away from taking down the page again.
+    const orderItems = Array.isArray(order.order_items) ? order.order_items : [];
     // Chocolates are the only category sold in fixed box sizes - the +/-
     // steppers below adjust one unit at a time with no awareness of that, so
     // this is what actually stops "שליחת הזמנה" once they no longer add up
     // to a valid combination of boxes (same rule /chocolates enforces before
     // an order is even created - this is what closes the same gap once
     // chocolates are already in a real order and adjusted here instead).
-    const chocolateQuantity = order.order_items
+    const chocolateQuantity = orderItems
         .filter(oi => oi.category === 'chocolate')
         .reduce((sum, oi) => sum + oi.quantity, 0);
     const chocolatePackagingInvalid = chocolateQuantity > 0 && calculatePackages(chocolateQuantity).remaining > 0;
@@ -31,7 +39,7 @@ function OrderCard({ order, remove, add, deleteOrder, sendOrder }) {
                 </div>
 
                 <div className='orderItemContainer'>
-                    {order.order_items.map(oi => (
+                    {orderItems.map(oi => (
                         <div key={oi.id} className='orderItem'>
                             {oi.image
                                 ? <img src={oi.image} alt={oi.name} />

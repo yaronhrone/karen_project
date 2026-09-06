@@ -3,6 +3,8 @@ import './Order.css';
 import { getOrderStatusLabel } from '../../utils/orderStatus';
 
 function OrderFinish({ order }) {
+    // See the matching guard/comment in OrderCard.jsx.
+    const orderItems = Array.isArray(order.order_items) ? order.order_items : [];
 
     return (
         <div className='orderCard'>
@@ -13,7 +15,7 @@ function OrderFinish({ order }) {
                 <h3>מחיר כולל: ₪{order.total_price}</h3>
             </div>
             <div className='orderItemContainer'>
-                {order.order_items.map(oi => (
+                {orderItems.map(oi => (
                     <div key={oi.id} className='orderItem'>
                         {oi.image
                             ? <img src={oi.image} alt={oi.name} />
