@@ -6,6 +6,8 @@ import { useNavigate } from 'react-router-dom';
 import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
 import {  getItemByName, logout } from '../../service/apiServise';
 import SearchIcon from '@mui/icons-material/Search';
+import MenuIcon from '@mui/icons-material/Menu';
+import CloseIcon from '@mui/icons-material/Close';
 import ChocolateLoader from '../loading/ChocolateLoader';
 
 function NavBar() {
@@ -17,6 +19,11 @@ const [items, setItems] = useState([]);
 const [error, setError] = useState("");
 const [isSearch, setIsSearch] = useState(false);
   const [typingTimeout, setTypingTimeout] = useState(null);
+  // Below NavBar.css's mobile breakpoint the whole nav collapses behind this
+  // toggle - see the ".mobile-open"/"navbar-toggle" rules in NavBar.css for
+  // the layout side of it. Above that breakpoint this state is simply never
+  // read by any CSS rule, so it's a no-op on desktop.
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 const handleLogout =()=>{
   logout();
   setTimeout(() => {
@@ -55,8 +62,27 @@ const handleSearch =  (e) => {
     };
 
   return (
- 
-        <div className='links'>
+
+        <div className={`links ${isMobileMenuOpen ? 'mobile-open' : ''}`}>
+ <button
+   type='button'
+   className='navbar-toggle'
+   onClick={() => setIsMobileMenuOpen(prev => !prev)}
+   aria-label={isMobileMenuOpen ? 'סגור תפריט' : 'פתח תפריט'}
+ >
+   {isMobileMenuOpen ? <CloseIcon /> : <MenuIcon />}
+ </button>
+ {/* Everything below collapses into the mobile drawer together - closing it
+     on any real navigation (a link or a search result) so it doesn't keep
+     covering the new page after tapping through. The toggle button and the
+     "מוצרים" trigger itself are excluded on purpose: tapping those should
+     open/close things, not immediately close the whole drawer. */}
+ <div
+   className='nav-links-wrapper'
+   onClick={(e) => {
+     if (e.target.closest('a, .item_info')) setIsMobileMenuOpen(false);
+   }}
+ >
  <div className='products' >
   <p onClick={toggleItem}   className='item'><ArrowDropDownIcon/> מוצרים</p>
 <div className= {`items${isOpen ? '_Close' : '_Open'}`} onMouseLeave={toggleItem}>
@@ -100,6 +126,7 @@ const handleSearch =  (e) => {
 </div>
 }
 {!isRequstToGetCurrentUserDone && <ChocolateLoader />}
+ </div>
     </div>
 
   )

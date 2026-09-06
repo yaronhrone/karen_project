@@ -9,6 +9,29 @@
   position: relative;
 }
 
+/* display:contents removes this wrapper from the box model entirely above
+   the mobile breakpoint below - .products/.auth/etc become direct flex
+   items of .links again, so desktop layout is exactly what it was before
+   this wrapper existed. Only the mobile media query below gives it a real
+   box (and turns it into the collapsible drawer). */
+.nav-links-wrapper {
+  display: contents;
+}
+
+.navbar-toggle {
+  display: none;
+  background: none;
+  border: none;
+  color: #fff;
+  padding: 4px;
+  cursor: pointer;
+  align-items: center;
+}
+
+.navbar-toggle svg {
+  font-size: 28px;
+}
+
 .links .custom-link {
   color: rgba(255, 255, 255, 0.9);
 }
@@ -176,7 +199,9 @@
   background: var(--color-surface);
   border-radius: var(--radius-sm);
   box-shadow: var(--shadow-md);
-  width: 320px;
+  /* Capped to the viewport, not just a flat 320px - a fixed width wider than
+     the screen pushed this off the right edge on any phone. */
+  width: min(320px, calc(100vw - 32px));
   max-height: 280px;
   overflow-y: auto;
   opacity: 0;
@@ -219,6 +244,92 @@
   gap: 24px;
   justify-content: flex-end;
   align-items: center;
+}
+
+/* Below this width the desktop layout (search box + categories dropdown +
+   auth links all inline in one row) doesn't fit any real phone - .search
+   alone (260px) plus .items_search (up to 320px) already exceed a typical
+   360-430px viewport before the category menu or auth links are even
+   accounted for. Collapse everything behind a hamburger toggle instead. */
+@media (max-width: 768px) {
+  .links {
+    flex-wrap: wrap;
+    padding: 12px 16px;
+  }
+
+  .navbar-toggle {
+    display: flex;
+  }
+
+  /* Give the wrapper a real box again (it's display:contents above this
+     breakpoint) and turn it into the collapsible drawer content. */
+  .nav-links-wrapper {
+    display: none;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 16px;
+    width: 100%;
+    margin-top: 12px;
+  }
+
+  .links.mobile-open .nav-links-wrapper {
+    display: flex;
+  }
+
+  .products {
+    flex: none;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 12px;
+  }
+
+  /* The "מוצרים ▾" trigger only exists to open the hover/click dropdown
+     below it - with the categories always shown flat in the drawer (next
+     rule), it has nothing left to do. */
+  .products > .item {
+    display: none;
+  }
+
+  /* Show the category links flat and always-visible instead of as a
+     hover/click dropdown - position:absolute anchored to .links made no
+     sense once .links can be several rows tall in the open drawer, and a
+     tap-to-toggle sub-menu inside an already-open drawer is one interaction
+     too many on a phone. */
+  .items_Close,
+  .items_Open {
+    position: static;
+    opacity: 1;
+    transform: none;
+    pointer-events: auto;
+    box-shadow: none;
+    padding: 0;
+    min-width: auto;
+  }
+
+  .search-area,
+  .search {
+    width: 100%;
+  }
+
+  /* Same reasoning as the categories dropdown above: shown inline under the
+     input instead of as an absolutely-positioned overlay, which had nowhere
+     good to sit once .search itself is full-width in a narrow drawer. */
+  .items_search {
+    position: static;
+    opacity: 1;
+    transform: none;
+    pointer-events: auto;
+    width: 100%;
+    max-height: none;
+    box-shadow: none;
+  }
+
+  .auth {
+    flex: none;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 12px;
+  }
 }
 
 .login-register {
