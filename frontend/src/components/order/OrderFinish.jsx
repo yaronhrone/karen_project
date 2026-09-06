@@ -5,6 +5,11 @@ import { getOrderStatusLabel } from '../../utils/orderStatus';
 function OrderFinish({ order }) {
     // See the matching guard/comment in OrderCard.jsx.
     const orderItems = Array.isArray(order.order_items) ? order.order_items : [];
+    // Same statuses the admin board's own "ביטול הזמנה" button allows
+    // cancelling from (see OrderService.SETTABLE_STATUSES/AdminOrders.jsx) -
+    // there's no customer-facing cancel action, so this only makes sense to
+    // show while cancelling is actually still possible on Keren's side.
+    const isCancellable = order.status === 'RECEIVED' || order.status === 'IN_PROGRESS';
 
     return (
         <div className='orderCard'>
@@ -13,6 +18,9 @@ function OrderFinish({ order }) {
                 <h3>תאריך הזמנה: {order.order_date}</h3>
                 {order.ready_by && <h3>מוכן ב-: {order.ready_by}</h3>}
                 <h3>מחיר כולל: ₪{order.total_price}</h3>
+                {isCancellable && (
+                    <p className='cancel-note'>לביטול ההזמנה יש לשלוח הודעת WhatsApp לקרן</p>
+                )}
             </div>
             <div className='orderItemContainer'>
                 {orderItems.map(oi => (

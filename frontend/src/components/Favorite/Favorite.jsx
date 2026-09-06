@@ -5,12 +5,16 @@ import { getAllFavoriteItems, getItemById, removeItemFromFavorite } from '../../
 import { useNavigate } from 'react-router-dom';
 import './Favorite.css'
 import { FavoriteContext } from '../../contexts/FavoriteContext';
+import ChocolateLoader from '../loading/ChocolateLoader';
 function Favorite() {
   const { currentUser, isRequstToGetCurrentUserDone } = useContext(UserContext);
   const [favoriteItems, setFavoriteItems] = useState([]);
   const navigate = useNavigate();
   const {favorites, toggleFavoriteContext} = useContext(FavoriteContext);
   const [errorFromServer, setErrorFromServer] = useState('');
+  // Without this, "אין לך מועדפים" showed during the brief window before
+  // the fetch below resolves - indistinguishable from genuinely having none.
+  const [isLoading, setIsLoading] = useState(true);
 
   const getFavoriteItems = async () => {
     try {
@@ -44,6 +48,8 @@ function Favorite() {
       setTimeout(() => {
         setErrorFromServer('');
       }, 5000);
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -62,6 +68,10 @@ function Favorite() {
     }
     setFavoriteItems(prev => prev.filter(i => i.id !== id));
   };
+
+  if (isLoading) {
+    return <div className='favorite-page center'><ChocolateLoader /></div>;
+  }
 
   return (
     <div className='favorite-page'>

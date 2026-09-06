@@ -8,6 +8,7 @@ import OrderFinish from './OrderFinish';
 import './Order.css';
 import { addItemToOrder, deleteOrderById, removeItemFromOredr, updateOrder } from '../../service/apiServise';
 import { cartContext } from '../../contexts/CartContext';
+import ChocolateLoader from '../loading/ChocolateLoader';
 
 
 
@@ -19,6 +20,11 @@ function Order() {
   const [errorFromServer, setErrorFromServer] = useState('');
   const { cartItems, addToCart, decrementFromCart } = useContext(cartContext);
   const [guestCartDetails, setGuestCartDetails] = useState([]);
+  // Without this, "אין הזמנות עדיין"/"העגלה שלך ריקה" showed during the
+  // brief window before the fetch below actually resolves - indistinguishable
+  // from genuinely having no orders, which is exactly what looked like a real
+  // order having silently vanished right after placing it.
+  const [isLoading, setIsLoading] = useState(true);
 
 
 
@@ -42,6 +48,8 @@ function Order() {
       setTimeout(() => {
         setErrorFromServer('');
       }, 5000);
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -62,6 +70,8 @@ function Order() {
       }));
       setGuestCartDetails(details);
     } catch (err) {
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -128,8 +138,8 @@ const remove = async (id) => {
 
   const guestTotalPrice = guestCartDetails.reduce((sum, { item, quantity }) => sum + item.price * quantity, 0);
 
-  if (!isRequstToGetCurrentUserDone) {
-    return null;
+  if (!isRequstToGetCurrentUserDone || isLoading) {
+    return <div className='center'><ChocolateLoader /></div>;
   }
 
   if (!currentUser) {

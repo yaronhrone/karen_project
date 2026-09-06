@@ -187,3 +187,10 @@
   color: var(--color-accent-hover);
   font-weight: 700;
 }
+
+.cancel-note {
+  font-size: 13px;
+  color: var(--color-text-muted);
+  font-weight: 400;
+  margin: 4px 0 0;
+}
