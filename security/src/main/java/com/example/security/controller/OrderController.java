@@ -39,14 +39,7 @@ public class OrderController {
     @PreAuthorize("hasAnyAuthority('USER','ADMIN')")
     public ResponseEntity<List<Order>> getOrder(Authentication authentication) {
         try {
-            List<Order> result = orderService.getAllOrderByEmail(authentication.getName());
-            // Temporary diagnostic - a customer with a real, confirmed-in-the-
-            // DB order got an empty result here with no exception thrown
-            // (2026-09-08). Need to see the exact identity this endpoint is
-            // actually querying with and how many rows it got back, since
-            // nothing else explains a genuine row existing but not returning.
-            System.out.println("GET /order for '" + authentication.getName() + "' -> " + result.size() + " order(s)");
-            return ResponseEntity.ok().body(result);
+            return ResponseEntity.ok().body(orderService.getAllOrderByEmail(authentication.getName()));
         } catch (Exception e) {
             // Was silent - a customer hit a frontend crash traced back to
             // this endpoint returning something other than an array, with
