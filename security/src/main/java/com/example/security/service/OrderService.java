@@ -162,6 +162,20 @@ public class OrderService {
         }
         return orders;
     }
+
+    // Admin's search-by-order-number - unlike the board above, this isn't
+    // limited to RECEIVED/IN_PROGRESS/READY, so it can also find an old
+    // CANCELLED order or one further back than the board's own pagination
+    // shows, without Keren needing to know its status ahead of time.
+    public Order getOrderByIdForAdmin(int orderId) {
+        Order order = orderRepository.getOrderById(orderId);
+        if (order == null) {
+            return null;
+        }
+        order.setOrderItems(allOrderItemsInfo(orderRepository.getOrderItemsByOrderId(order.getId())));
+        order.setTotalPrice(calculateTotalPrice(order.getOrderItems()));
+        return order;
+    }
     public String deleteOrder(int orderId, String callerEmail, boolean isAdmin) {
         Order order = orderRepository.getOrderById(orderId);
         if (order == null) {

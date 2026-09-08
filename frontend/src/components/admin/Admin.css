@@ -148,6 +148,31 @@
     border-radius: var(--radius-md);
     padding: 16px 20px;
 }
+.order_search{
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background-color: var(--color-surface);
+    box-shadow: var(--shadow-sm);
+    border-radius: var(--radius-md);
+    padding: 14px 20px;
+    margin-bottom: 20px;
+}
+.order_search label{
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 14px;
+    color: var(--color-text);
+}
+.order_search input{
+    width: 120px;
+    border: 1px solid var(--color-bg-alt);
+    border-radius: var(--radius-sm);
+    padding: 6px 8px;
+    background: var(--color-bg);
+    color: var(--color-text);
+}
 .order_row{
     display: flex;
     flex-direction: column;

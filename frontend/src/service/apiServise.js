@@ -168,6 +168,12 @@ export const advanceOrderStatus = (orderId, status, readyBy) => {
     const readyByParam = readyBy ? `&readyBy=${readyBy}` : '';
     return axios.put(`${BASE_URL}/admin/order/${orderId}/status?status=${status}${readyByParam}`, null, { headers: getAuthHeader() });
 }
+// Admin search-by-order-number - finds any order by id regardless of status
+// (including CANCELLED, or one further back than the board's own pagination
+// shows), unlike getAdminOrdersBoard above.
+export const getOrderByIdForAdmin = (orderId) => {
+    return axios.get(`${BASE_URL}/admin/order/by-id/${orderId}`, { headers: getAuthHeader() });
+}
 // Bulk product import - see ItemImportService.java for the expected CSV
 // columns (name, description, price, category, veg, image_url).
 export const importItemsCsv = (file) => {

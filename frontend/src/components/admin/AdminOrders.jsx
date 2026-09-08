@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react'
-import { advanceOrderStatus, getAdminOrdersBoard } from '../../service/apiServise';
+import { advanceOrderStatus, getAdminOrdersBoard, getOrderByIdForAdmin } from '../../service/apiServise';
 import OrderFinish from '../order/OrderFinish';
 import { getOrderStatusLabel } from '../../utils/orderStatus';
 import './Admin.css';
@@ -28,6 +28,33 @@ function AdminOrders() {
     // sent along when actually advancing that specific order to
     // IN_PROGRESS (see handleAdvanceStatus below).
     const [readyByDrafts, setReadyByDrafts] = useState({});
+    // Only the closed/READY section gets long-term - RECEIVED and
+    // IN_PROGRESS are Keren's actual current work queue, she needs to see
+    // every one of those, not just the newest 5.
+    const [visibleReadyCount, setVisibleReadyCount] = useState(5);
+    const [searchId, setSearchId] = useState('');
+    const [searchResult, setSearchResult] = useState(null);
+    const [searchError, setSearchError] = useState('');
+
+    const handleSearchById = async (e) => {
+        e.preventDefault();
+        if (!searchId.trim()) {
+            return;
+        }
+        setSearchError('');
+        setSearchResult(null);
+        try {
+            const { data } = await getOrderByIdForAdmin(searchId.trim());
+            setSearchResult(data);
+        } catch (error) {
+            setSearchError(error.response?.status === 404 ? `לא נמצאה הזמנה מספר ${searchId.trim()}` : 'שגיאה בחיפוש ההזמנה');
+        }
+    };
+    const clearSearch = () => {
+        setSearchId('');
+        setSearchResult(null);
+        setSearchError('');
+    };
 
     const loadOrders = async () => {
         try {
@@ -84,8 +111,42 @@ function AdminOrders() {
     return (
         <div className='admin-orders'>
             {error && <p>{error}</p>}
+
+            <form className='order_search' onSubmit={handleSearchById}>
+                <label>
+                    חיפוש הזמנה לפי מספר:
+                    <input
+                        type='number'
+                        value={searchId}
+                        onChange={(e) => setSearchId(e.target.value)}
+                        placeholder='מספר הזמנה'
+                    />
+                </label>
+                <button className='btn' type='submit'>חיפוש</button>
+                {(searchResult || searchError) && (
+                    <button className='btn btn-ghost' type='button' onClick={clearSearch}>נקה חיפוש</button>
+                )}
+            </form>
+            {searchError && <p className='error_server'>{searchError}</p>}
+            {searchResult && (
+                <div className='order_group'>
+                    <h2 className='tital'>תוצאת חיפוש</h2>
+                    <div className='order_row'>
+                        <OrderFinish order={searchResult} />
+                    </div>
+                </div>
+            )}
+
             {GROUPS.map(group => {
-                const groupOrders = orders.filter(order => order.status === group.status);
+                let groupOrders = orders.filter(order => order.status === group.status);
+                // See visibleReadyCount above - only this group is capped,
+                // with a "עוד 5" to reveal more instead of always loading
+                // Keren's entire order history onto one page.
+                const isReadyGroup = group.status === 'READY';
+                const hasMoreReady = isReadyGroup && groupOrders.length > visibleReadyCount;
+                if (isReadyGroup) {
+                    groupOrders = groupOrders.slice(0, visibleReadyCount);
+                }
                 return (
                     <div className='order_group' key={group.status}>
                         <h2 className='tital'>{group.title}</h2>
@@ -118,6 +179,13 @@ function AdminOrders() {
                                     </div>
                                 </div>
                             ))}
+                        {hasMoreReady && (
+                            <div className='load-more'>
+                                <button className='btn' type='button' onClick={() => setVisibleReadyCount(c => c + 5)}>
+                                    עוד 5 הזמנות
+                                </button>
+                            </div>
+                        )}
                     </div>
                 );
             })}

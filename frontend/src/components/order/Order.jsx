@@ -20,6 +20,10 @@ function Order() {
   const [errorFromServer, setErrorFromServer] = useState('');
   const { cartItems, addToCart, decrementFromCart } = useContext(cartContext);
   const [guestCartDetails, setGuestCartDetails] = useState([]);
+  // How many of the older ("previous") orders to show, below the current
+  // one - starts small and grows via "עוד 5" instead of dumping the whole
+  // history at once.
+  const [visiblePreviousCount, setVisiblePreviousCount] = useState(5);
   // Without this, "אין הזמנות עדיין"/"העגלה שלך ריקה" showed during the
   // brief window before the fetch below actually resolves - indistinguishable
   // from genuinely having no orders, which is exactly what looked like a real
@@ -134,7 +138,12 @@ const remove = async (id) => {
   };
   
   const lastOrder = orders[orders.length - 1];
-  const previousOrders = orders.slice(0, -1);
+  // orders comes back oldest-first (see getAllOrderByEmail) - that's still
+  // what "the last one is the current/most-recent one" below relies on, but
+  // everything *older* than that should read newest-on-top, not the reverse.
+  const previousOrders = orders.slice(0, -1).reverse();
+  const visiblePreviousOrders = previousOrders.slice(0, visiblePreviousCount);
+  const hasMorePreviousOrders = previousOrders.length > visiblePreviousCount;
 
   const guestTotalPrice = guestCartDetails.reduce((sum, { item, quantity }) => sum + item.price * quantity, 0);
 
@@ -188,7 +197,7 @@ const remove = async (id) => {
               }
 
 
-              {previousOrders.map((item) => (
+              {visiblePreviousOrders.map((item) => (
                 <div key={item.id}>
                   <div className='line'></div>
 
@@ -200,6 +209,13 @@ const remove = async (id) => {
 
                 </div>
               ))}
+              {hasMorePreviousOrders && (
+                <div className='load-more'>
+                  <button className='btn' type='button' onClick={() => setVisiblePreviousCount(c => c + 5)}>
+                    עוד 5 הזמנות
+                  </button>
+                </div>
+              )}
             </div>
 
           }

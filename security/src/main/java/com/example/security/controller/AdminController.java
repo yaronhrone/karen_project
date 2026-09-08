@@ -211,6 +211,24 @@ public class AdminController {
 
     }
 
+    // Search-by-order-number: unlike /order/{email}, not limited to a known
+    // customer, and unlike the board below, not limited to
+    // RECEIVED/IN_PROGRESS/READY - finds a CANCELLED order, or one further
+    // back in history than the board's own pagination shows, by its id alone.
+    @PreAuthorize("hasAuthority('ADMIN')")
+    @GetMapping("/order/by-id/{id}")
+    public ResponseEntity<Order> getOrderByIdForAdmin(@PathVariable int id) {
+        try {
+            Order order = orderService.getOrderByIdForAdmin(id);
+            if (order == null) {
+                return ResponseEntity.notFound().build();
+            }
+            return ResponseEntity.ok(order);
+        } catch (Exception e) {
+            return new ResponseEntity(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
     // Every order on Keren's admin board (RECEIVED/IN_PROGRESS/READY) -
     // AdminOrders.jsx groups these into its 3 sections. A CANCELLED order
     // drops off this list entirely once its status changes (by design -
