@@ -32,6 +32,13 @@ kerendiamonds.xubi.org {
         header Accept *text/html*
     }
 
+    # Defense in depth alongside the index.html Cache-Control fix in
+    # nginx.conf: this is per-user data (orders, favorites, admin) - a
+    # browser or intermediate proxy caching a response here at all, for any
+    # reason, means a later request can serve stale or even the wrong
+    # user's data. Neither backend service sets this itself. Harmless to
+    # apply unconditionally (not just to GET) - POST/PUT/DELETE responses
+    # were never cached by anything either way.
     handle /api/items/* {
         reverse_proxy items-service:8080
     }
@@ -39,6 +46,7 @@ kerendiamonds.xubi.org {
         reverse_proxy users-service:8081
     }
     handle /users* {
+        header Cache-Control "no-store"
         reverse_proxy users-service:8081
     }
     handle /order* {
@@ -46,6 +54,7 @@ kerendiamonds.xubi.org {
             reverse_proxy frontend:80
         }
         handle {
+            header Cache-Control "no-store"
             reverse_proxy users-service:8081
         }
     }
@@ -54,6 +63,7 @@ kerendiamonds.xubi.org {
             reverse_proxy frontend:80
         }
         handle {
+            header Cache-Control "no-store"
             reverse_proxy users-service:8081
         }
     }
@@ -62,6 +72,7 @@ kerendiamonds.xubi.org {
             reverse_proxy frontend:80
         }
         handle {
+            header Cache-Control "no-store"
             reverse_proxy users-service:8081
         }
     }

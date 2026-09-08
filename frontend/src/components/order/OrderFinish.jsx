@@ -14,6 +14,7 @@ function OrderFinish({ order }) {
     return (
         <div className='orderCard'>
             <div className='orderHeader'>
+                <h3>הזמנה מס' {order.id}</h3>
                 <h3>מצב הזמנה: {getOrderStatusLabel(order.status)}</h3>
                 <h3>תאריך הזמנה: {order.order_date}</h3>
                 {order.ready_by && <h3>מוכן ב-: {order.ready_by}</h3>}
