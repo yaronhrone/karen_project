@@ -66,12 +66,17 @@ public class itemController {
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
+    // Postgres full-text search (tsvector + GIN, see data-postgresql.sql) -
+    // matches partial words and multi-word queries in any order (e.g. "שוקו
+    // כה" finds "שוקולד כהה"), which the substring LIKE this replaced could
+    // never do. Same endpoint/response shape as before - only what powers it
+    // changed.
     @GetMapping("/{name}")
     public ResponseEntity<List<Items>> getItemBYName(@PathVariable String name){
         try {
-            List<Items> item = itemService.getItemByName(name);
+            List<Items> item = itemService.searchItems(name);
 
-if (item.isEmpty()){
+if (item == null || item.isEmpty()){
     return new ResponseEntity("not found",HttpStatus.NOT_FOUND);
 }
         return new ResponseEntity<>( item,HttpStatus.OK);

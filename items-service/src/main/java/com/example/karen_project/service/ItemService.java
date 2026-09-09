@@ -67,6 +67,12 @@ public class ItemService {
      return itemRepository.getItemByName(name.toLowerCase());
 
     }
+    // See ItemRepository.searchItemsFullText for why this is a separate
+    // method from getItemByName above rather than that one's implementation
+    // being swapped out.
+    public List<Items> searchItems(String query){
+        return itemRepository.searchItemsFullText(query);
+    }
     public String deleteItem(String name){
         // getItemByName returns an empty List (not null) when nothing
         // matches - same gotcha noted in createItem() above. Without this

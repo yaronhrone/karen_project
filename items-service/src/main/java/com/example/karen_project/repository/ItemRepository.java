@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Repository
@@ -82,6 +83,61 @@ public class ItemRepository {
             return null;
         }
     }
+    // Powers the customer-facing search box (itemController's GET /{name}) -
+    // deliberately a separate method from getItemByName above, which is a
+    // substring LIKE used by createItem/deleteItem's "does this name already
+    // exist" checks and needs to keep behaving exactly as it does today.
+    // Repurposing that shared method for full-text matching would have
+    // silently changed those duplicate-detection checks too (e.g. creating
+    // "שוקולד" could then flag as a duplicate against any existing item
+    // whose name/description merely contains that word).
+    public List<Items> searchItemsFullText(String rawQuery){
+        String tsQuery = buildTsQuery(rawQuery);
+        if (tsQuery == null) {
+            return new ArrayList<>();
+        }
+        try {
+            String sql = String.format(
+                "SELECT * FROM %s WHERE search_vector @@ to_tsquery('simple', ?) " +
+                "ORDER BY ts_rank(search_vector, to_tsquery('simple', ?)) DESC",
+                ITEMS_TABLE
+            );
+            return jdbcTemplate.query(sql, new ItemMapper(), tsQuery, tsQuery);
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
+    // Turns free-typed input like "שוקו כה" into a tsquery string like
+    // "שוקו:* & כה:*" - each word becomes its own prefix-match term, ANDed
+    // together so a multi-word search matches a product containing all of
+    // them regardless of order or which field (name vs description) each
+    // word actually landed in. Returns null for blank/whitespace-only input
+    // rather than ever building an empty or invalid tsquery string, which
+    // Postgres would reject with a syntax error.
+    private String buildTsQuery(String rawQuery) {
+        if (rawQuery == null || rawQuery.isBlank()) {
+            return null;
+        }
+        StringBuilder tsQuery = new StringBuilder();
+        for (String word : rawQuery.trim().split("\\s+")) {
+            // Strips tsquery's own operator characters (&, |, :, ( ) etc.)
+            // along with anything else that isn't a letter or digit - \p{L}
+            // covers Hebrew (and any other script) the same as Latin, so a
+            // user typing one of those operators never reaches to_tsquery()
+            // as literal syntax.
+            String cleaned = word.replaceAll("[^\\p{L}\\p{N}]", "");
+            if (cleaned.isEmpty()) {
+                continue;
+            }
+            if (tsQuery.length() > 0) {
+                tsQuery.append(" & ");
+            }
+            tsQuery.append(cleaned).append(":*");
+        }
+        return tsQuery.length() == 0 ? null : tsQuery.toString();
+    }
+
     public List<Items> getItemsByCategoryAndName(String category,String name){
         try {  String sql = String.format("SELECT * FROM %s WHERE category = ? AND name = ? ",ITEMS_TABLE);
         return jdbcTemplate.query(sql,new ItemMapper(),category,name);
