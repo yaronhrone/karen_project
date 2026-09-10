@@ -17,6 +17,12 @@ public class Order {
     // OrderService.advanceOrderStatus). Null for most orders.
     @JsonProperty("ready_by")
     private LocalDate readyBy;
+    // Actual moment Keren advanced the order to READY/SENT (server-side, set
+    // in OrderRepository via NOW() - not user-entered like ready_by above).
+    @JsonProperty("ready_at")
+    private LocalDate readyAt;
+    @JsonProperty("sent_at")
+    private LocalDate sentAt;
     @JsonProperty("total_price")
     private BigDecimal totalPrice;
     @JsonProperty("address_shipping")
@@ -97,6 +103,22 @@ public class Order {
         this.readyBy = readyBy;
     }
 
+    public LocalDate getReadyAt() {
+        return readyAt;
+    }
+
+    public void setReadyAt(LocalDate readyAt) {
+        this.readyAt = readyAt;
+    }
+
+    public LocalDate getSentAt() {
+        return sentAt;
+    }
+
+    public void setSentAt(LocalDate sentAt) {
+        this.sentAt = sentAt;
+    }
+
     public BigDecimal getTotalPrice() {
         return totalPrice;
     }
@@ -113,6 +135,8 @@ public class Order {
                 ", status=" + status +
                 ", orderDate=" + orderDate +
                 ", readyBy=" + readyBy +
+                ", readyAt=" + readyAt +
+                ", sentAt=" + sentAt +
                 ", totalPrice=" + totalPrice +
                 ", addressShipping='" + addressShipping + '\'' +
                 ", orderItems=" + orderItems +

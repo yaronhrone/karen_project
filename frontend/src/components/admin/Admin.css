@@ -113,6 +113,37 @@
     font-weight: bold;
     font-size: 20px;
 }
+.users-table-wrapper{
+    width: 100%;
+    overflow-x: auto;
+}
+.users-table{
+    width: 100%;
+    border-collapse: collapse;
+    background-color: var(--color-surface);
+    box-shadow: var(--shadow-sm);
+    border-radius: var(--radius-md);
+    overflow: hidden;
+}
+.users-table th,
+.users-table td{
+    padding: 12px 16px;
+    text-align: right;
+    border-bottom: 1px solid var(--color-bg-alt);
+    white-space: nowrap;
+}
+.users-table th{
+    background-color: var(--color-bg-alt);
+    color: var(--color-heading);
+    font-weight: 700;
+}
+.users-table tr:last-child td{
+    border-bottom: none;
+}
+.users-table-actions{
+    display: flex;
+    gap: 10px;
+}
 
 /* Tab bar between the 3 admin sub-pages (AdminNav) - same dark background as
    the main NavBar's .links so it reads as "still the admin chrome", with

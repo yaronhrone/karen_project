@@ -21,6 +21,11 @@ CREATE TABLE orders (
     -- never get one, and it must never be overwritten by a later status
     -- change (READY/CANCELLED) once set.
     ready_by TIMESTAMP,
+    -- Actual moment Keren advanced the order to READY/SENT (server-side
+    -- NOW(), not user-entered) - see the postgres variant of this file for
+    -- the full explanation of how these differ from ready_by above.
+    ready_at TIMESTAMP,
+    sent_at TIMESTAMP,
     address_shipping VARCHAR(255) NOT NULL,
     total_price DECIMAL(10,2) NOT NULL,
     PRIMARY KEY (id),

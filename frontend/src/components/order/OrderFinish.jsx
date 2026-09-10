@@ -18,6 +18,12 @@ function OrderFinish({ order }) {
                 <h3>מצב הזמנה: {getOrderStatusLabel(order.status)}</h3>
                 <h3>תאריך הזמנה: {order.order_date}</h3>
                 {order.ready_by && <h3>מוכן ב-: {order.ready_by}</h3>}
+                {/* ready_at/sent_at are the actual dates each stage happened
+                    (server-stamped when Keren advances the status) -
+                    different from ready_by above, which is a target date she
+                    optionally sets while the order is still RECEIVED. */}
+                {order.ready_at && <h3>מוכן בתאריך: {order.ready_at}</h3>}
+                {order.sent_at && <h3>נשלח בתאריך: {order.sent_at}</h3>}
                 <h3>מחיר כולל: ₪{order.total_price}</h3>
                 {isCancellable && (
                     <p className='cancel-note'>לביטול ההזמנה יש לשלוח הודעת WhatsApp לקרן</p>

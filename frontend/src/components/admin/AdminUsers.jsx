@@ -3,6 +3,13 @@ import { deltedUser, fetchAllUsers, getAllOrderByEmail } from '../../service/api
 import OrderFinish from '../order/OrderFinish';
 import './Admin.css';
 
+// USER/ADMIN are the raw role values stored in the DB - shown in Hebrew here
+// same as every other status/role label in this app, never the raw value.
+const ROLE_LABELS = {
+    USER: 'לקוח',
+    ADMIN: 'מנהל/ת',
+};
+
 function AdminUsers() {
     const [userOrder, setUserOrder] = useState([]);
     const [users, setUsers] = useState([]);
@@ -51,19 +58,43 @@ function AdminUsers() {
         <div className='users_container'>
             {error && <p>{error}</p>}
             <h2 className='tital'>משתמשים</h2>
-            {users.map(user => (
-                <div key={user.id}>
-                    <p> First Name: {user.first_name} </p><p> Last Name: {user.last_name} </p><p> Email: {user.email} </p><p>  Role: {user.role} </p><p>  Id: {user.id}</p>
-                    <button className='btn' type='button' onClick={() => handelOrderUser(user.email)}>Get orders</button>
-                    <button className='btn' type='button' onClick={() => deleteUser(user.email)}>Delete</button>
+            {users.length > 0 && (
+                <div className='users-table-wrapper'>
+                    <table className='users-table'>
+                        <thead>
+                            <tr>
+                                <th>שם פרטי</th>
+                                <th>שם משפחה</th>
+                                <th>אימייל</th>
+                                <th>תפקיד</th>
+                                <th>מזהה</th>
+                                <th>פעולות</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {users.map(user => (
+                                <tr key={user.id}>
+                                    <td>{user.first_name}</td>
+                                    <td>{user.last_name}</td>
+                                    <td>{user.email}</td>
+                                    <td>{ROLE_LABELS[user.role] || user.role}</td>
+                                    <td>{user.id}</td>
+                                    <td className='users-table-actions'>
+                                        <button className='btn' type='button' onClick={() => handelOrderUser(user.email)}>קבל הזמנות</button>
+                                        <button className='btn btn-cancel' type='button' onClick={() => deleteUser(user.email)}>מחיקה</button>
+                                    </td>
+                                </tr>
+                            ))}
+                        </tbody>
+                    </table>
                 </div>
-            ))}
+            )}
             <button className='btn' onClick={handelUsers}>קבל משתמשים</button>
 
-            {(selectedUserEmail.length > 0 && userOrder.length <= 0) && <h2>{selectedUserEmail} don't have orders</h2>}
+            {(selectedUserEmail.length > 0 && userOrder.length <= 0) && <h2>ל-{selectedUserEmail} אין הזמנות</h2>}
             {userOrder.length > 0
                 && <div >
-                    <h2>Orders for {selectedUserEmail}</h2>
+                    <h2>הזמנות של {selectedUserEmail}</h2>
                     {userOrder.map(order => (
                         <OrderFinish order={order} key={order.id} />
                     ))}

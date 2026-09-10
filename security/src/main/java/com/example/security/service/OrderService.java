@@ -144,11 +144,17 @@ public class OrderService {
             return "Invalid status";
         }
         // readyBy only ever gets written on the RECEIVED -> IN_PROGRESS
+        // transition; ready_at/sent_at only on their own matching
         // transition - every other target status uses the plain update,
-        // which never touches ready_by (see OrderRepository comment on
-        // updateOrderStatusAndReadyBy for why that separation matters).
+        // which never touches any of these (see OrderRepository comments on
+        // why that separation matters - a later status change must never
+        // overwrite an already-set value from an earlier one).
         if ("IN_PROGRESS".equals(newStatus)) {
             orderRepository.updateOrderStatusAndReadyBy(orderId, newStatus, readyBy);
+        } else if ("READY".equals(newStatus)) {
+            orderRepository.updateOrderStatusAndReadyAt(orderId, newStatus);
+        } else if ("SENT".equals(newStatus)) {
+            orderRepository.updateOrderStatusAndSentAt(orderId, newStatus);
         } else {
             orderRepository.updateOrderStatus(orderId, newStatus);
         }

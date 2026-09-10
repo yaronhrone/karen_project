@@ -87,6 +87,22 @@ public class OrderRepository {
         jdbcTemplate.update(sql, status, readyBy, orderId);
     }
 
+    // ready_at/sent_at: the actual moment each stage happened, stamped by the
+    // database itself (NOW()) rather than passed in from the app - avoids
+    // any clock-skew question between app server and DB. Same
+    // one-method-per-transition separation as updateOrderStatusAndReadyBy
+    // above, for the same reason: a later status change must never
+    // overwrite an already-set timestamp from an earlier one.
+    public void updateOrderStatusAndReadyAt(int orderId, String status) {
+        String sql = "UPDATE " + ORDER_TABLE + " SET order_status = ?, ready_at = NOW() WHERE id = ?";
+        jdbcTemplate.update(sql, status, orderId);
+    }
+
+    public void updateOrderStatusAndSentAt(int orderId, String status) {
+        String sql = "UPDATE " + ORDER_TABLE + " SET order_status = ?, sent_at = NOW() WHERE id = ?";
+        jdbcTemplate.update(sql, status, orderId);
+    }
+
     // Keren's "active orders" inbox in Admin - orders she still needs to act
     // on (already sent by the customer, not yet marked ready/shipped).
     public List<Order> getOrdersByStatuses(List<String> statuses) {

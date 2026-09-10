@@ -37,6 +37,15 @@ CREATE TABLE IF NOT EXISTS orders (
 -- never be overwritten by a later status change (READY/CANCELLED) once set.
 ALTER TABLE orders ADD COLUMN IF NOT EXISTS ready_by TIMESTAMP;
 
+-- ready_at/sent_at: the ACTUAL moment Keren advanced the order to READY/SENT
+-- (server-side NOW(), not user-entered) - not to be confused with ready_by
+-- above, which is an optional target date SHE types in while it's still
+-- RECEIVED. Added 2026-09-10 alongside splitting the old combined
+-- "מוכן / נשלח" status into two real ones (see Status.java) - Yaron wants
+-- the real date each stage actually happened, not just the current status.
+ALTER TABLE orders ADD COLUMN IF NOT EXISTS ready_at TIMESTAMP;
+ALTER TABLE orders ADD COLUMN IF NOT EXISTS sent_at TIMESTAMP;
+
 CREATE TABLE IF NOT EXISTS order_items (
     id INT GENERATED ALWAYS AS IDENTITY,
     order_id INT NOT NULL,
