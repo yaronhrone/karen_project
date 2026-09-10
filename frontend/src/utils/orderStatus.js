@@ -5,7 +5,12 @@ const STATUS_LABELS = {
   OPEN: 'עגלה פתוחה',
   RECEIVED: 'התקבלה',
   IN_PROGRESS: 'בהכנה',
-  READY: 'מוכן / נשלח',
+  // Split 2026-09-10 (Yaron's own correction) - these used to be one
+  // combined status/label. READY = Keren finished preparing it, awaiting
+  // handoff. SENT = the customer actually has it - a distinct final step,
+  // not just different wording for the same thing.
+  READY: 'מוכן',
+  SENT: 'נשלח',
   CANCELLED: 'בוטלה',
   // Legacy - orders placed before the 3-stage flow existed still have this
   // in the DB (Status.java keeps it defined for exactly that reason).

@@ -4,21 +4,28 @@ import OrderFinish from '../order/OrderFinish';
 import { getOrderStatusLabel } from '../../utils/orderStatus';
 import './Admin.css';
 
-// RECEIVED -> IN_PROGRESS -> READY, the same 3-stage flow OrderService
-// enforces server-side (advanceOrderStatus there rejects anything else).
+// RECEIVED -> IN_PROGRESS -> READY -> SENT, the same 4-stage flow
+// OrderService enforces server-side (advanceOrderStatus there rejects
+// anything else). READY and SENT used to be one combined status until
+// Yaron split them (2026-09-10): READY = Keren finished preparing it,
+// SENT = the customer actually has it - a real, separate final step.
 const NEXT_STATUS = {
     RECEIVED: 'IN_PROGRESS',
     IN_PROGRESS: 'READY',
+    READY: 'SENT',
 };
 
 // One board endpoint (GET /admin/orders/board, already newest-first server
-// side) split into 3 sections client-side by status - simpler than 3
-// separate requests, and keeps "newest first within each group" for free
-// since Array.filter preserves relative order.
+// side) split into sections client-side by status - simpler than separate
+// requests, and keeps "newest first within each group" for free since
+// Array.filter preserves relative order. SENT isn't a section here at all -
+// OrderService.ADMIN_BOARD_STATUSES deliberately excludes it, same as
+// CANCELLED, so a sent order drops off this board entirely (still findable
+// via the search box above).
 const GROUPS = [
     { status: 'RECEIVED', title: 'הזמנות פתוחות' },
     { status: 'IN_PROGRESS', title: 'בהכנה' },
-    { status: 'READY', title: 'הזמנות סגורות' },
+    { status: 'READY', title: 'מוכן למסירה' },
 ];
 
 function AdminOrders() {
@@ -28,10 +35,6 @@ function AdminOrders() {
     // sent along when actually advancing that specific order to
     // IN_PROGRESS (see handleAdvanceStatus below).
     const [readyByDrafts, setReadyByDrafts] = useState({});
-    // Only the closed/READY section gets long-term - RECEIVED and
-    // IN_PROGRESS are Keren's actual current work queue, she needs to see
-    // every one of those, not just the newest 5.
-    const [visibleReadyCount, setVisibleReadyCount] = useState(5);
     const [searchId, setSearchId] = useState('');
     const [searchResult, setSearchResult] = useState(null);
     const [searchError, setSearchError] = useState('');
@@ -82,8 +85,8 @@ function AdminOrders() {
         try {
             await advanceOrderStatus(order.id, nextStatus, readyByDrafts[order.id]);
             // The order moves to a different section (or drops off the
-            // board entirely once READY -> nothing further) - just reload
-            // rather than patch one row across groups.
+            // board entirely once advanced to SENT) - just reload rather
+            // than patch one row across groups.
             loadOrders();
         } catch (error) {
             if (error.response?.status === 400 || error.response?.status === 500) {
@@ -138,15 +141,7 @@ function AdminOrders() {
             )}
 
             {GROUPS.map(group => {
-                let groupOrders = orders.filter(order => order.status === group.status);
-                // See visibleReadyCount above - only this group is capped,
-                // with a "עוד 5" to reveal more instead of always loading
-                // Keren's entire order history onto one page.
-                const isReadyGroup = group.status === 'READY';
-                const hasMoreReady = isReadyGroup && groupOrders.length > visibleReadyCount;
-                if (isReadyGroup) {
-                    groupOrders = groupOrders.slice(0, visibleReadyCount);
-                }
+                const groupOrders = orders.filter(order => order.status === group.status);
                 return (
                     <div className='order_group' key={group.status}>
                         <h2 className='tital'>{group.title}</h2>
@@ -179,13 +174,6 @@ function AdminOrders() {
                                     </div>
                                 </div>
                             ))}
-                        {hasMoreReady && (
-                            <div className='load-more'>
-                                <button className='btn' type='button' onClick={() => setVisibleReadyCount(c => c + 5)}>
-                                    עוד 5 הזמנות
-                                </button>
-                            </div>
-                        )}
                     </div>
                 );
             })}

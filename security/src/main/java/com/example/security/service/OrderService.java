@@ -23,12 +23,16 @@ public class OrderService {
 
     // Admin's order board (AdminOrders.jsx groups these 3 into their own
     // sections client-side: RECEIVED = "open", IN_PROGRESS = "in prep",
-    // READY = "closed").
+    // READY = "ready, awaiting handoff to the customer". SENT (the customer
+    // actually has it - the real final step, split out from READY 2026-09-10)
+    // is deliberately NOT in this list, same as CANCELLED - both drop off
+    // the active board entirely once set, still findable via admin's
+    // search-by-order-number.
     private static final List<String> ADMIN_BOARD_STATUSES = List.of("RECEIVED", "IN_PROGRESS", "READY");
     // Every status advanceOrderStatus is allowed to set - not just forward
     // steps anymore now that CANCELLED is settable from RECEIVED or
     // IN_PROGRESS too (see AdminOrders.jsx for when each button shows).
-    private static final List<String> SETTABLE_STATUSES = List.of("IN_PROGRESS", "READY", "CANCELLED");
+    private static final List<String> SETTABLE_STATUSES = List.of("IN_PROGRESS", "READY", "SENT", "CANCELLED");
 
 
     public Integer createOrder(String email) {
