@@ -1,42 +1,42 @@
-/* Footer.css's .footer_container is display:flex + flex-wrap:wrap with
-   several inline items (social icons, two nav columns) - width:100% here
-   is the same trick .footer_copy already uses to force itself onto its own
-   full-width row instead of squeezing in as just another flex item. */
-.install-app-btn {
-    width: 100%;
+.install-app-icon-btn {
+    position: absolute;
+    left: 20px;
+    top: 50%;
+    transform: translateY(-50%);
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 6px;
-    margin-bottom: 12px;
-}
-
-.install-app-banner {
-    width: 100%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 12px;
-    background: var(--color-accent-soft);
-    color: var(--color-text);
-    font-size: 13px;
-    padding: 10px 16px;
-    margin-bottom: 12px;
-    border-radius: var(--radius-sm);
-    text-align: center;
-}
-
-.install-app-banner-close {
-    background: none;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
     border: none;
-    color: var(--color-text-muted);
-    font-size: 16px;
-    line-height: 1;
+    background: var(--color-accent-soft);
+    color: var(--color-accent-hover);
     cursor: pointer;
-    padding: 0;
-    flex-shrink: 0;
+    transition: background var(--transition), color var(--transition);
 }
 
-.install-app-banner-close:hover {
-    color: var(--color-text);
+.install-app-icon-btn:hover {
+    background: var(--color-accent);
+    color: #fff;
+}
+
+.install-app-tooltip {
+    position: absolute;
+    top: calc(100% + 6px);
+    left: 50%;
+    transform: translateX(-50%);
+    white-space: nowrap;
+    background: var(--color-heading);
+    color: #fff;
+    font-size: 12px;
+    padding: 4px 10px;
+    border-radius: var(--radius-sm);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity var(--transition);
+}
+
+.install-app-icon-btn:hover .install-app-tooltip {
+    opacity: 1;
 }

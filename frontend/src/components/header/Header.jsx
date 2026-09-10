@@ -1,4 +1,5 @@
 import CustomeLink from '../navbar/CustomeLink'
+import InstallApp from '../installApp/InstallApp'
 import React from 'react'
 import './Header.css'
 // import DeliveryDiningIcon from '@mui/icons-material/DeliveryDining';
@@ -13,6 +14,7 @@ const Header = () => {
         <p>משלוח חינם מעל 200 שקל</p>
         <DeliveryDiningIcon className='delivery_icon'/>
       </div> */}
+      <InstallApp />
       <CustomeLink to={'/'}>
         <img src='/image/logo.jpg' alt="היהלומים של קרן" className='icon'/>
       </CustomeLink>
