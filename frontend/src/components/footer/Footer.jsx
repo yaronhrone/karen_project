@@ -2,10 +2,12 @@ import React from 'react'
 import FacebookIcon from '@mui/icons-material/Facebook';
 import InstagramIcon from '@mui/icons-material/Instagram';
 import CustomerLink from '../navbar/CustomeLink';
+import InstallApp from '../installApp/InstallApp';
 import './Footer.css'
 function Footer() {
   return (
     <div className='footer_container'>
+      <InstallApp />
       <div className='footer_social'>
         <a href="https://www.instagram.com/kerens_diamond?utm_source=qr" target="_blank" rel="noopener noreferrer"><InstagramIcon className='icon_f' /></a>
         <a href="https://www.facebook.com/keren.gamliel?locale=he_IL" target="_blank" rel="noopener noreferrer"><FacebookIcon className='icon_f' /></a>
