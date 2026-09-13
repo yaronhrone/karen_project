@@ -14,6 +14,10 @@ function AdminProducts() {
     // state let a stale File picked earlier in the create form leak into an
     // unrelated later edit that never touched the photo.
     const [updateFile, setUpdateFile] = useState(null);
+    // Holds the just-added product's name while the success confirmation is
+    // open; null means closed. Set right before the form resets below, so
+    // the confirmation still shows the name that was actually submitted.
+    const [addedItemName, setAddedItemName] = useState(null);
     const [itemsFrom, setItemsFrom] = useState({
         name: '',
         description: '',
@@ -64,6 +68,7 @@ if (!(file instanceof File)) {
 
 
             await createItem(formData);
+            setAddedItemName(itemsFrom.name.trim());
             setItemsFrom({
                 name: '',
                 description: '',
@@ -228,6 +233,16 @@ if (!(file instanceof File)) {
                 }
             >
                 <p>למחוק את המוצר הזה? הפעולה בלתי הפיכה.</p>
+            </Modal>
+            <Modal
+                isOpen={addedItemName !== null}
+                onClose={() => setAddedItemName(null)}
+                title="המוצר נוסף בהצלחה"
+                footer={
+                    <button className='btn' type='button' onClick={() => setAddedItemName(null)}>אישור</button>
+                }
+            >
+                <p>המוצר "{addedItemName}" נוסף בהצלחה לקטלוג.</p>
             </Modal>
         </div>
     )
