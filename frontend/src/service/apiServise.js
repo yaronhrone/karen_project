@@ -174,10 +174,3 @@ export const advanceOrderStatus = (orderId, status, readyBy) => {
 export const getOrderByIdForAdmin = (orderId) => {
     return axios.get(`${BASE_URL}/admin/order/by-id/${orderId}`, { headers: getAuthHeader() });
 }
-// Bulk product import - see ItemImportService.java for the expected CSV
-// columns (name, description, price, category, veg, image_url).
-export const importItemsCsv = (file) => {
-    const formData = new FormData();
-    formData.append('file', file);
-    return axios.post(`${BASE_URL}/admin/items/import`, formData, { headers: getAuthHeader() });
-}

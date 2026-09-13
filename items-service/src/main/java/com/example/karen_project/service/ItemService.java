@@ -21,11 +21,11 @@ public class ItemService {
 
 
     public String createItem(Items item){
-        // ItemImportService's CSV path already validates price > 0 - the
-        // single-item create/update paths (this method and updateItem below)
-        // didn't, so a negative/zero price could reach the public catalog
-        // and order-total math through this route even though the admin
-        // frontend form also checks it (a direct API call skips that).
+        // The single-item create/update paths (this method and updateItem
+        // below) didn't validate this, so a negative/zero price could reach
+        // the public catalog and order-total math through this route even
+        // though the admin frontend form also checks it (a direct API call
+        // skips that).
         if (item.getPrice() == null || item.getPrice().signum() <= 0) {
             return "המחיר חייב להיות גדול מ-0";
         }
