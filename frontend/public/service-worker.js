@@ -21,5 +21,18 @@ self.addEventListener('activate', (event) => {
 });
 
 self.addEventListener('fetch', (event) => {
+  // Navigation requests (a real page load/reload, or launching the
+  // installed PWA icon) carry request.mode === 'navigate'. Re-fetching such
+  // a request via fetch(event.request) is spec-disallowed - Chrome quietly
+  // tolerates it, but Safari/WebKit enforces the spec and throws, which
+  // broke the entire page load on iPhone (both plain Safari and the
+  // installed app - 2026-09-13/14, reported via Keren's iPhone). Since this
+  // worker never caches anything anyway, there's nothing gained by
+  // intercepting navigations - skip respondWith and let the browser fetch
+  // them itself, exactly as if there were no service worker for this
+  // request at all.
+  if (event.request.mode === 'navigate') {
+    return;
+  }
   event.respondWith(fetch(event.request));
 });
