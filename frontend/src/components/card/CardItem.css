@@ -63,7 +63,7 @@
 .wrapper .bottom h3 {
   margin: 0;
   padding: 0;
-  font-size: 15px;
+  font-size: 18px;
   width: 100%;
   color: var(--color-text);
 }
@@ -227,9 +227,10 @@
 .wrapper .contents h4 {
   color: #fff;
   margin: 6px 0;
-  font-size: 14px;
+  font-size: 18px;
   font-weight: 500;
 }
+
 
 .error {
   color: var(--color-danger);
