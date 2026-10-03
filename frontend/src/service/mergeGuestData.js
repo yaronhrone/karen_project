@@ -13,26 +13,48 @@ import { addItemToOrder, addItemToFavorite } from './apiServise';
 // Each call is wrapped individually so one failed item (e.g. it was deleted
 // from the catalog since it was added to the guest cart) doesn't abort the
 // rest of the merge.
-export const mergeGuestDataToAccount = async (cartItems, favorites, { clearCart, clearFavorites }) => {
+//
+// A failure that looks temporary (no response at all, or a 5xx) is retried
+// once, and if it still fails the item goes back into the guest cart instead
+// of being thrown away with the rest - the cart is cleared below either way,
+// so before this a single network hiccup during login silently lost items.
+// A 4xx (item no longer exists, bad request) is permanent: retrying or
+// keeping it would just fail again at every future login, so it is dropped.
+const tryOnce = async (action, itemId) => {
+  try {
+    await action(itemId);
+    return 'ok';
+  } catch (err) {
+    const transient = !err.response || err.response.status >= 500;
+    return transient ? 'transient' : 'permanent';
+  }
+};
+
+const mergeItem = async (action, itemId) => {
+  const first = await tryOnce(action, itemId);
+  return first === 'transient' ? tryOnce(action, itemId) : first;
+};
+
+export const mergeGuestDataToAccount = async (cartItems, favorites, { clearCart, clearFavorites, addToCart }) => {
   const hadCartItems = cartItems.length > 0;
+  const stillFailing = [];
 
   for (const itemId of cartItems) {
-    try {
-      await addItemToOrder(itemId);
-    } catch (err) {
+    if (await mergeItem(addItemToOrder, itemId) === 'transient') {
+      stillFailing.push(itemId);
     }
   }
 
   const uniqueFavoriteIds = [...new Set(favorites)];
   for (const itemId of uniqueFavoriteIds) {
-    try {
-      await addItemToFavorite(itemId);
-    } catch (err) {
-    }
+    await mergeItem(addItemToFavorite, itemId);
   }
 
   clearCart();
   clearFavorites();
+  if (addToCart) {
+    stillFailing.forEach((itemId) => addToCart(itemId));
+  }
 
   return hadCartItems;
 };

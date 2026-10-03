@@ -12,7 +12,7 @@ import { GoogleLogin } from '@react-oauth/google';
 import { passwordRegex } from '../../utils/validation';
 function Register() {
   const { currentUser, updateCurrentUserContext } = useContext(UserContext);
-  const { cartItems, clearCart } = useContext(cartContext);
+  const { cartItems, clearCart, addToCart } = useContext(cartContext);
   const { favorites, clearFavorites } = useContext(FavoriteContext);
   const [formData, setFormData] = useState({
     first_name: '',
@@ -92,7 +92,7 @@ function Register() {
       updateCurrentUserContext(data);
       // Same guest-cart/favorites carry-over as Login.jsx - see that file's
       // comment on mergeGuestDataToAccount for why.
-      const hadGuestCart = await mergeGuestDataToAccount(cartItems, favorites, { clearCart, clearFavorites });
+      const hadGuestCart = await mergeGuestDataToAccount(cartItems, favorites, { clearCart, clearFavorites, addToCart });
       setTimeout(() => {
         navigate(hadGuestCart ? '/order' : '/');
       }, 200);
@@ -120,7 +120,7 @@ function Register() {
       await loginWithGoogle(credentialResponse.credential);
       const { data } = await fetchCurrentUser();
       updateCurrentUserContext(data);
-      const hadGuestCart = await mergeGuestDataToAccount(cartItems, favorites, { clearCart, clearFavorites });
+      const hadGuestCart = await mergeGuestDataToAccount(cartItems, favorites, { clearCart, clearFavorites, addToCart });
       setTimeout(() => {
         navigate(hadGuestCart ? '/order' : '/');
       }, 200);

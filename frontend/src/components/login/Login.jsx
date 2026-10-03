@@ -13,7 +13,7 @@ function Login() {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const { updateCurrentUserContext } = useContext(UserContext);
-    const { cartItems, clearCart } = useContext(cartContext);
+    const { cartItems, clearCart, addToCart } = useContext(cartContext);
     const { favorites, clearFavorites } = useContext(FavoriteContext);
     const [error, setError] = useState('');
     const native = useNavigate();
@@ -24,7 +24,7 @@ function Login() {
         // Carry over whatever this person built up as a guest (cart +
         // favorites) onto the account they just logged into, instead of
         // leaving it stranded in localStorage.
-        const hadGuestCart = await mergeGuestDataToAccount(cartItems, favorites, { clearCart, clearFavorites });
+        const hadGuestCart = await mergeGuestDataToAccount(cartItems, favorites, { clearCart, clearFavorites, addToCart });
         setTimeout(() => {
             native(hadGuestCart ? '/order' : '/');
         }, 200);
