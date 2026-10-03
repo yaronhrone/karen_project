@@ -19,7 +19,7 @@ function Footer() {
       <ul className='footer_col'>
         <li className='footer_col_title'>יצירת קשר</li>
         <li>טלפון: 050-9422951</li>
-        {/* <li>כתובת: כפר הנגיד רחוב הארז 217 </li> */}
+        <li>כתובת לאיסוף עצמי: כפר הנגיד רחוב הארז 217 </li>
       </ul>
       <p className='footer_copy'>Yaron Haroni&copy; :כל הזכויות שמורות</p>
     </div>

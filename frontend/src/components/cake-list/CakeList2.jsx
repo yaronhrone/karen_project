@@ -6,7 +6,7 @@ import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import { FavoriteContext } from '../../contexts/FavoriteContext';
 import UserContext from '../../contexts/UserContext';
-import useIsMobile from '../../utils/useIsMobile';
+import useCarouselPageSize from '../../utils/useCarouselPageSize';
 
 // A boutique catalog, not a warehouse - fetching the whole category once and
 // paging through it client-side avoids guessing a page count from the
@@ -20,8 +20,7 @@ function CakeList2() {
     const [favorites, setFavorites] = useState([]);
     const { currentUser, isRequstToGetCurrentUserDone } = useContext(UserContext);
     const { favorites: favoriteItems } = useContext(FavoriteContext);
-    const isMobile = useIsMobile();
-    const pageSize = isMobile ? 1 : 3;
+    const pageSize = useCarouselPageSize();
     const totalPages = Math.max(1, Math.ceil(cakes.length / pageSize));
 
     const fetchCakes = async () => {
@@ -56,7 +55,7 @@ function CakeList2() {
     }, []);
     useEffect(() => {
         setPageIndex(0);
-    }, [isMobile]);
+    }, [pageSize]);
     const visibleCakes = cakes.slice(pageIndex * pageSize, pageIndex * pageSize + pageSize);
     return (
         <div>
