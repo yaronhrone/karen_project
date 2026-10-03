@@ -13,7 +13,8 @@ public class ItemsClientFallback implements ItemsClient {
     }
     @Override
     public String createItem(Item item) {
-        return "Fallback cold not create";
+        // Shown to the admin as-is when the items service is unreachable.
+        return "לא ניתן להוסיף את המוצר כרגע, נסו שוב בעוד רגע";
     }
 
     @Override

@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useRef } from 'react'
 import { createItem, deleteItemById, getAllItems, updateItem } from '../../service/apiServise';
 import CardItem from '../card/CardItem';
 import Modal from '../modal/Modal';
@@ -12,6 +12,15 @@ function AdminProducts() {
     const [pageItem, setPageItem] = useState(1);
     const [updateId, setUpdateId] = useState(null);
     const [error, setError] = useState('');
+    // Every error message clears itself after 8 seconds (it used to stay on
+    // screen until the next successful action). A newer message restarts the
+    // clock instead of being wiped by the previous message's timer.
+    const errorTimer = useRef(null);
+    const showError = (message) => {
+        setError(message);
+        clearTimeout(errorTimer.current);
+        errorTimer.current = setTimeout(() => setError(''), 8000);
+    };
     const [item, setItem] = useState([]);
     const [file, setFile] = useState(null);
     // Separate from `file` (the create form's) on purpose - sharing one
@@ -39,23 +48,23 @@ function AdminProducts() {
             setItem(prev => [...prev, ...data]);
         } catch (error) {
             if (error.response?.status === 400 || error.response?.status === 500) {
-                setError(error.response.data);
+                showError(error.response.data);
             }
         }
     }
     const handleCreateItem = async (e) => {
         e.preventDefault();
         if (!file || !itemsFrom.name || !itemsFrom.description || !itemsFrom.price || !itemsFrom.category) {
-            setError('All fields are required');
+            showError('יש למלא את כל השדות ולהעלות תמונה');
             return;
         }
         if (Number(itemsFrom.price) <= 0) {
-            setError('Price must be greater than 0');
+            showError('המחיר חייב להיות גדול מ-0');
             return;
         }
         const formData = new FormData();
 if (!(file instanceof File)) {
-    setError('Invalid file');
+    showError('הקובץ לא תקין, יש לבחור תמונה');
     return;
 }
         const realFile = new File([file], "upload.jpg", { type: file.type || "image/jpeg" });
@@ -87,10 +96,10 @@ if (!(file instanceof File)) {
 
         } catch (error) {
             if (error.response?.status === 400 || error.response?.status === 500) {
-                setError(error.response.data);
+                showError(error.response.data);
             }
             if (error.code === "ERR_NETWORK") {
-                setError("שגיאת רשת: בדוק/י את החיבור לאינטרנט ונסה/י שוב.");
+                showError("שגיאת רשת: בדוק/י את החיבור לאינטרנט ונסה/י שוב.");
             }
         }
     };
@@ -107,7 +116,7 @@ if (!(file instanceof File)) {
             setItem(item.filter(i => i.id !== deleteTarget));
         } catch (error) {
             if (error.response?.status === 400 || error.response?.status === 500) {
-                setError(error.response.data);
+                showError(error.response.data);
             }
         }
         setDeleteTarget(null);
@@ -125,7 +134,7 @@ if (!(file instanceof File)) {
     const updateItemId = async (e) => {
         e.preventDefault();
         if (Number(itemsFrom.price) <= 0) {
-            setError('Price must be greater than 0');
+            showError('המחיר חייב להיות גדול מ-0');
             return;
         }
         // A new photo is optional here (unlike create) - only attach a
@@ -133,7 +142,7 @@ if (!(file instanceof File)) {
         // absence tells the backend to keep the item's existing image
         // untouched.
         if (updateFile && !(updateFile instanceof File)) {
-            setError('Invalid file');
+            showError('הקובץ לא תקין, יש לבחור תמונה');
             return;
         }
         const formData = new FormData();
@@ -164,7 +173,7 @@ if (!(file instanceof File)) {
             handelItems();
         } catch (error) {
             if (error.response?.status === 400 || error.response?.status === 500) {
-                setError(error.response.data);
+                showError(error.response.data);
             }
         };
     }
