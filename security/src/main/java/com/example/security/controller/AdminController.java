@@ -21,6 +21,17 @@ import java.util.List;
 @RequestMapping("/admin")
 public class AdminController {
 
+    // Matches items.description VARCHAR(1255) in items-service. Checked here
+    // so an over-long description gets a clear 400 before the image is
+    // uploaded to S3 (and before the DB would reject it with a bare 500).
+    private static final int MAX_DESCRIPTION_LENGTH = 1255;
+    private static final String DESCRIPTION_TOO_LONG_MESSAGE =
+            "התיאור ארוך מדי - עד " + MAX_DESCRIPTION_LENGTH + " תווים";
+
+    private static boolean isDescriptionTooLong(String description) {
+        return description != null && description.length() > MAX_DESCRIPTION_LENGTH;
+    }
+
     @Autowired
     private UserService userService;
     @Autowired
@@ -62,6 +73,9 @@ public class AdminController {
             try {
                 if(file.isEmpty()) {
                     return ResponseEntity.badRequest().body("יש להעלות תמונה");
+                }
+                if (isDescriptionTooLong(itemRequest.getDescription())) {
+                    return ResponseEntity.badRequest().body(DESCRIPTION_TOO_LONG_MESSAGE);
                 }
         // העלאה ל-S3
         S3Service.UploadResult uploadResult = s3Service.upload(file);
@@ -131,6 +145,9 @@ public class AdminController {
             Item existing = itemService.getItemById(itemRequest.getId());
             if (existing == null) {
                 return ResponseEntity.badRequest().body("המוצר לא קיים במערכת");
+            }
+            if (isDescriptionTooLong(itemRequest.getDescription())) {
+                return ResponseEntity.badRequest().body(DESCRIPTION_TOO_LONG_MESSAGE);
             }
 
             Item item = new Item();

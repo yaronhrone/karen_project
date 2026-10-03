@@ -201,6 +201,7 @@
 }
 
 .wrapper .inside:hover {
+  overflow-y: auto;
   width: 100%;
   right: 0;
   top: 0;
@@ -229,6 +230,10 @@
   margin: 6px 0;
   font-size: 18px;
   font-weight: 500;
+  /* Product descriptions are free text: keep the admin's line breaks and
+     break very long words instead of overflowing the card. */
+  white-space: pre-line;
+  overflow-wrap: anywhere;
 }
 
 

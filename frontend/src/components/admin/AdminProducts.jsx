@@ -4,6 +4,10 @@ import CardItem from '../card/CardItem';
 import Modal from '../modal/Modal';
 import './Admin.css';
 
+// Matches items.description VARCHAR(1255) in items-service (and the check in
+// the backend's AdminController).
+const MAX_DESCRIPTION_LENGTH = 1255;
+
 function AdminProducts() {
     const [pageItem, setPageItem] = useState(1);
     const [updateId, setUpdateId] = useState(null);
@@ -172,7 +176,8 @@ if (!(file instanceof File)) {
             <form onSubmit={handleCreateItem} className='form_item'>
                 <h2 className='tital'>הוספת מוצר</h2>
                 <input type="text" placeholder="שם במוצר" value={itemsFrom.name} onChange={(e) => setItemsFrom({ ...itemsFrom, name: e.target.value })} />
-                <input type="text" placeholder="תיאור" value={itemsFrom.description} onChange={(e) => setItemsFrom({ ...itemsFrom, description: e.target.value })} />
+                <textarea placeholder="תיאור" rows={4} maxLength={MAX_DESCRIPTION_LENGTH} value={itemsFrom.description} onChange={(e) => setItemsFrom({ ...itemsFrom, description: e.target.value })} />
+                <span className="desc-counter">{itemsFrom.description.length}/{MAX_DESCRIPTION_LENGTH}</span>
                 <input type="number" placeholder="מחיר" value={itemsFrom.price} onChange={(e) => setItemsFrom({ ...itemsFrom, price: parseFloat(e.target.value) })} />
                 <input type="file" placeholder="העלאת תמונה"   accept="image/*"  onChange={(e) => setFile(  e.target.files[0] )} />
                 <select value={itemsFrom.category} onChange={(e) => setItemsFrom({ ...itemsFrom, category: e.target.value })}>
@@ -202,7 +207,8 @@ if (!(file instanceof File)) {
                             <form onSubmit={updateItemId} className='form_item'>
 
                                 <input type="text" placeholder="שם המוצר" value={itemsFrom.name} onChange={(e) => setItemsFrom({ ...itemsFrom, name: e.target.value })} />
-                                <input type="text" placeholder="תיאור" value={itemsFrom.description} onChange={(e) => setItemsFrom({ ...itemsFrom, description: e.target.value })} />
+                                <textarea placeholder="תיאור" rows={4} maxLength={MAX_DESCRIPTION_LENGTH} value={itemsFrom.description} onChange={(e) => setItemsFrom({ ...itemsFrom, description: e.target.value })} />
+                                <span className="desc-counter">{itemsFrom.description.length}/{MAX_DESCRIPTION_LENGTH}</span>
                                 <input type="number" placeholder="מחיר" value={itemsFrom.price} onChange={(e) => setItemsFrom({ ...itemsFrom, price: parseFloat(e.target.value) })} />
                                 <input type="file" placeholder="העלאת תמונה" accept="image/*" onChange={(e) => setUpdateFile(e.target.files[0])} />
                                 <select value={itemsFrom.category} onChange={(e) => setItemsFrom({ ...itemsFrom, category: e.target.value })}>
