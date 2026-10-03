@@ -25,10 +25,13 @@ import Header from './components/header/Header';
 import { CartProvider } from './contexts/CartContext';
 import PhoneNumberPrompt from './components/phone-prompt/PhoneNumberPrompt';
 import ErrorBoundary from './components/error/ErrorBoundary';
+import useAutoReload from './utils/useAutoReload';
 
 
 
 function App() {
+  // Picks up new deploys in already-open tabs/installed apps - see the hook.
+  useAutoReload();
   const [currentUser, setCurrentUser] = useState(null);
   const [isRequstToGetCurrentUserDone, setIsRequstToGetCurrentUserDone] = useState(false);
   const updateCurrentUserContext = (user) => {
