@@ -3,6 +3,7 @@ package com.example.security.controller;
 
 import com.example.security.model.Order;
 import com.example.security.model.ProductRequest;
+import com.example.security.model.SendOrderRequest;
 import com.example.security.service.OrderService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -18,6 +19,10 @@ import java.util.List;
 @RequestMapping("/order")
 
 public class OrderController {
+    // Matches orders.note VARCHAR(500); checked here so the customer gets a
+    // clear 400 instead of the DB rejecting it with a bare 500.
+    private static final int MAX_NOTE_LENGTH = 500;
+
     @Autowired
     private OrderService orderService;
 
@@ -52,9 +57,14 @@ public class OrderController {
     }
     @PutMapping
     @PreAuthorize("hasAnyAuthority('USER','ADMIN')")
-    public ResponseEntity<String> updateOrder(Authentication authentication) {
+    public ResponseEntity<String> updateOrder(Authentication authentication,
+                                              @RequestBody(required = false) SendOrderRequest request) {
         try {
-            String response = orderService.changeOrderStatus(authentication.getName());
+            String note = request != null ? request.note() : null;
+            if (note != null && note.length() > MAX_NOTE_LENGTH) {
+                return ResponseEntity.badRequest().body("ההערה ארוכה מדי - עד " + MAX_NOTE_LENGTH + " תווים");
+            }
+            String response = orderService.changeOrderStatus(authentication.getName(), note);
 
             return ResponseEntity.ok().body(response);
         }  catch (Exception e) {

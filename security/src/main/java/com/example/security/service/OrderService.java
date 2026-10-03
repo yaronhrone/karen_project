@@ -109,8 +109,10 @@ public class OrderService {
         orderRepository.updateOrderItem(orderItem);
         return "Order item updated successfully";
     }
-    public String changeOrderStatus(String email) {
-        String result = orderRepository.changeOrderStatusToReceived(email);
+    public String changeOrderStatus(String email, String note) {
+        // Blank means "no remark" - store NULL rather than an empty string.
+        String cleanNote = note == null || note.isBlank() ? null : note.trim();
+        String result = orderRepository.changeOrderStatusToReceived(email, cleanNote);
 
         // Notify Keren over WhatsApp that a new order came in, so she isn't
         // relying on manually checking Admin for it. A failure here (GreenAPI

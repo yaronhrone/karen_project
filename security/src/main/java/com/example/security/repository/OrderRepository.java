@@ -65,9 +65,9 @@ public class OrderRepository {
         String sql = "SELECT * FROM " + ORDER_TABLE + " WHERE user_email = ? ORDER BY id ASC";
         return jdbcTemplate.query(sql, new OrderMapper(), userEmail);
     }
-    public String changeOrderStatusToReceived(String userEmail) {
-        String sql = "UPDATE " + ORDER_TABLE + " SET order_status = 'RECEIVED' WHERE user_email = ? AND order_status = 'OPEN'";
-        jdbcTemplate.update(sql, userEmail);
+    public String changeOrderStatusToReceived(String userEmail, String note) {
+        String sql = "UPDATE " + ORDER_TABLE + " SET order_status = 'RECEIVED', note = ? WHERE user_email = ? AND order_status = 'OPEN'";
+        jdbcTemplate.update(sql, note, userEmail);
         return "Order status updated successfully";
     }
 

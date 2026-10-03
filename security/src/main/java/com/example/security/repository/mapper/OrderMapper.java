@@ -25,6 +25,8 @@ public class OrderMapper implements RowMapper<Order> {
         order.setReadyAt(readyAt != null ? readyAt.toLocalDate() : null);
         java.sql.Date sentAt = rs.getDate("sent_at");
         order.setSentAt(sentAt != null ? sentAt.toLocalDate() : null);
+        // Nullable - only set when the customer wrote a remark.
+        order.setNote(rs.getString("note"));
         // Was rs.getDouble()+BigDecimal.valueOf() - a binary float round-trip
         // on a DECIMAL(10,2) money column, unlike OrderItemsMapper/ItemMapper
         // which correctly read the same column type via getBigDecimal().

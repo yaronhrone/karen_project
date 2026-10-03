@@ -23,6 +23,8 @@ public class Order {
     private LocalDate readyAt;
     @JsonProperty("sent_at")
     private LocalDate sentAt;
+    // Optional free-text remark the customer typed when sending the order.
+    private String note;
     @JsonProperty("total_price")
     private BigDecimal totalPrice;
     @JsonProperty("address_shipping")
@@ -109,6 +111,14 @@ public class Order {
 
     public void setReadyAt(LocalDate readyAt) {
         this.readyAt = readyAt;
+    }
+
+    public String getNote() {
+        return note;
+    }
+
+    public void setNote(String note) {
+        this.note = note;
     }
 
     public LocalDate getSentAt() {

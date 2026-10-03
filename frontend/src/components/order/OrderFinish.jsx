@@ -46,6 +46,12 @@ function OrderFinish({ order }) {
                     </div>
                 ))}
             </div>
+            {order.note && (
+                <div className='orderNote orderNote-readonly'>
+                    <span className='label'>הערה להזמנה</span>
+                    <p>{order.note}</p>
+                </div>
+            )}
         </div>
     )
 }

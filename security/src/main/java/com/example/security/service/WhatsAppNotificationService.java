@@ -69,6 +69,10 @@ public class WhatsAppNotificationService {
                     .append(" (₪").append(item.getTotalPrice()).append(")\n");
         }
         sb.append("\nסה\"כ: ₪").append(order.getTotalPrice());
+        // Optional remark the customer typed when sending the order.
+        if (order.getNote() != null && !order.getNote().isBlank()) {
+            sb.append("\n\nהערה: ").append(order.getNote());
+        }
         // Tried having Keren reply here to update status, but the instance
         // IS her own WhatsApp number - a message she sends to her own
         // self-chat is never delivered as an "incoming" webhook event (there's

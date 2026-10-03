@@ -118,9 +118,9 @@ const remove = async (id) => {
       }, 5000);
     }
   };
-    const sendOrder = async () => {
+    const sendOrder = async (note) => {
         try {
-            await updateOrder();
+            await updateOrder(note);
             // No alert() here anymore - fetchOrders() below re-renders the
             // card with the new status ("התקבלה") right away, which is
             // already the confirmation that it went through.

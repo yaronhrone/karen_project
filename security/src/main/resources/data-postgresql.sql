@@ -46,6 +46,10 @@ ALTER TABLE orders ADD COLUMN IF NOT EXISTS ready_by TIMESTAMP;
 ALTER TABLE orders ADD COLUMN IF NOT EXISTS ready_at TIMESTAMP;
 ALTER TABLE orders ADD COLUMN IF NOT EXISTS sent_at TIMESTAMP;
 
+-- Free-text remark the customer can attach when sending the order (see
+-- OrderController.updateOrder). Optional; capped at 500 chars in the API.
+ALTER TABLE orders ADD COLUMN IF NOT EXISTS note VARCHAR(500);
+
 CREATE TABLE IF NOT EXISTS order_items (
     id INT GENERATED ALWAYS AS IDENTITY,
     order_id INT NOT NULL,

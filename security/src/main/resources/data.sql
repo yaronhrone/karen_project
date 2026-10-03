@@ -26,6 +26,8 @@ CREATE TABLE orders (
     -- the full explanation of how these differ from ready_by above.
     ready_at TIMESTAMP,
     sent_at TIMESTAMP,
+    -- Optional customer remark attached when the order is sent.
+    note VARCHAR(500),
     address_shipping VARCHAR(255) NOT NULL,
     total_price DECIMAL(10,2) NOT NULL,
     PRIMARY KEY (id),

@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState } from 'react'
 import './Order.css';
 import AddIcon from '@mui/icons-material/Add';
 import RemoveIcon from '@mui/icons-material/Remove';
@@ -8,7 +8,11 @@ import { getOrderStatusLabel } from '../../utils/orderStatus';
 import { calculatePackages } from '../../utils/chocolatePackaging';
 import ChocolatePackageStatus from './ChocolatePackageStatus';
 
+// Matches orders.note VARCHAR(500) and the check in OrderController.
+const MAX_NOTE_LENGTH = 500;
+
 function OrderCard({ order, remove, add, deleteOrder, sendOrder }) {
+    const [note, setNote] = useState('');
     // Defensive - a "TypeError: .map is not a function" crashed this whole
     // page (before the ErrorBoundary existed to at least catch it) on an
     // order whose order_items apparently wasn't an array at render time.
@@ -68,13 +72,26 @@ function OrderCard({ order, remove, add, deleteOrder, sendOrder }) {
                     <span className='number'>₪{order.total_price}</span>
                 </div>
 
+                <div className='orderNote'>
+                    <label htmlFor={`order-note-${order.id}`}>הערה להזמנה (לא חובה)</label>
+                    <textarea
+                        id={`order-note-${order.id}`}
+                        rows={3}
+                        maxLength={MAX_NOTE_LENGTH}
+                        placeholder="למשל: בקשות מיוחדות, שעת איסוף מועדפת..."
+                        value={note}
+                        onChange={(e) => setNote(e.target.value)}
+                    />
+                    <span className='note-counter'>{note.length}/{MAX_NOTE_LENGTH}</span>
+                </div>
+
                 <div className='btns'>
                     <button className='btn btn-ghost' onClick={() => { deleteOrder(order.id) }}>
                         <DeleteIcon fontSize="small" /> מחיקת הזמנה
                     </button>
                     <button
                         className='btn btn-primary'
-                        onClick={() => { sendOrder() }}
+                        onClick={() => { sendOrder(note) }}
                         disabled={chocolatePackagingInvalid}
                         title={chocolatePackagingInvalid ? 'כמות השוקולדים לא מתאימה למארז מלא - השלימו או הורידו כמות' : undefined}
                     >

@@ -153,8 +153,8 @@ export const getAllOrders = () => {
 export const removeItemFromOredr = (id) => { 
     return axios.delete(`${BASE_URL}/order/item/${id}`, { headers: getAuthHeader() });
 }
-export const updateOrder = () => {
-    return axios.put(`${BASE_URL}/order`,null, { headers: getAuthHeader() });
+export const updateOrder = (note) => {
+    return axios.put(`${BASE_URL}/order`, { note }, { headers: getAuthHeader() });
 }
 export const deleteOrderById = (id) => {
     return axios.delete(`${BASE_URL}/order/${id}` ,  { headers: getAuthHeader() })

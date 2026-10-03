@@ -194,3 +194,47 @@
   font-weight: 400;
   margin: 4px 0 0;
 }
+
+.orderNote {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin: 16px 0;
+}
+
+.orderNote label,
+.orderNote .label {
+  font-weight: 600;
+  color: var(--color-text);
+}
+
+.orderNote textarea {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 10px;
+  border: 1px solid var(--color-bg-alt);
+  border-radius: var(--radius-sm);
+  background: var(--color-bg);
+  color: var(--color-text);
+  font-family: inherit;
+  font-size: 16px;
+  resize: vertical;
+}
+
+.orderNote textarea:focus {
+  outline: none;
+  border-color: var(--color-accent);
+}
+
+.orderNote .note-counter {
+  align-self: flex-end;
+  font-size: 13px;
+  color: var(--color-text-muted);
+}
+
+.orderNote-readonly p {
+  margin: 0;
+  white-space: pre-line;
+  overflow-wrap: anywhere;
+  color: var(--color-text);
+}
