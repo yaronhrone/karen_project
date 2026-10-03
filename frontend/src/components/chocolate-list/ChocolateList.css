@@ -229,7 +229,10 @@
   border-radius: var(--radius-lg);
   background: var(--color-surface);
   box-shadow: var(--shadow-sm);
-  width: 70%;
+  /* Wide enough that the row below never has to wrap: the widest row
+     (3 cards, from 1326px up - see utils/useCarouselPageSize.js) needs about
+     1010px, 2 cards about 720px, 1 card about 430px. */
+  width: min(94%, 1100px);
   height: auto;
   margin: 20px auto;
   padding: 16px;
@@ -241,6 +244,7 @@
 }
 
 .card-wrapper {
+  flex: 0 0 auto;
   opacity: 0;
   transform: translateY(20px);
   animation: fadeInUp 1.2s ease forwards;
@@ -248,7 +252,9 @@
 
 .cards-wrapper {
   display: flex;
-  flex-wrap: wrap;
+  /* One row always - arrows and cards never drop to a second line; only the
+     number of cards changes with the screen width. */
+  flex-wrap: nowrap;
   margin: 20px auto;
   align-items: center;
   justify-content: center;
@@ -290,6 +296,37 @@
 
 .arrow:hover {
   transform: scale(1.2);
+}
+
+/* On phones there is no room beside the card for two 40px arrows, so they
+   float over the card's left and right edges instead, still on the same row. */
+@media (max-width: 520px) {
+  .cards-container {
+    padding: 8px;
+  }
+  .cards-wrapper {
+    position: relative;
+    gap: 0;
+  }
+  .cards-wrapper > .arrow {
+    position: absolute;
+    top: 50%;
+    z-index: 3;
+    transform: translateY(-50%);
+    padding: 2px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.9);
+    box-shadow: var(--shadow-sm);
+  }
+  .cards-wrapper > .arrow:hover {
+    transform: translateY(-50%) scale(1.1);
+  }
+  .cards-wrapper > .arrow:first-child {
+    inset-inline-start: 0;
+  }
+  .cards-wrapper > .arrow:last-child {
+    inset-inline-end: 0;
+  }
 }
 
 .error_server {

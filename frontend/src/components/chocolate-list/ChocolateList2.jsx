@@ -7,6 +7,7 @@ import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import UserContext from '../../contexts/UserContext';
 import { FavoriteContext } from '../../contexts/FavoriteContext';
 import useCarouselPageSize from '../../utils/useCarouselPageSize';
+import { visibleWindow, stepStart } from '../../utils/carouselWindow';
 
 // A boutique catalog, not a warehouse - fetching the whole category once and
 // paging through it client-side avoids guessing a page count from the
@@ -16,12 +17,11 @@ const FETCH_ALL_SIZE = 100;
 
 function ChocolateList2() {
     const [chocolates, setChocolates] = useState([]);
-    const [pageIndex, setPageIndex] = useState(0);
+    const [startIndex, setStartIndex] = useState(0);
     const [favorites, setFavorites] = useState([]);
     const { currentUser, isRequstToGetCurrentUserDone } = useContext(UserContext);
     const { favorites: favoriteItems } = useContext(FavoriteContext);
     const pageSize = useCarouselPageSize();
-    const totalPages = Math.max(1, Math.ceil(chocolates.length / pageSize));
 
     const fetchChocolates = async () => {
         try {
@@ -46,30 +46,30 @@ function ChocolateList2() {
     }
 
     const handleNextPage = () => {
-        setPageIndex((prev) => (prev + 1) % totalPages);
+        setStartIndex((prev) => stepStart(prev, 1, pageSize, chocolates.length));
     }
     const handlePreviousPage = () => {
-        setPageIndex((prev) => (prev - 1 + totalPages) % totalPages);
+        setStartIndex((prev) => stepStart(prev, -1, pageSize, chocolates.length));
     }
     useEffect(() => {
         fetchChocolates();
     }, []);
     useEffect(() => {
-        setPageIndex(0);
+        setStartIndex(0);
     }, [pageSize]);
-    const visibleChocolates = chocolates.slice(pageIndex * pageSize, pageIndex * pageSize + pageSize);
+    const visibleChocolates = visibleWindow(chocolates, startIndex, pageSize);
     return (
         <div>
             <div className="cards-container ">
                 <h2>פרלינים</h2>
 
-                <div key={pageIndex} className="cards-wrapper fade">
+                <div key={startIndex} className="cards-wrapper fade">
                     <ArrowBackIcon onClick={handleNextPage} className='arrow' />
                     {visibleChocolates.map((chocolate, index) => (
                         <div key={chocolate.id} className="card-wrapper" style={{ animationDelay: `${index * 0.3}s` }}>
                             <CardItem key={chocolate.id} item={chocolate} isFavoriteDefault={favorites?.includes(chocolate.id)} categoryPath="/chocolates" />
                         </div>))}
-                    <ArrowForwardIcon onClick={handlePreviousPage} disabled={pageIndex === 0} className='arrow' />
+                    <ArrowForwardIcon onClick={handlePreviousPage} className='arrow' />
                 </div>
             </div>
             <div className="pagination">

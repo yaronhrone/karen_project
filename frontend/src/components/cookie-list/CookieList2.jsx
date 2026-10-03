@@ -7,6 +7,7 @@ import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import { FavoriteContext } from '../../contexts/FavoriteContext';
 import UserContext from '../../contexts/UserContext';
 import useCarouselPageSize from '../../utils/useCarouselPageSize';
+import { visibleWindow, stepStart } from '../../utils/carouselWindow';
 
 // A boutique catalog, not a warehouse - fetching the whole category once and
 // paging through it client-side avoids guessing a page count from the
@@ -16,12 +17,11 @@ const FETCH_ALL_SIZE = 100;
 
 function CookieList2() {
     const [cookies, setCookies] = useState([]);
-    const [pageIndex, setPageIndex] = useState(0);
+    const [startIndex, setStartIndex] = useState(0);
     const [favorites, setFavorites] = useState([]);
     const { currentUser, isRequstToGetCurrentUserDone } = useContext(UserContext);
     const { favorites: favoriteItems } = useContext(FavoriteContext);
     const pageSize = useCarouselPageSize();
-    const totalPages = Math.max(1, Math.ceil(cookies.length / pageSize));
 
     const fetchCookies = async () => {
         try {
@@ -45,29 +45,29 @@ function CookieList2() {
     }
 
     const handleNextPage = () => {
-        setPageIndex((prev) => (prev + 1) % totalPages);
+        setStartIndex((prev) => stepStart(prev, 1, pageSize, cookies.length));
     }
     const handlePreviousPage = () => {
-        setPageIndex((prev) => (prev - 1 + totalPages) % totalPages);
+        setStartIndex((prev) => stepStart(prev, -1, pageSize, cookies.length));
     }
     useEffect(() => {
         fetchCookies();
     }, []);
     useEffect(() => {
-        setPageIndex(0);
+        setStartIndex(0);
     }, [pageSize]);
-    const visibleCookies = cookies.slice(pageIndex * pageSize, pageIndex * pageSize + pageSize);
+    const visibleCookies = visibleWindow(cookies, startIndex, pageSize);
     return (
         <div>
             <div className="cards-container ">
                 <h2>עוגיות</h2>
-                <div key={pageIndex} className="cards-wrapper fade">
+                <div key={startIndex} className="cards-wrapper fade">
                     <ArrowBackIcon onClick={handleNextPage} className='arrow' />
                     {visibleCookies.map((cookie, index) => (
                         <div key={cookie.id} className="card-wrapper" style={{ animationDelay: `${index * 0.3}s` }}>
                             <CardItem key={cookie.id} item={cookie} isFavoriteDefault={favorites.includes(cookie.id)} categoryPath="/cookies" />
                         </div>))}
-                    <ArrowForwardIcon onClick={handlePreviousPage} disabled={pageIndex === 0} className='arrow' />
+                    <ArrowForwardIcon onClick={handlePreviousPage} className='arrow' />
                 </div>
             </div>
             <div className="pagination">
