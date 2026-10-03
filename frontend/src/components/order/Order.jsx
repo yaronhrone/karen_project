@@ -8,6 +8,7 @@ import OrderFinish from './OrderFinish';
 import './Order.css';
 import { addItemToOrder, deleteOrderById, removeItemFromOredr, updateOrder } from '../../service/apiServise';
 import { cartContext } from '../../contexts/CartContext';
+import { OpenOrderContext } from '../../contexts/OpenOrderContext';
 import ChocolateLoader from '../loading/ChocolateLoader';
 
 
@@ -19,6 +20,7 @@ function Order() {
   const navigate = useNavigate();
   const [errorFromServer, setErrorFromServer] = useState('');
   const { cartItems, addToCart, decrementFromCart } = useContext(cartContext);
+  const { syncFromOrders } = useContext(OpenOrderContext);
   const [guestCartDetails, setGuestCartDetails] = useState([]);
   // How many of the older ("previous") orders to show, below the current
   // one - starts small and grows via "עוד 5" instead of dumping the whole
@@ -43,6 +45,9 @@ function Order() {
       // so root cause is still server-side, not yet confirmed) returned
       // something itself missing .map further down, at render time.
       setOrder(Array.isArray(data) ? data : []);
+      // Keep the product cards' "added" marks in step with what this page
+      // just showed (items removed, order sent or deleted here).
+      syncFromOrders(data);
     } catch (err) {
       if (err.response?.status == 400 || err.response?.status == 500) {
         setErrorFromServer(err.response.data);

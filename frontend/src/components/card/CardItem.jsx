@@ -9,6 +9,7 @@ import FavoriteIcon from '@mui/icons-material/Favorite';
 import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder';
 import { FavoriteContext } from '../../contexts/FavoriteContext';
 import { cartContext } from '../../contexts/CartContext';
+import { OpenOrderContext } from '../../contexts/OpenOrderContext';
 import { useNavigate } from 'react-router-dom';
 
 // categoryPath: when set (Home's preview lists pass e.g. "/chocolates"), the
@@ -21,9 +22,13 @@ function CardItem({ item, isFavoriteDefault, categoryPath }) {
     const { toggleFavoriteContext } = useContext(FavoriteContext);
     const navigate = useNavigate();
     const [error, setError] = useState("");
-    const [clicked, setClicked] = useState(false);
     const [isFavorite, setIsFavorite] = useState(isFavoriteDefault);
-    const{addToCart} = useContext(cartContext);
+    const { cartItems, addToCart, removeFromCart } = useContext(cartContext);
+    const { openOrderItemIds, refreshOpenOrder, markInOrder } = useContext(OpenOrderContext);
+    // "Already added" is derived from the real cart/order instead of a flag
+    // local to this card - a local flag reset every time the card remounted,
+    // so leaving the page and coming back showed the product as not added.
+    const clicked = currentUser ? openOrderItemIds.has(item.id) : cartItems.includes(item.id);
 
     // Empty deps meant this only ever ran once, on mount - if the parent's
     // favorites list (fetched async) resolved AFTER this card already
@@ -73,7 +78,6 @@ function CardItem({ item, isFavoriteDefault, categoryPath }) {
                 setError("");
             }, 2000);
         }
-        setClicked(false);
     }
 
     const addToOrder = async () => {
@@ -90,15 +94,14 @@ function CardItem({ item, isFavoriteDefault, categoryPath }) {
             return;
         }
         if (currentUser === null) {
-         
-            setClicked(true);
             addToCart(item.id);
             return;
         }
 
         try {
             await addItemToOrder(item.id);
-            setClicked(true);
+            markInOrder(item.id);
+            refreshOpenOrder();
         } catch (error) {
             if (error.response && error.response.data) {
                 setError(error.response.data);
@@ -106,13 +109,20 @@ function CardItem({ item, isFavoriteDefault, categoryPath }) {
                 setTimeout(() => {
                     setError("");
                 }, 3000);
-            } setClicked(false);
+            }
         }
     }
 
     const removeFromOrder = async () => {
+        // A guest's items live in the local cart, not in an order on the
+        // server - calling the order API here could only ever fail for them.
+        if (currentUser === null) {
+            removeFromCart(item.id);
+            return;
+        }
         try {
             await removeItemFromOredr(item.id);
+            refreshOpenOrder();
         } catch (error) {
             if (error.response && error.response.data) {
 
@@ -123,7 +133,6 @@ function CardItem({ item, isFavoriteDefault, categoryPath }) {
                 }, 3000);
             };
         }
-        setClicked(false);
     }
 
 

@@ -23,6 +23,7 @@ import Footer from './components/footer/Footer';
 import SearchPage from './components/searchPage/SearchPage';
 import Header from './components/header/Header';
 import { CartProvider } from './contexts/CartContext';
+import { OpenOrderProvider } from './contexts/OpenOrderContext';
 import PhoneNumberPrompt from './components/phone-prompt/PhoneNumberPrompt';
 import ErrorBoundary from './components/error/ErrorBoundary';
 import useAutoReload from './utils/useAutoReload';
@@ -58,6 +59,7 @@ function App() {
     <div className="App">
       <UserContext.Provider value={{ currentUser, updateCurrentUserContext, isRequstToGetCurrentUserDone }}>
           <CartProvider>
+           <OpenOrderProvider>
             <Router>
               {/* Blocking, no skip - Google Sign-In never provides a phone
                   number, and Keren needs one to reach the customer over
@@ -96,6 +98,7 @@ function App() {
               </ErrorBoundary>
               <Footer />
             </Router>
+           </OpenOrderProvider>
           </CartProvider>
       </UserContext.Provider>
     </div>
