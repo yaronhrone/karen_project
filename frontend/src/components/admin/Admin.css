@@ -247,6 +247,65 @@
     display: flex;
     gap: 10px;
 }
+/* The order card is a flex item of .order_row, whose align-items is
+   flex-start - so it was sized to its content (up to 640px) instead of the
+   row, and on a phone it ran off the screen. Fill the row, never exceed it. */
+.order_row .orderCard{
+    width: 100%;
+    box-sizing: border-box;
+    min-width: 0;
+}
+.order_row .orderItemInfo{
+    min-width: 0;
+    overflow-wrap: anywhere;
+}
+
+/* Phones: make the admin orders look like the customer's orders page - the
+   order card itself is the white card, full width, instead of a card inside a
+   padded group card inside a padded page (which left a sliver of room). */
+@media (max-width: 600px){
+    .admin{
+        padding: 8px;
+    }
+    .admin-orders{
+        width: 100%;
+    }
+    .order_group{
+        background: transparent;
+        box-shadow: none;
+        padding: 0;
+    }
+    .order_group .tital{
+        font-size: 30px;
+        margin: 12px 0;
+    }
+    .order_row{
+        padding: 0 0 8px;
+        border-bottom: none;
+    }
+    .order_row .orderCard{
+        margin: 0 0 8px;
+        padding: 20px 16px;
+    }
+    .order_search{
+        flex-wrap: wrap;
+        padding: 12px;
+    }
+    .order_search label{
+        flex: 1 1 100%;
+    }
+    .order_search input{
+        flex: 1;
+        width: auto;
+    }
+    .order_row_actions{
+        flex-wrap: wrap;
+        width: 100%;
+    }
+    .ready-by-input{
+        flex-wrap: wrap;
+    }
+}
 /* Compound selector (not just .btn-cancel) so this reliably beats .btn's
    own background-color regardless of CSS import order between index.css
    (global) and this component-scoped stylesheet. */
