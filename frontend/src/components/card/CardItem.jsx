@@ -11,6 +11,7 @@ import { FavoriteContext } from '../../contexts/FavoriteContext';
 import { cartContext } from '../../contexts/CartContext';
 import { OpenOrderContext } from '../../contexts/OpenOrderContext';
 import { useNavigate } from 'react-router-dom';
+import ImageLightbox from '../lightbox/ImageLightbox';
 
 // categoryPath: when set (Home's preview lists pass e.g. "/chocolates"), the
 // cart button no longer orders the item directly - it routes to the item's
@@ -22,6 +23,7 @@ function CardItem({ item, isFavoriteDefault, categoryPath }) {
     const { toggleFavoriteContext } = useContext(FavoriteContext);
     const navigate = useNavigate();
     const [error, setError] = useState("");
+    const [zoomed, setZoomed] = useState(false);
     const [isFavorite, setIsFavorite] = useState(isFavoriteDefault);
     const { cartItems, addToCart, removeFromCart } = useContext(cartContext);
     const { openOrderItemIds, refreshOpenOrder, markInOrder } = useContext(OpenOrderContext);
@@ -77,6 +79,16 @@ function CardItem({ item, isFavoriteDefault, categoryPath }) {
             setTimeout(() => {
                 setError("");
             }, 2000);
+        }
+    }
+
+    // Home's preview cards (categoryPath set) lead to the category page;
+    // everywhere else the image enlarges.
+    const onImageClick = () => {
+        if (categoryPath) {
+            navigate(categoryPath);
+        } else {
+            setZoomed(true);
         }
     }
 
@@ -139,7 +151,7 @@ function CardItem({ item, isFavoriteDefault, categoryPath }) {
     return (
         <div className="wrapper" key={item.id} >
             <div className="container" >
-                <div className="top" style={{ "--bg-url": `url(${item.image})` }}>  <div onClick={() => toggleFavorite(item.id)}> {isFavorite ? <FavoriteIcon className='icon' /> : <FavoriteBorderIcon className='icon' />} </div> </div>
+                <div className="top clickable" style={{ "--bg-url": `url(${item.image})` }} onClick={onImageClick}>  <div onClick={(e) => { e.stopPropagation(); toggleFavorite(item.id); }}> {isFavorite ? <FavoriteIcon className='icon' /> : <FavoriteBorderIcon className='icon' />} </div> </div>
                 <div className={`bottom ${clicked ? 'clicked' : ''}`}>
                     <div className="left">
                         <div className="details">
@@ -167,13 +179,14 @@ function CardItem({ item, isFavoriteDefault, categoryPath }) {
                 </div>
             </div>
             <div className="inside">
-                <div className="icon"><InfoIcon style={{ marginLeft: '90px' }} /></div>
+                <div className="icon"><InfoIcon /></div>
                 <div className="contents">
                     <h4>מידע: {item.description}</h4>
                     <h4>טיבעוני: {item.veg ? 'כן' : 'לא'}</h4>
 
                 </div>
             </div>
+            {zoomed && <ImageLightbox src={item.image} alt={item.name} onClose={() => setZoomed(false)} />}
         </div>
     )
 

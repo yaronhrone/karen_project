@@ -7,8 +7,10 @@
 }
 
 .wrapper {
-  width: 260px;
-  height: 250px;
+  width: 264px;
+  /* Height follows the content so a long product name is never cut off
+     (the price used to be pushed out of the fixed-height footer). */
+  min-height: 254px;
   background: var(--color-surface);
   margin: auto;
   position: relative;
@@ -26,17 +28,25 @@
 
 .wrapper .container {
   width: 100%;
-  height: 100%;
+  display: flex;
+  flex-direction: column;
+  /* Fills the card's min-height so no blank strip shows under the footer. */
+  min-height: inherit;
 }
 
 .wrapper .top {
-  height: 70%;
+  height: 178px;
+  flex: 0 0 auto;
   width: 100%;
   margin: 0;
   padding: 0;
   background: var(--bg-url) no-repeat center center;
   background-size: cover;
   background-color: var(--color-bg-alt);
+}
+
+.wrapper .top.clickable {
+  cursor: pointer;
 }
 
 .wrapper .top .icon {
@@ -53,10 +63,14 @@
 }
 
 .wrapper .bottom {
-  margin: auto;
+  /* margin:auto in the column-flex container swallowed the free height, so
+     the footer stayed short and left a white strip under it. */
+  margin: 0;
   padding: 0;
   width: 200%;
-  height: 30%;
+  flex: 1 0 auto;
+  min-height: 76px;
+  display: flex;
   transition: transform var(--transition);
 }
 
@@ -67,30 +81,33 @@
 .wrapper .bottom h3 {
   margin: 0;
   padding: 0;
-  font-size: 18px;
+  font-size: 16px;
   width: 100%;
   color: var(--color-text);
 }
 
 .wrapper .left {
-  height: 100%;
   width: 50%;
   background: var(--color-bg-alt);
   position: relative;
-  float: left;
+  display: flex;
 }
 
 .wrapper .left .details {
   padding: 8px 10px;
-  float: left;
-  width: calc(70% - 40px);
+  flex: 1;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.wrapper .left > div:not(.details) {
+  flex: 0 0 30%;
 }
 
 .wrapper .buy {
-  float: right;
   z-index: 1;
-  width: calc(30% - 2px);
-  height: 100px;
+  width: 100%;
+  height: 100%;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -118,9 +135,10 @@
   width: 50%;
   background: var(--color-accent);
   color: #fff;
-  float: right;
-  height: 200%;
   overflow: hidden;
+  /* Its content (50%-height rows) must not size the footer - the footer's
+     height comes from the name/price side only. */
+  contain: size;
 }
 
 .wrapper .right .details {
@@ -197,8 +215,15 @@
 
 .wrapper .inside > .icon {
   position: absolute;
-  right: 15px;
-  top: 15px;
+  right: 90px;
+  top: 88px;
+  /* Header.css's global .icon (the 130px round logo with a border) leaked
+     onto this element and drew a huge arc instead of the info icon. */
+  width: auto;
+  height: auto;
+  border: none;
+  border-radius: 0;
+  line-height: 0;
   color: #fff;
   opacity: 1;
   transition: opacity var(--transition);
@@ -210,7 +235,11 @@
   right: 0;
   top: 0;
   border-radius: 0;
-  height: 70%;
+  height: 178px;
+}
+
+.wrapper .inside > .icon:hover {
+  transform: none;
 }
 
 .wrapper .inside:hover > .icon {

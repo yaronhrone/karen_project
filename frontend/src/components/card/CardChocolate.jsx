@@ -8,12 +8,14 @@ import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder';
 import InfoIcon from '@mui/icons-material/Info';
 import AddShoppingCartIcon from '@mui/icons-material/AddShoppingCart';
 import { Clear, Done } from '@mui/icons-material';
+import ImageLightbox from '../lightbox/ImageLightbox';
 import { addItemToOrder, removeItemFromOredr } from '../../service/apiServise';
 
 const CardChocolate = ({ item, isFavoriteDefault, addToList, removeFromList, removedItemId, click }) => {
     const { currentUser, isRequstToGetCurrentUserDone } = useContext(UserContext);
     const { toggleFavoriteContext } = useContext(FavoriteContext);
     const [error, setError] = useState("");
+    const [zoomed, setZoomed] = useState(false);
     const [clicked, setClicked] = useState(click);
     const [isFavorite, setIsFavorite] = useState(isFavoriteDefault);
     const { addToCart } = useContext(cartContext);
@@ -106,7 +108,7 @@ const CardChocolate = ({ item, isFavoriteDefault, addToList, removeFromList, rem
     return (
         <div className="wrapper" key={item.id} >
             <div className="container" >
-                <div className="top" style={{ "--bg-url": `url(${item.image})` }}>  <div onClick={() => toggleFavorite(item.id)}> {isFavorite ? <FavoriteIcon className='icon' /> : <FavoriteBorderIcon className='icon' />} </div> </div>
+                <div className="top clickable" style={{ "--bg-url": `url(${item.image})` }} onClick={() => setZoomed(true)}>  <div onClick={(e) => { e.stopPropagation(); toggleFavorite(item.id); }}> {isFavorite ? <FavoriteIcon className='icon' /> : <FavoriteBorderIcon className='icon' />} </div> </div>
                 <div className={`bottom ${clicked ? 'clicked' : ''}`}>
                     <div className="left">
                         <div className="details">
@@ -134,13 +136,14 @@ const CardChocolate = ({ item, isFavoriteDefault, addToList, removeFromList, rem
                 </div>
             </div>
             <div className="inside">
-                <div className="icon"><InfoIcon style={{ marginLeft: '90px' }} /></div>
+                <div className="icon"><InfoIcon /></div>
                 <div className="contents">
                     <h4>מידע: {item.description}</h4>
                     <h4>טיבועוני: {item.veg ? 'כן' : 'לא'}</h4>
 
                 </div>
             </div>
+            {zoomed && <ImageLightbox src={item.image} alt={item.name} onClose={() => setZoomed(false)} />}
         </div>
     )
 }
