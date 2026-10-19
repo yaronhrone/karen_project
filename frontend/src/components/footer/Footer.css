@@ -53,6 +53,16 @@
   border-bottom-color: var(--color-accent-soft);
 }
 
+.footer_feedback {
+  color: rgba(255, 255, 255, 0.85);
+  text-decoration: underline;
+  transition: color var(--transition);
+}
+
+.footer_feedback:hover {
+  color: #fff;
+}
+
 .footer_copy {
   width: 100%;
   text-align: center;

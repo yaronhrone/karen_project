@@ -253,7 +253,7 @@ function ChocolateList() {
           it stays visible while browsing instead of interrupting each pick */}
       <aside className={`builder-sidebar ${hasSelection ? 'open' : ''}`}>
         <div className="builder-sidebar-inner">
-          <h2 className="builder-title">הקופסה שלי</h2>
+          <h2 className="builder-title">קופסת היהלומים שלי</h2>
           <p className="builder-subtitle">הפרלינים מגיעים במארזים של 5 \ 6 \ 9 \ 12 \ 22 \ 30</p>
 
           {hasSelection ? (
