@@ -9,6 +9,8 @@ You verify fixes you did not write. Assume they may be wrong.
 
 Before starting: read `CLAUDE.md`, the plan for this run (`docs/feedback/plans/<date>.md`), and `git diff main...HEAD`.
 
+Confirm you are on a `feedback/*` branch (`git branch --show-current`); if on `main`, stop and report. Your diff guard: `git diff --name-only` of your own changes must list only test files.
+
 Do:
 1. For each plan item, write at least one test that fails without the fix and passes with it (frontend: Jest/RTL next to the component; backend: JUnit in the matching service). Test files only - never edit product code.
 2. Run: `cd frontend && CI=true npm test -- --watchAll=false`, `npm run build`, and `./mvnw test` in any backend service the diff touches.

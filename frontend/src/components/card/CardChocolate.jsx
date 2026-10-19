@@ -108,7 +108,7 @@ const CardChocolate = ({ item, isFavoriteDefault, addToList, removeFromList, rem
     return (
         <div className="wrapper" key={item.id} >
             <div className="container" >
-                <div className="top clickable" style={{ "--bg-url": `url(${item.image})` }} onClick={() => setZoomed(true)}>  <div onClick={(e) => { e.stopPropagation(); toggleFavorite(item.id); }}> {isFavorite ? <FavoriteIcon className='icon' /> : <FavoriteBorderIcon className='icon' />} </div> </div>
+                <div className="top clickable" role="button" tabIndex={0} aria-label={item.name} style={{ "--bg-url": `url(${item.image})` }} onClick={() => setZoomed(true)} onKeyDown={(e) => { if (e.target === e.currentTarget && (e.key === 'Enter' || e.key === ' ')) { e.preventDefault(); setZoomed(true); } }}>  <div onClick={(e) => { e.stopPropagation(); toggleFavorite(item.id); }}> {isFavorite ? <FavoriteIcon className='icon' /> : <FavoriteBorderIcon className='icon' />} </div> </div>
                 <div className={`bottom ${clicked ? 'clicked' : ''}`}>
                     <div className="left">
                         <div className="details">

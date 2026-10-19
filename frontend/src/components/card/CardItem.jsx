@@ -151,7 +151,7 @@ function CardItem({ item, isFavoriteDefault, categoryPath }) {
     return (
         <div className="wrapper" key={item.id} >
             <div className="container" >
-                <div className="top clickable" style={{ "--bg-url": `url(${item.image})` }} onClick={onImageClick}>  <div onClick={(e) => { e.stopPropagation(); toggleFavorite(item.id); }}> {isFavorite ? <FavoriteIcon className='icon' /> : <FavoriteBorderIcon className='icon' />} </div> </div>
+                <div className="top clickable" role="button" tabIndex={0} aria-label={item.name} style={{ "--bg-url": `url(${item.image})` }} onClick={onImageClick} onKeyDown={(e) => { if (e.target === e.currentTarget && (e.key === 'Enter' || e.key === ' ')) { e.preventDefault(); onImageClick(); } }}>  <div onClick={(e) => { e.stopPropagation(); toggleFavorite(item.id); }}> {isFavorite ? <FavoriteIcon className='icon' /> : <FavoriteBorderIcon className='icon' />} </div> </div>
                 <div className={`bottom ${clicked ? 'clicked' : ''}`}>
                     <div className="left">
                         <div className="details">
