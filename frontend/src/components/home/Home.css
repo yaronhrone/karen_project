@@ -11,6 +11,9 @@
 }
 
 .hero p {
+  /* The page is LTR, so Hebrew punctuation (periods, commas) and trailing
+     emoji jumped to the wrong end of each line. */
+  direction: rtl;
   font-size: 18px;
   line-height: 1.8;
   color: var(--color-text);
