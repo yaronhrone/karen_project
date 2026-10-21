@@ -16,7 +16,7 @@ const Header = () => {
       </div> */}
       <InstallApp />
       <CustomeLink to={'/'}>
-        <img src='/image/logo.jpg' alt="היהלומים של קרן" className='icon'/>
+        <img src='/image/logo-v2.jpg' alt="היהלומים של קרן" className='icon'/>
       </CustomeLink>
     </header>
   )

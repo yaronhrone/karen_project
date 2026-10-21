@@ -7,6 +7,7 @@ import SendIcon from '@mui/icons-material/Send';
 import { getOrderStatusLabel } from '../../utils/orderStatus';
 import { calculatePackages } from '../../utils/chocolatePackaging';
 import ChocolatePackageStatus from './ChocolatePackageStatus';
+import { readyEstimateText } from '../../utils/readyEstimate';
 
 // Matches orders.note VARCHAR(500) and the check in OrderController.
 const MAX_NOTE_LENGTH = 500;
@@ -84,6 +85,8 @@ function OrderCard({ order, remove, add, deleteOrder, sendOrder }) {
                     />
                     <span className='note-counter'>{note.length}/{MAX_NOTE_LENGTH}</span>
                 </div>
+
+                <p className='lead-time'>{readyEstimateText()} (2-5 ימי עסקים)</p>
 
                 <div className='btns'>
                     <button className='btn btn-ghost' onClick={() => { deleteOrder(order.id) }}>

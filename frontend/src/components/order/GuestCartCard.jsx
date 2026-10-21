@@ -5,6 +5,7 @@ import RemoveIcon from '@mui/icons-material/Remove';
 import LoginIcon from '@mui/icons-material/Login';
 import { useNavigate } from 'react-router-dom';
 import ChocolatePackageStatus from './ChocolatePackageStatus';
+import { readyEstimateText } from '../../utils/readyEstimate';
 
 // Guest equivalent of OrderCard - same look, but backed by CartContext's
 // local (not-yet-a-real-order) items instead of a server order, and its
@@ -55,6 +56,8 @@ function GuestCartCard({ items, totalPrice, onIncrement, onDecrement }) {
                 <span className='label'>סה"כ לתשלום</span>
                 <span className='number'>₪{totalPrice}</span>
             </div>
+
+            <p className='lead-time'>{readyEstimateText()} (2-5 ימי עסקים)</p>
 
             <div className='btns'>
                 <button className='btn btn-primary' onClick={() => navigate('/login')}>

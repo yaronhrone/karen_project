@@ -8,19 +8,19 @@
       "type": "image/x-icon"
     },
     {
-      "src": "logo192.png",
+      "src": "logo192-v2.png",
       "type": "image/png",
       "sizes": "192x192",
       "purpose": "any"
     },
     {
-      "src": "logo512.png",
+      "src": "logo512-v2.png",
       "type": "image/png",
       "sizes": "512x512",
       "purpose": "any"
     },
     {
-      "src": "logo512-maskable.png",
+      "src": "logo512-maskable-v2.png",
       "type": "image/png",
       "sizes": "512x512",
       "purpose": "maskable"
