@@ -139,12 +139,19 @@
   /* Its content (50%-height rows) must not size the footer - the footer's
      height comes from the name/price side only. */
   contain: size;
+  position: relative;
 }
 
 .wrapper .right .details {
-  padding: 10px;
+  /* Same text width and padding as the name on the other side of the strip
+     (.left .details), so a long name wraps to the same number of lines and
+     is not cut off at the bottom once the item is added. */
+  box-sizing: border-box;
+  padding: 8px 10px;
   float: right;
-  width: calc(70% - 40px);
+  width: 70%;
+  overflow-wrap: anywhere;
+  transform: translateY(4px);
 }
 
 .wrapper .right .details h3 {
@@ -152,11 +159,15 @@
 }
 
 .wrapper .done {
+  /* Pinned to the strip, not floated: a long product name (a tall floated
+     title) used to push the "remove" block down and cut it off. */
+  position: absolute;
+  top: 0;
+  left: 0;
   width: calc(30% - 2px);
-  float: left;
   transition: transform var(--transition);
   border-right: solid thin rgba(255, 255, 255, 0.3);
-  height: 50%;
+  height: 100%;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -168,10 +179,12 @@
 }
 
 .wrapper .remove {
+  position: absolute;
+  top: 100%;
+  left: 0;
   width: calc(30% - 1px);
-  clear: both;
   border-right: solid thin rgba(255, 255, 255, 0.3);
-  height: 50%;
+  height: 100%;
   display: flex;
   align-items: center;
   justify-content: center;
