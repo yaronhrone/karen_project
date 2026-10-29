@@ -13,7 +13,7 @@ import Order from './components/order/Order';
 import Register from './components/auth/Register';
 import NotFound from './components/not-found/NotFound';
 import Favorite from './components/favorite/Favorite';
-import { fetchCurrentUser } from './service/apiService';
+import { fetchCurrentUser, logout } from './service/apiService';
 import CookieList from './components/product-lists/CookieList';
 import Admin from './components/admin/Admin';
 import AdminOrders from './components/admin/AdminOrders';
@@ -48,6 +48,12 @@ function App() {
 
       }
     } catch (error) {
+      // A saved token the server no longer accepts (expired, or from another
+      // database/secret) only produces a 401 on every start and leaves the
+      // visitor half logged in: drop it and carry on as a guest.
+      if (error.response && error.response.status === 401) {
+        logout();
+      }
     } finally {
       setIsRequstToGetCurrentUserDone(true);
     }
