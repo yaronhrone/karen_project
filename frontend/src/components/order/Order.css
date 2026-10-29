@@ -248,7 +248,13 @@
   color: var(--color-accent-hover);
 }
 
-.box-contents { margin-top: 6px; }
-.box-contents ul { margin: 8px 0 0; padding-inline-start: 18px; font-size: 14px; color: var(--color-text); }
+.box-contents { margin-top: 6px; direction: rtl; text-align: right; }
+.box-contents ul { margin: 8px 0 0; padding-inline-start: 22px; list-style: disc; font-size: 14px; color: var(--color-text); }
+.box-contents li { margin-bottom: 4px; }
+.box-contents .box-line { display: flex; gap: 6px; align-items: baseline; }
+.box-contents .box-qty { font-weight: 700; }
+
+/* A box's photo is shown whole (not cropped into the round product thumbnail). */
+.orderItem img.box-photo { width: 88px; height: 88px; border-radius: var(--radius-md); object-fit: contain; background: #fff; box-shadow: none; }
 
 .box-actions { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; }

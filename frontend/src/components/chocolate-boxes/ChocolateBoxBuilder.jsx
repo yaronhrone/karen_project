@@ -229,7 +229,12 @@ function ChocolateBoxBuilder({ onAddToOrder, initial = null, onCancel }) {
         {counts.length > 0 && (
           <ul className="box-builder-counts">
             {counts.map(({ item, qty }) => (
-              <li key={item.id}><Swatch item={item} className="box-builder-swatch-sm" /> {item.name} <bdi>× {qty}</bdi></li>
+              <li key={item.id}>
+                <Swatch item={item} className="box-builder-swatch-sm" />
+                <strong className="box-builder-qty">{qty}</strong>
+                <span aria-hidden="true">×</span>
+                <span>{item.name}</span>
+              </li>
             ))}
           </ul>
         )}

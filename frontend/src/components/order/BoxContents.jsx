@@ -15,7 +15,13 @@ function BoxContents({ composition }) {
             {open && (
                 <ul>
                     {composition.map((c) => (
-                        <li key={c.id}>{c.name} <bdi>× {c.quantity}</bdi></li>
+                        <li key={c.id}>
+                            <span className='box-line'>
+                                <strong className='box-qty'>{c.quantity}</strong>
+                                <span aria-hidden='true'>×</span>
+                                <span>{c.name}</span>
+                            </span>
+                        </li>
                     ))}
                 </ul>
             )}

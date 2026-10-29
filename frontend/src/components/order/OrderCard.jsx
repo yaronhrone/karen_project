@@ -38,7 +38,7 @@ function OrderCard({ order, remove, add, removeBox, editBox, deleteOrder, sendOr
                     {orderItems.map(oi => (
                         <div key={oi.id} className='orderItem'>
                             {(oi.image || boxImageForCategory(oi.category))
-                                ? <img src={oi.image || boxImageForCategory(oi.category)} alt={oi.name} />
+                                ? <img className={oi.composition ? 'box-photo' : undefined} src={oi.image || boxImageForCategory(oi.category)} alt={oi.name} />
                                 : <div className='img-placeholder' aria-hidden="true" />}
                             <div className='orderItemInfo'>
                                 <h3>{oi.name}</h3>

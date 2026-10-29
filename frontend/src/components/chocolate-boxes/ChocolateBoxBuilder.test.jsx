@@ -46,7 +46,7 @@ test('the same chocolate can fill several squares and counts add up', async () =
     fireEvent.click(await screen.findByRole('button', { name: 'בחירת שוקולד חלב' }));
   }
   expect(screen.getByText(`2 / ${box.size} פרלינים`)).toBeInTheDocument();
-  expect(screen.getByText('× 2')).toBeInTheDocument();
+  expect(screen.getByText('2', { selector: 'strong' })).toBeInTheDocument();
 });
 
 test('filling every square enables the button; clearing a square disables it again', async () => {
