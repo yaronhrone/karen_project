@@ -1,3 +1,4 @@
+import { Link } from 'react-router-dom';
 import React, { useContext, useEffect, useState } from 'react'
 import { getAllCake, getAllFavoriteItems } from '../../service/apiService';
 import CardItem from '../card/CardItem';
@@ -70,6 +71,7 @@ function CakeCarousel() {
                         </div>))}
                     <ArrowForwardIcon onClick={handlePreviousPage} className='arrow' />
                 </div>
+                <div className="carousel-more"><Link className="btn btn-ghost" to="/cakes">לכל העוגות</Link></div>
             </div>
             <div className="pagination">
             </div>

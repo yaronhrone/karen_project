@@ -20,6 +20,7 @@ function HomeBoxes() {
           </Link>
         ))}
       </div>
+      <div className="carousel-more"><Link className="btn btn-ghost" to="/chocolates">לכל המארזים</Link></div>
     </section>
   );
 }

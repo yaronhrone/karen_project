@@ -1,3 +1,4 @@
+import { Link } from 'react-router-dom';
 import React, { useContext, useEffect, useState } from 'react'
 import { getAllCookie, getAllFavoriteItems } from '../../service/apiService';
 import CardItem from '../card/CardItem';
@@ -70,6 +71,7 @@ function CookieCarousel() {
                         </div>))}
                     <ArrowForwardIcon onClick={handlePreviousPage} className='arrow' />
                 </div>
+                <div className="carousel-more"><Link className="btn btn-ghost" to="/cookies">לכל העוגיות</Link></div>
             </div>
             <div className="pagination">
             </div>
