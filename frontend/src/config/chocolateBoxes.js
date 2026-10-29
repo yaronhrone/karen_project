@@ -21,6 +21,14 @@ export const CHOCOLATE_BOXES = [
   { size: 22, cols: 6, shape: ['xx..xx', 'xxxxxx', 'xxxxxx', '.xxxx.', '..xx..'], frame: 'heart', label: 'מארז 22 פרלינים', image: '/image/boxes/box-22.jpeg' },
 ];
 
+// The configured photo for an order line of a box, found by the catalog
+// category chocolate-box-<size> - used when the catalog item has no photo.
+export const boxImageForCategory = (category) => {
+  const match = /^chocolate-box-(\d+)$/.exec(category || '');
+  const box = match && CHOCOLATE_BOXES.find((b) => b.size === Number(match[1]));
+  return (box && box.image) || null;
+};
+
 // One entry per grid cell, row by row: true = a square, false = empty space.
 export const boxCells = (box) => (box.shape
   ? box.shape.join('').split('').map((c) => c === 'x')

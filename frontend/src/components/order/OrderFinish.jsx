@@ -2,6 +2,7 @@ import React from 'react'
 import './Order.css';
 import { getOrderStatusLabel } from '../../utils/orderStatus';
 import BoxContents from './BoxContents';
+import { boxImageForCategory } from '../../config/chocolateBoxes';
 
 function OrderFinish({ order }) {
     // See the matching guard/comment in OrderCard.jsx.
@@ -33,8 +34,8 @@ function OrderFinish({ order }) {
             <div className='orderItemContainer'>
                 {orderItems.map(oi => (
                     <div key={oi.id} className='orderItem'>
-                        {oi.image
-                            ? <img src={oi.image} alt={oi.name} />
+                        {(oi.image || boxImageForCategory(oi.category))
+                            ? <img src={oi.image || boxImageForCategory(oi.category)} alt={oi.name} />
                             : <div className='img-placeholder' aria-hidden="true" />}
                         <div className='orderItemInfo'>
                             <h3>{oi.name}</h3>

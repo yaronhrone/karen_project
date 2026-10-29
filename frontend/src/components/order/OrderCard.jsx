@@ -6,6 +6,7 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import SendIcon from '@mui/icons-material/Send';
 import { getOrderStatusLabel } from '../../utils/orderStatus';
 import BoxContents from './BoxContents';
+import { boxImageForCategory } from '../../config/chocolateBoxes';
 import { readyEstimateText } from '../../utils/readyEstimate';
 
 // Matches orders.note VARCHAR(500) and the check in OrderController.
@@ -35,8 +36,8 @@ function OrderCard({ order, remove, add, removeBox, deleteOrder, sendOrder }) {
                 <div className='orderItemContainer'>
                     {orderItems.map(oi => (
                         <div key={oi.id} className='orderItem'>
-                            {oi.image
-                                ? <img src={oi.image} alt={oi.name} />
+                            {(oi.image || boxImageForCategory(oi.category))
+                                ? <img src={oi.image || boxImageForCategory(oi.category)} alt={oi.name} />
                                 : <div className='img-placeholder' aria-hidden="true" />}
                             <div className='orderItemInfo'>
                                 <h3>{oi.name}</h3>
