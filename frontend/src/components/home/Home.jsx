@@ -1,5 +1,5 @@
 import React from 'react'
-import ChocolateList2 from '../chocolate-list/ChocolateList2';
+import HomeBoxes from './HomeBoxes';
 import CakeList2 from '../cake-list/CakeList2';
 import CookieList2 from '../cookie-list/CookieList2';
 import './Home.css'
@@ -28,7 +28,7 @@ const Home = () => {
       </div>
 
       <h2 className='section_title'>היהלומים שלי</h2>
-      <ChocolateList2 />
+      <HomeBoxes />
       <CakeList2 />
       <CookieList2 />
     </div>

@@ -1,8 +1,8 @@
 import { calculatePackages } from '../../utils/chocolatePackaging';
+import './ChocolatePackageStatus.css';
 
 // The same package-completion note shown while building a box on
-// /chocolates (.builder-note classes come from ChocolateList.css, already
-// loaded globally) - reused here so the order/cart view gives the same
+// /chocolates - reused here so the order/cart view gives the same
 // guidance once chocolates can be adjusted outside that page too (search
 // results, the order page's own +/- steppers).
 function ChocolatePackageStatus({ totalQuantity }) {

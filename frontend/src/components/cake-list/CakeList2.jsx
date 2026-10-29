@@ -2,6 +2,7 @@ import React, { useContext, useEffect, useState } from 'react'
 import { getAllCake, getAllFavoriteItems } from '../../service/apiServise';
 import CardItem from '../card/CardItem';
 import './CakeList.css';
+import '../carousel/Carousel.css';
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import { FavoriteContext } from '../../contexts/FavoriteContext';

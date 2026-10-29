@@ -1,0 +1,8 @@
+.home-boxes { width: min(94%, 1100px); margin: 20px auto; padding: 16px; border-radius: var(--radius-lg); background: var(--color-surface); box-shadow: var(--shadow-sm); text-align: center; }
+.home-boxes-row { display: flex; flex-wrap: wrap; gap: 24px; justify-content: center; margin-top: 16px; }
+.home-box-card { width: 240px; display: flex; flex-direction: column; align-items: center; gap: 8px; padding: 16px; border-radius: var(--radius-md); background: var(--color-surface); box-shadow: var(--shadow-sm); text-decoration: none; color: var(--color-text); transition: box-shadow var(--transition), transform var(--transition); }
+.home-box-card:hover { box-shadow: var(--shadow-lg); transform: translateY(-3px); }
+.home-box-card img { width: 100%; aspect-ratio: 4 / 3; object-fit: cover; border-radius: var(--radius-md); }
+.home-box-placeholder { width: 100%; aspect-ratio: 4 / 3; display: flex; align-items: center; justify-content: center; border-radius: var(--radius-md); background: #5a3a2a; color: #fff; font-size: 48px; }
+.home-box-label { font-weight: 600; color: var(--color-heading); }
+.home-box-price { color: var(--color-accent-hover); font-weight: 700; }

@@ -1,0 +1,109 @@
+.cards-container {
+  border-radius: var(--radius-lg);
+  background: var(--color-surface);
+  box-shadow: var(--shadow-sm);
+  /* Wide enough that the row below never has to wrap: the widest row
+     (3 cards, from 1326px up - see utils/useCarouselPageSize.js) needs about
+     1010px, 2 cards about 720px, 1 card about 430px. */
+  width: min(94%, 1100px);
+  height: auto;
+  margin: 20px auto;
+  padding: 16px;
+  align-items: center;
+  justify-content: center;
+  transition: opacity 0.6s ease-in-out;
+  opacity: 1;
+  position: relative;
+}
+
+.card-wrapper {
+  flex: 0 0 auto;
+  opacity: 0;
+  transform: translateY(20px);
+  animation: fadeInUp 1.2s ease forwards;
+}
+
+.cards-wrapper {
+  display: flex;
+  /* One row always - arrows and cards never drop to a second line; only the
+     number of cards changes with the screen width. */
+  flex-wrap: nowrap;
+  margin: 20px auto;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: auto;
+  gap: 30px;
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.fade {
+  animation: fadeInContainer 0.8s ease-in-out;
+}
+
+@keyframes fadeInContainer {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.arrow {
+  cursor: pointer;
+  font-size: 40px;
+  color: var(--color-accent);
+  transition: transform var(--transition);
+}
+
+.arrow:hover {
+  transform: scale(1.2);
+}
+
+/* On phones there is no room beside the card for two 40px arrows, so they
+   float over the card's left and right edges instead, still on the same row. */
+@media (max-width: 520px) {
+  .cards-container {
+    padding: 8px;
+  }
+  .cards-wrapper {
+    position: relative;
+    gap: 0;
+  }
+  .cards-wrapper > .arrow {
+    position: absolute;
+    top: 50%;
+    z-index: 3;
+    transform: translateY(-50%);
+    padding: 2px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.9);
+    box-shadow: var(--shadow-sm);
+  }
+  .cards-wrapper > .arrow:hover {
+    transform: translateY(-50%) scale(1.1);
+  }
+  .cards-wrapper > .arrow:first-child {
+    inset-inline-start: 0;
+  }
+  .cards-wrapper > .arrow:last-child {
+    inset-inline-end: 0;
+  }
+}
+
+.error_server {
+  text-align: center;
+  color: var(--color-danger);
+  font-weight: 600;
+}
