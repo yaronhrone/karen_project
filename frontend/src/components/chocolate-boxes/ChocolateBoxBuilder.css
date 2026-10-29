@@ -10,7 +10,7 @@
 .box-builder-price { color: var(--color-accent-hover); font-weight: 700; }
 
 /* The tray: a drawn box, or the real photo when the config provides one. */
-.box-builder-tray { display: block; width: min(560px, 100%); margin: 0 auto 24px; padding: 18px; border-radius: var(--radius-md); background: #5a3a2a; box-shadow: var(--shadow-md); background-size: cover; background-position: center; box-sizing: border-box; }
+.box-builder-tray { display: block; width: min(560px, 100%); margin: 0 auto 24px; padding: 18px; border-radius: var(--radius-md); background: #5a3a2a; box-shadow: var(--shadow-md); box-sizing: border-box; }
 .box-builder-tray-small { margin: 0; padding: 8px; box-shadow: none; pointer-events: none; }
 .box-builder-grid { display: grid; gap: 10px; direction: ltr; }
 .box-builder-tray-small .box-builder-grid { gap: 4px; }
@@ -39,3 +39,4 @@
 .box-builder-pick-choose { margin-top: auto; }
 .box-builder-error { padding: 8px 12px; border-radius: var(--radius-sm); background: var(--color-bg-alt); color: var(--color-text); }
 .box-builder-picker > .btn { grid-column: 1 / -1; }
+.box-builder-photo { width: 100%; aspect-ratio: 4 / 3; object-fit: cover; border-radius: var(--radius-md); display: block; }

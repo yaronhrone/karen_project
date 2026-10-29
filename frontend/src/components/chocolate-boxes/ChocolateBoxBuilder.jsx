@@ -33,9 +33,8 @@ const Swatch = ({ item, className = '' }) => {
 // `preview` draws the squares as plain decoration (used inside a box card,
 // which is itself a button - interactive squares there would nest buttons).
 function BoxPreview({ box, slots, onSlotClick, preview = false }) {
-  const style = box.image ? { backgroundImage: `url(${box.image})` } : undefined;
   return (
-    <span className={`box-builder-tray ${preview ? 'box-builder-tray-small' : ''}`} style={style}>
+    <span className={`box-builder-tray ${preview ? 'box-builder-tray-small' : ''}`}>
       <span className="box-builder-grid" style={{ gridTemplateColumns: `repeat(${box.cols}, 1fr)` }}>
         {Array.from({ length: box.size }).map((_, i) => {
           const chocolate = slots ? slots[i] : null;
@@ -151,7 +150,9 @@ function ChocolateBoxBuilder() {
         <div className="box-builder-boxes">
           {CHOCOLATE_BOXES.map((b) => (
             <button key={b.size} type="button" className="box-builder-box-card" onClick={() => chooseBox(b)}>
-              <BoxPreview box={b} preview />
+              {b.image
+                ? <img className="box-builder-photo" src={b.image} alt="" />
+                : <BoxPreview box={b} preview />}
               <h3>{b.label}</h3>
               <span className="box-builder-price">₪{b.price}</span>
             </button>

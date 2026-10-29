@@ -27,24 +27,24 @@ test('lists every configured box', async () => {
 });
 
 test('choosing a box shows that many empty squares and a disabled button', async () => {
-  const box = await openBox(6);
+  const box = await openBox(CHOCOLATE_BOXES[0].size);
   expect(screen.getAllByLabelText(/ריבוע \d+: ריק/)).toHaveLength(box.size);
   expect(screen.getByText(`0 / ${box.size} פרלינים`)).toBeInTheDocument();
   expect(screen.getByRole('button', { name: /להשלמת המארז/ })).toBeDisabled();
 });
 
 test('the same chocolate can fill several squares and counts add up', async () => {
-  await openBox(6);
+  const box = await openBox(CHOCOLATE_BOXES[0].size);
   for (let i = 1; i <= 2; i++) {
     fireEvent.click(screen.getByLabelText(`ריבוע ${i}: ריק`));
     fireEvent.click(await screen.findByRole('button', { name: 'בחירת שוקולד חלב' }));
   }
-  expect(screen.getByText('2 / 6 פרלינים')).toBeInTheDocument();
+  expect(screen.getByText(`2 / ${box.size} פרלינים`)).toBeInTheDocument();
   expect(screen.getByText('× 2')).toBeInTheDocument();
 });
 
 test('filling every square enables the button; clearing a square disables it again', async () => {
-  const box = await openBox(6);
+  const box = await openBox(CHOCOLATE_BOXES[0].size);
   for (let i = 1; i <= box.size; i++) {
     fireEvent.click(screen.getByLabelText(`ריבוע ${i}: ריק`));
     fireEvent.click(await screen.findByRole('button', { name: 'בחירת קרמל מלוח' }));
@@ -58,7 +58,7 @@ test('filling every square enables the button; clearing a square disables it aga
 });
 
 test('going back to box selection resets the squares', async () => {
-  await openBox(6);
+  await openBox(CHOCOLATE_BOXES[0].size);
   fireEvent.click(screen.getByLabelText('ריבוע 1: ריק'));
   fireEvent.click(await screen.findByRole('button', { name: 'בחירת פיסטוק' }));
   fireEvent.click(screen.getByText(/בחירת מארז אחר/));
@@ -68,7 +68,7 @@ test('going back to box selection resets the squares', async () => {
 
 test('a failed catalog request shows an error, not demo chocolates', async () => {
   require('../../service/apiServise').getAllChocolate.mockRejectedValue(new Error('down'));
-  await openBox(6).catch(() => {});
+  await openBox(CHOCOLATE_BOXES[0].size).catch(() => {});
   expect(await screen.findByRole('alert')).toHaveTextContent('לא הצלחנו לטעון');
   expect(screen.queryByText(/מוצגים פרלינים לדוגמה/)).not.toBeInTheDocument();
 });
@@ -77,7 +77,7 @@ test('rows without id/name and repeated ids are ignored', async () => {
   require('../../service/apiServise').getAllChocolate.mockResolvedValue({
     data: [{ id: 1, name: 'א' }, { id: 1, name: 'כפול' }, { name: 'בלי מזהה' }, { id: 2 }],
   });
-  await openBox(6);
+  await openBox(CHOCOLATE_BOXES[0].size);
   fireEvent.click(screen.getByLabelText('ריבוע 1: ריק'));
   expect(await screen.findByRole('button', { name: 'בחירת א' })).toBeInTheDocument();
   expect(screen.queryByRole('button', { name: 'בחירת כפול' })).not.toBeInTheDocument();
@@ -88,7 +88,7 @@ test('"עוד מידע" reveals the description and the photo opens enlarged', a
   require('../../service/apiServise').getAllChocolate.mockResolvedValue({
     data: [{ id: 1, name: 'פרלין', description: 'פירוט הפרלין', image: '/x.jpg' }],
   });
-  await openBox(6);
+  await openBox(CHOCOLATE_BOXES[0].size);
   fireEvent.click(screen.getByLabelText('ריבוע 1: ריק'));
   expect(screen.queryByText('פירוט הפרלין')).not.toBeInTheDocument();
   fireEvent.click(await screen.findByRole('button', { name: 'עוד מידע' }));
@@ -98,7 +98,7 @@ test('"עוד מידע" reveals the description and the photo opens enlarged', a
 });
 
 test('Escape closes the picker', async () => {
-  await openBox(6);
+  await openBox(CHOCOLATE_BOXES[0].size);
   fireEvent.click(screen.getByLabelText('ריבוע 1: ריק'));
   expect(await screen.findByText('בחרו פרלין')).toBeInTheDocument();
   fireEvent.keyDown(window, { key: 'Escape' });

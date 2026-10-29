@@ -3,16 +3,15 @@
 // in the builder depends on specific sizes.
 //
 // - size:   number of chocolates (= number of squares) in the box
-// - cols:   squares per row (rows = size / cols)
-// - image:  optional photo of the real box, shown behind the squares
-//           (put the file in public/image/boxes/ and reference it here).
-//           Without one, a drawn tray is used.
+// - cols:   squares per row (rows = size / cols, last row may be shorter)
+// - image:  optional photo of the real box, shown on the box card and on Home
+//           (file in public/image/boxes/). The squares are always drawn, so a
+//           box without a photo still works.
 // - price:  price of the whole box in NIS. PLACEHOLDER VALUES - set Keren's
 //           real prices before this goes live.
 export const CHOCOLATE_BOXES = [
-  { size: 6, cols: 3, label: 'מארז 6 פרלינים', image: null, price: 60 },
-  { size: 12, cols: 4, label: 'מארז 12 פרלינים', image: null, price: 110 },
-  { size: 18, cols: 6, label: 'מארז 18 פרלינים', image: null, price: 160 },
+  { size: 9, cols: 3, label: 'מארז 9 פרלינים', image: '/image/boxes/box-9.jpeg', price: 80 },
+  { size: 22, cols: 6, label: 'מארז 22 פרלינים', image: '/image/boxes/box-22.jpg', price: 180 },
 ];
 
 // Shown only when the shop has no chocolates in the catalog yet, so the
