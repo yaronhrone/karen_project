@@ -7,6 +7,7 @@
 // - shape:  optional, instead of a plain grid: one string per row, 'x' = a
 //           square, '.' = empty space (cols is then the row width). The number
 //           of 'x' must equal size.
+// - frame:  optional outline drawn around the squares ('heart')
 // - image:  optional photo of the real box, shown on the box card and on Home
 //           (file in public/image/boxes/). The squares are always drawn, so a
 //           box without a photo still works.
@@ -14,7 +15,7 @@
 //           real prices before this goes live.
 export const CHOCOLATE_BOXES = [
   { size: 9, cols: 3, label: 'מארז 9 פרלינים', image: '/image/boxes/box-9.jpg', price: 80 },
-  { size: 22, cols: 6, shape: ['xx.xx.', 'xxxxxx', 'xxxxxx', '.xxxx.', '..xx..'], label: 'מארז 22 פרלינים', image: '/image/boxes/box-22.jpeg', price: 180 },
+  { size: 22, cols: 6, shape: ['xx..xx', 'xxxxxx', 'xxxxxx', '.xxxx.', '..xx..'], frame: 'heart', label: 'מארז 22 פרלינים', image: '/image/boxes/box-22.jpeg', price: 180 },
 ];
 
 // One entry per grid cell, row by row: true = a square, false = empty space.

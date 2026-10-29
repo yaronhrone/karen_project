@@ -35,7 +35,7 @@ const Swatch = ({ item, className = '' }) => {
 function BoxPreview({ box, slots, onSlotClick, preview = false }) {
   let squareIndex = 0;
   return (
-    <span className={`box-builder-tray ${preview ? 'box-builder-tray-small' : ''}`}>
+    <span className={`box-builder-tray ${preview ? 'box-builder-tray-small' : ''} ${box.frame ? `box-builder-frame-${box.frame}` : ''}`}>
       <span className="box-builder-grid" style={{ gridTemplateColumns: `repeat(${box.cols}, 1fr)` }}>
         {boxCells(box).map((isSquare, cell) => {
           if (!isSquare) return <span key={`gap-${cell}`} aria-hidden="true" />;

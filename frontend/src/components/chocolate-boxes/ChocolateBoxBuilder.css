@@ -40,3 +40,8 @@
 .box-builder-error { padding: 8px 12px; border-radius: var(--radius-sm); background: var(--color-bg-alt); color: var(--color-text); }
 .box-builder-picker > .btn { grid-column: 1 / -1; }
 .box-builder-photo { width: 100%; aspect-ratio: 4 / 3; object-fit: cover; border-radius: var(--radius-md); display: block; }
+
+/* Heart frame: the tray itself becomes a heart (SVG stretched to the tray). */
+.box-builder-frame-heart { width: min(520px, 100%); padding: 0; display: flow-root; background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 92' preserveAspectRatio='none'%3E%3Cpath fill='%235a3a2a' d='M50 90C50 90 3 58 3 29C3 13 15 3 28 3C38 3 46 9 50 16C54 9 62 3 72 3C85 3 97 13 97 29C97 58 50 90 50 90Z'/%3E%3C/svg%3E") center / 100% 100% no-repeat; box-shadow: none; filter: drop-shadow(0 6px 10px rgba(58, 47, 40, 0.35)); border-radius: 0; }
+/* Percent margins are relative to the tray's width, which keeps the squares inside the heart at any size. */
+.box-builder-frame-heart .box-builder-grid { margin: 15% 11% 12%; }
