@@ -33,7 +33,7 @@ function OrderFinish({ order }) {
             </div>
             <div className='orderItemContainer'>
                 {orderItems.map(oi => (
-                    <div key={oi.id} className='orderItem'>
+                    <div key={oi.id} className={oi.composition ? 'orderItem orderItem-box' : 'orderItem'}>
                         {(oi.image || boxImageForCategory(oi.category))
                             ? <img className={oi.composition ? 'box-photo' : undefined} src={oi.image || boxImageForCategory(oi.category)} alt={oi.name} />
                             : <div className='img-placeholder' aria-hidden="true" />}

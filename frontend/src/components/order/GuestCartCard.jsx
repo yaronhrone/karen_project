@@ -43,7 +43,7 @@ function GuestCartCard({ items, boxes = [], totalPrice, onIncrement, onDecrement
                     </div>
                 ))}
                 {boxes.map((box) => (
-                    <div key={box.key} className='orderItem'>
+                    <div key={box.key} className='orderItem orderItem-box'>
                         {box.image
                             ? <img className='box-photo' src={box.image} alt={box.label} />
                             : <div className='img-placeholder' aria-hidden="true" />}

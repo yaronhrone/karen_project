@@ -254,7 +254,22 @@
 .box-contents .box-line { display: flex; gap: 6px; align-items: baseline; }
 .box-contents .box-qty { font-weight: 700; }
 
-/* A box's photo is shown whole (not cropped into the round product thumbnail). */
-.orderItem img.box-photo { width: 88px; height: 88px; border-radius: var(--radius-md); object-fit: contain; background: #fff; box-shadow: none; }
+/* A box's photo is shown whole, inside a round frame like the other products
+   (padding keeps the corners of a wide photo inside the circle). */
+.orderItem img.box-photo { width: 96px; height: 96px; box-sizing: border-box; padding: 8px; border-radius: 50%; object-fit: contain; background: #fff; box-shadow: var(--shadow-sm); }
+/* With contents open the whole box has to show, not scroll inside a cap. */
+.orderItemContainer:has(.orderItem-box) { max-height: none; overflow: visible; }
 
 .box-actions { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; }
+
+/* Phones: a box line wraps - photo and contents on top, price and the two
+   buttons stacked underneath at full width, so nothing sits on top of
+   anything else. */
+@media (max-width: 560px) {
+  .orderCard { padding: 20px 14px; }
+  .orderItem-box { flex-wrap: wrap; }
+  .orderItem-box .orderItemInfo { flex: 1 1 calc(100% - 120px); }
+  .orderItem-box .orderItemQuantity { flex: 1 0 100%; flex-direction: column-reverse; align-items: stretch; gap: 8px; text-align: center; }
+  .orderItem-box .box-actions { flex-direction: column; align-items: stretch; }
+  .orderItem-box .box-actions .btn { width: 100%; justify-content: center; }
+}
