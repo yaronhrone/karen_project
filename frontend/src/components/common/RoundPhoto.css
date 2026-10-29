@@ -1,0 +1,19 @@
+/* The frame is a circle sized by its width alone (aspect-ratio); the photo is
+   absolutely placed inside it, so its own proportions can never stretch the
+   frame into an oval. */
+.round-photo {
+  position: relative;
+  display: block;
+  aspect-ratio: 1 / 1;
+  border-radius: 50%;
+  background: #fff;
+  box-shadow: var(--shadow-sm);
+}
+
+.round-photo img {
+  position: absolute;
+  inset: 10%;
+  width: 80%;
+  height: 80%;
+  object-fit: contain;
+}

@@ -4,6 +4,7 @@ import { DEMO_CHOCOLATES, boxCells } from '../../config/chocolateBoxes';
 import useChocolateBoxes from './useChocolateBoxes';
 import Modal from '../common/Modal';
 import ImageLightbox from '../common/ImageLightbox';
+import RoundPhoto from '../common/RoundPhoto';
 import './ChocolateBoxBuilder.css';
 
 // The chocolates page: 1) pick a box, 2) click a square, 3) pick a chocolate
@@ -201,7 +202,7 @@ function ChocolateBoxBuilder({ onAddToOrder, initial = null, onCancel }) {
           {boxes.map((b) => (
             <button key={b.size} type="button" className="box-builder-box-card" onClick={() => chooseBox(b)}>
               {b.image
-                ? <img className="box-builder-photo" src={b.image} alt="" />
+                ? <RoundPhoto src={b.image} />
                 : <BoxPreview box={b} preview />}
               <h3>{b.label}</h3>
               <span className="box-builder-price">{priceText(b)}</span>

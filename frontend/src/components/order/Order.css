@@ -256,7 +256,7 @@
 
 /* A box's photo is shown whole, inside a round frame like the other products
    (padding keeps the corners of a wide photo inside the circle). */
-.orderItem img.box-photo { width: 96px; height: 96px; box-sizing: border-box; padding: 8px; border-radius: 50%; object-fit: contain; background: #fff; box-shadow: var(--shadow-sm); }
+.orderItem .box-photo { width: 96px; flex-shrink: 0; }
 /* With contents open the whole box has to show, not scroll inside a cap. */
 .orderItemContainer:has(.orderItem-box) { max-height: none; overflow: visible; }
 

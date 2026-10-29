@@ -1,5 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
+import RoundPhoto from '../common/RoundPhoto';
 import useChocolateBoxes from '../chocolate-boxes/useChocolateBoxes';
 import './HomeBoxes.css';
 
@@ -14,7 +15,7 @@ function HomeBoxes() {
         {boxes.map((b) => (
           <Link key={b.size} to="/chocolates" className="home-box-card">
             {b.image
-              ? <img src={b.image} alt={b.label} />
+              ? <RoundPhoto src={b.image} />
               : <span className="home-box-placeholder" aria-hidden="true">{b.size}</span>}
             <span className="home-box-label">{b.label}</span>
             {b.price != null && <span className="home-box-price">₪{b.price}</span>}

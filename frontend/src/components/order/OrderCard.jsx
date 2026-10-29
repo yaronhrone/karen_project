@@ -6,6 +6,7 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import SendIcon from '@mui/icons-material/Send';
 import { getOrderStatusLabel } from '../../utils/orderStatus';
 import BoxContents from './BoxContents';
+import RoundPhoto from '../common/RoundPhoto';
 import { boxImageForCategory } from '../../config/chocolateBoxes';
 import EditIcon from '@mui/icons-material/Edit';
 import { readyEstimateText } from '../../utils/readyEstimate';
@@ -38,7 +39,9 @@ function OrderCard({ order, remove, add, removeBox, editBox, deleteOrder, sendOr
                     {orderItems.map(oi => (
                         <div key={oi.id} className={oi.composition ? 'orderItem orderItem-box' : 'orderItem'}>
                             {(oi.image || boxImageForCategory(oi.category))
-                                ? <img className={oi.composition ? 'box-photo' : undefined} src={oi.image || boxImageForCategory(oi.category)} alt={oi.name} />
+                                ? (oi.composition
+                                    ? <RoundPhoto className='box-photo' src={oi.image || boxImageForCategory(oi.category)} alt={oi.name} />
+                                    : <img src={oi.image || boxImageForCategory(oi.category)} alt={oi.name} />)
                                 : <div className='img-placeholder' aria-hidden="true" />}
                             <div className='orderItemInfo'>
                                 <h3>{oi.name}</h3>

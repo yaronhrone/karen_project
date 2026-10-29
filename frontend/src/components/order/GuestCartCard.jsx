@@ -7,6 +7,7 @@ import { useNavigate } from 'react-router-dom';
 import DeleteIcon from '@mui/icons-material/Delete';
 import EditIcon from '@mui/icons-material/Edit';
 import BoxContents from './BoxContents';
+import RoundPhoto from '../common/RoundPhoto';
 import { readyEstimateText } from '../../utils/readyEstimate';
 
 // Guest equivalent of OrderCard - same look, but backed by CartContext's
@@ -45,7 +46,7 @@ function GuestCartCard({ items, boxes = [], totalPrice, onIncrement, onDecrement
                 {boxes.map((box) => (
                     <div key={box.key} className='orderItem orderItem-box'>
                         {box.image
-                            ? <img className='box-photo' src={box.image} alt={box.label} />
+                            ? <RoundPhoto className='box-photo' src={box.image} alt={box.label} />
                             : <div className='img-placeholder' aria-hidden="true" />}
                         <div className='orderItemInfo'>
                             <h3>{box.label}</h3>

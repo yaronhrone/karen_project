@@ -2,6 +2,7 @@ import React from 'react'
 import './Order.css';
 import { getOrderStatusLabel } from '../../utils/orderStatus';
 import BoxContents from './BoxContents';
+import RoundPhoto from '../common/RoundPhoto';
 import { boxImageForCategory } from '../../config/chocolateBoxes';
 
 function OrderFinish({ order }) {
@@ -35,7 +36,9 @@ function OrderFinish({ order }) {
                 {orderItems.map(oi => (
                     <div key={oi.id} className={oi.composition ? 'orderItem orderItem-box' : 'orderItem'}>
                         {(oi.image || boxImageForCategory(oi.category))
-                            ? <img className={oi.composition ? 'box-photo' : undefined} src={oi.image || boxImageForCategory(oi.category)} alt={oi.name} />
+                            ? (oi.composition
+                                    ? <RoundPhoto className='box-photo' src={oi.image || boxImageForCategory(oi.category)} alt={oi.name} />
+                                    : <img src={oi.image || boxImageForCategory(oi.category)} alt={oi.name} />)
                             : <div className='img-placeholder' aria-hidden="true" />}
                         <div className='orderItemInfo'>
                             <h3>{oi.name}</h3>
