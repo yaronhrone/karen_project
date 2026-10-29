@@ -8,14 +8,17 @@
 //           square, '.' = empty space (cols is then the row width). The number
 //           of 'x' must equal size.
 // - frame:  optional outline drawn around the squares ('heart')
-// - image:  optional photo of the real box, shown on the box card and on Home
-//           (file in public/image/boxes/). The squares are always drawn, so a
-//           box without a photo still works.
-// - price:  price of the whole box in NIS. PLACEHOLDER VALUES - set Keren's
-//           real prices before this goes live.
+// - image:  fallback photo of the real box (file in public/image/boxes/),
+//           used when the box's catalog item has no photo of its own. The
+//           squares are always drawn, so a box without a photo still works.
+//
+// Price, photo and the id an order needs come from the box's catalog item:
+// a product in the category "chocolate-box-<size>" (e.g. chocolate-box-9),
+// created and priced by Keren in Admin. A size listed here with no such
+// product shows as "not available for ordering yet".
 export const CHOCOLATE_BOXES = [
-  { size: 9, cols: 3, label: 'מארז 9 פרלינים', image: '/image/boxes/box-9.jpg', price: 80 },
-  { size: 22, cols: 6, shape: ['xx..xx', 'xxxxxx', 'xxxxxx', '.xxxx.', '..xx..'], frame: 'heart', label: 'מארז 22 פרלינים', image: '/image/boxes/box-22.jpeg', price: 180 },
+  { size: 9, cols: 3, label: 'מארז 9 פרלינים', image: '/image/boxes/box-9.jpg' },
+  { size: 22, cols: 6, shape: ['xx..xx', 'xxxxxx', 'xxxxxx', '.xxxx.', '..xx..'], frame: 'heart', label: 'מארז 22 פרלינים', image: '/image/boxes/box-22.jpeg' },
 ];
 
 // One entry per grid cell, row by row: true = a square, false = empty space.

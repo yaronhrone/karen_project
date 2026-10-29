@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import './App.css';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import UserContext from './contexts/UserContext';
-import ChocolateBoxBuilder from './components/chocolate-boxes/ChocolateBoxBuilder';
+import ChocolateBoxesPage from './components/chocolate-boxes/ChocolateBoxesPage';
 import CakeList from './components/product-lists/CakeList';
 import Home from './components/home/Home';
 import NavBar from './components/layout/NavBar';
@@ -77,7 +77,7 @@ function App() {
               <ErrorBoundary>
               <Routes>
                 <Route path="/" element={<Home />} />
-                <Route path="/chocolates" element={<ChocolateBoxBuilder />} />
+                <Route path="/chocolates" element={<ChocolateBoxesPage />} />
                 <Route path="/cakes" element={<CakeList />} />
                 <Route path="/cookies" element={<CookieList />} />
                 <Route path="/favorite" element={<Favorite />} />

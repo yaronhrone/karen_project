@@ -6,7 +6,7 @@ import UserContext from '../../contexts/UserContext';
 import { useNavigate } from 'react-router-dom';
 import OrderFinish from './OrderFinish';
 import './Order.css';
-import { addItemToOrder, deleteOrderById, removeItemFromOrder, updateOrder } from '../../service/apiService';
+import { addItemToOrder, deleteOrderById, removeBoxFromOrder, removeItemFromOrder, updateOrder } from '../../service/apiService';
 import { cartContext } from '../../contexts/CartContext';
 import { OpenOrderContext } from '../../contexts/OpenOrderContext';
 import ChocolateLoader from '../common/ChocolateLoader';
@@ -19,7 +19,7 @@ function Order() {
   const [orders, setOrder] = useState([]);
   const navigate = useNavigate();
   const [errorFromServer, setErrorFromServer] = useState('');
-  const { cartItems, addToCart, decrementFromCart } = useContext(cartContext);
+  const { cartItems, addToCart, decrementFromCart, cartBoxes, removeBox: removeGuestBox } = useContext(cartContext);
   const { syncFromOrders } = useContext(OpenOrderContext);
   const [guestCartDetails, setGuestCartDetails] = useState([]);
   // How many of the older ("previous") orders to show, below the current
@@ -100,6 +100,12 @@ const remove = async (id) => {
             fetchOrders();
         } catch (err) {};
     }
+    const removeBox = async (orderItemId) => {
+        try {
+            await removeBoxFromOrder(orderItemId);
+            fetchOrders();
+        } catch (err) {};
+    }
     const add = async (id) => {
 
 
@@ -150,7 +156,8 @@ const remove = async (id) => {
   const visiblePreviousOrders = previousOrders.slice(0, visiblePreviousCount);
   const hasMorePreviousOrders = previousOrders.length > visiblePreviousCount;
 
-  const guestTotalPrice = guestCartDetails.reduce((sum, { item, quantity }) => sum + item.price * quantity, 0);
+  const guestTotalPrice = guestCartDetails.reduce((sum, { item, quantity }) => sum + item.price * quantity, 0)
+    + cartBoxes.reduce((sum, box) => sum + (box.price || 0), 0);
 
   if (!isRequestToGetCurrentUserDone || isLoading) {
     return <div className='center'><ChocolateLoader /></div>;
@@ -161,11 +168,13 @@ const remove = async (id) => {
     // actually want to send it - see GuestCartCard/mergeGuestDataToAccount.
     return (
       <div>
-        {guestCartDetails.length === 0
+        {guestCartDetails.length === 0 && cartBoxes.length === 0
           ? <h2>העגלה שלך ריקה</h2>
           : (
             <GuestCartCard
               items={guestCartDetails}
+              boxes={cartBoxes}
+              onRemoveBox={removeGuestBox}
               totalPrice={guestTotalPrice}
               onIncrement={(id) => addToCart(id)}
               onDecrement={(id) => decrementFromCart(id)}
@@ -188,6 +197,7 @@ const remove = async (id) => {
                     order={lastOrder}
                     remove={remove}
                     add={add}
+                    removeBox={removeBox}
                     deleteOrder={deleteOrder}
                     sendOrder={sendOrder}
 

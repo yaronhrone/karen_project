@@ -1,6 +1,7 @@
 package com.example.security.controller;
 
 
+import com.example.security.model.AddBoxRequest;
 import com.example.security.model.Order;
 import com.example.security.model.ProductRequest;
 import com.example.security.model.SendOrderRequest;
@@ -40,6 +41,33 @@ public class OrderController {
         }
 
     }
+    @PostMapping("/box")
+    @PreAuthorize("hasAnyAuthority('USER','ADMIN')")
+    public ResponseEntity<String> addBoxOrder(Authentication authentication, @RequestBody AddBoxRequest request) {
+        try {
+            return ResponseEntity.ok().body(orderService.addBoxToOrder(authentication.getName(), request));
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+        }
+    }
+
+    @DeleteMapping("/box/{order_item_id}")
+    @PreAuthorize("hasAnyAuthority('USER','ADMIN')")
+    public ResponseEntity<String> removeBoxOrder(Authentication authentication, @PathVariable(value = "order_item_id") int orderItemId) {
+        try {
+            String response = orderService.removeBoxFromOrder(authentication.getName(), orderItemId);
+            if (response.contains("not found")) {
+                return ResponseEntity.badRequest().body(response);
+            }
+            return ResponseEntity.ok().body(response);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+        }
+    }
+
     @GetMapping
     @PreAuthorize("hasAnyAuthority('USER','ADMIN')")
     public ResponseEntity<List<Order>> getOrder(Authentication authentication) {

@@ -127,6 +127,20 @@ public class OrderRepository {
         String sql = "INSERT INTO " + ORDER_ITEM_TABLE + " (order_id, product_id ,quantity ,price) VALUES (?, ?, ?,?)";
         jdbcTemplate.update(sql, orderItem.getOrderId(), orderItem.getProductId(), orderItem.getQuantity(),orderItem.getPrice());
     }
+    // A box line always gets its own row (never merged into an existing one by
+    // product_id): two boxes of the same size usually hold different chocolates.
+    public void addBoxOrderItem(OrderItem orderItem, String compositionJson) {
+        String sql = "INSERT INTO " + ORDER_ITEM_TABLE + " (order_id, product_id, quantity, price, composition) VALUES (?, ?, ?, ?, ?)";
+        jdbcTemplate.update(sql, orderItem.getOrderId(), orderItem.getProductId(), orderItem.getQuantity(), orderItem.getPrice(), compositionJson);
+    }
+
+    // Deleting by order_item id, scoped to the order, so one box line can go
+    // without touching another line that shares its product_id.
+    public int deleteOrderItemById(int orderId, int orderItemId) {
+        String sql = "DELETE FROM " + ORDER_ITEM_TABLE + " WHERE order_id = ? AND id = ? AND composition IS NOT NULL";
+        return jdbcTemplate.update(sql, orderId, orderItemId);
+    }
+
     public void updateOrderItem(OrderItem orderItem) {
         String sql = "UPDATE " + ORDER_ITEM_TABLE + " SET  quantity = ? - 1  WHERE order_id = ? AND product_id = ? ";
         jdbcTemplate.update(sql, orderItem.getQuantity(), orderItem.getOrderId(), orderItem.getProductId());

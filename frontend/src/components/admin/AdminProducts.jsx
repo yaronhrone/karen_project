@@ -1,3 +1,4 @@
+import { CHOCOLATE_BOXES } from '../../config/chocolateBoxes';
 import React, { useState, useRef } from 'react'
 import { createItem, deleteItemById, getAllItems, updateItem } from '../../service/apiService';
 import CardItem from '../card/CardItem';
@@ -194,6 +195,7 @@ if (!(file instanceof File)) {
                     <option value="chocolate">שוקולד</option>
                     <option value="cake">עוגה</option>
                     <option value="cookie">עוגיה</option>
+                    {CHOCOLATE_BOXES.map((b) => <option key={b.size} value={`chocolate-box-${b.size}`}>מארז {b.size} פרלינים</option>)}
                 </select>
                 <label>
                     צמחוני:
@@ -225,6 +227,7 @@ if (!(file instanceof File)) {
                                     <option value="chocolate">שוקולד</option>
                                     <option value="cake">עוגה</option>
                                     <option value="cookie">עוגיה</option>
+                    {CHOCOLATE_BOXES.map((b) => <option key={b.size} value={`chocolate-box-${b.size}`}>מארז {b.size} פרלינים</option>)}
                                 </select>
                                 <label>  צמחוני:  <input className='veg' type="checkbox" checked={itemsFrom.veg} onChange={(e) => setItemsFrom({ ...itemsFrom, veg: e.target.checked })} /> </label>
                                 <button className='btn' type="submit">שמירה</button>

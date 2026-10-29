@@ -4,6 +4,7 @@ import com.example.security.clientApi.GreenApiClient;
 import com.example.security.model.CustomUser;
 import com.example.security.model.GreenApiMessageRequest;
 import com.example.security.model.Order;
+import com.example.security.model.BoxChocolate;
 import com.example.security.model.OrderItem;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -67,6 +68,11 @@ public class WhatsAppNotificationService {
             sb.append("- ").append(item.getName())
                     .append(" x").append(item.getQuantity())
                     .append(" (₪").append(item.getTotalPrice()).append(")\n");
+            if (item.getComposition() != null) {
+                for (BoxChocolate chocolate : item.getComposition()) {
+                    sb.append("    · ").append(chocolate.name()).append(" x").append(chocolate.quantity()).append("\n");
+                }
+            }
         }
         sb.append("\nסה\"כ: ₪").append(order.getTotalPrice());
         // Optional remark the customer typed when sending the order.

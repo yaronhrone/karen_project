@@ -1,6 +1,7 @@
 import React from 'react'
 import './Order.css';
 import { getOrderStatusLabel } from '../../utils/orderStatus';
+import BoxContents from './BoxContents';
 
 function OrderFinish({ order }) {
     // See the matching guard/comment in OrderCard.jsx.
@@ -38,9 +39,10 @@ function OrderFinish({ order }) {
                         <div className='orderItemInfo'>
                             <h3>{oi.name}</h3>
                             <p>{oi.description}</p>
+                            <BoxContents composition={oi.composition} />
                         </div>
                         <div className='orderItemQuantity'>
-                            <span className='number'>כמות: {oi.quantity}</span>
+                            {!oi.composition && <span className='number'>כמות: {oi.quantity}</span>}
                             <span className='number'>₪{oi.total_price}</span>
                         </div>
                     </div>

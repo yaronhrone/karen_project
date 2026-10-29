@@ -100,7 +100,7 @@ function CardItem({ item, isFavoriteDefault, categoryPath }) {
         // renders a chocolate without an explicit categoryPath - route it to
         // the builder unconditionally rather than relying on every call site
         // to remember to pass one.
-        const targetPath = categoryPath || (item.category === 'chocolate' ? '/chocolates' : null);
+        const targetPath = categoryPath || ((item.category === 'chocolate' || (item.category || '').startsWith('chocolate-box-')) ? '/chocolates' : null);
         if (targetPath) {
             navigate(targetPath);
             return;

@@ -60,6 +60,11 @@ CREATE TABLE IF NOT EXISTS order_items (
     FOREIGN KEY (order_id) REFERENCES orders (id)
 );
 
+-- What is inside a chocolate box line: a JSON array of {id, name, quantity}
+-- (names are a snapshot, so the order still reads the same if a chocolate is
+-- later renamed or deleted). NULL for every ordinary product line.
+ALTER TABLE order_items ADD COLUMN IF NOT EXISTS composition TEXT;
+
 CREATE TABLE IF NOT EXISTS favorites (
     user_email VARCHAR(255) NOT NULL,
     item_id INT NOT NULL,

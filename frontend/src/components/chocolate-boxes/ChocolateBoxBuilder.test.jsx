@@ -1,19 +1,25 @@
 import React from 'react';
-import { render, screen, fireEvent } from '@testing-library/react';
+import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import ChocolateBoxBuilder from './ChocolateBoxBuilder';
 import { CHOCOLATE_BOXES, boxCells } from '../../config/chocolateBoxes';
 
 jest.mock('../../service/apiService', () => ({
   getAllChocolate: jest.fn(),
+  getChocolateBox: jest.fn(),
 }));
+
+const api = () => require('../../service/apiService');
+// A catalog item for every configured box, as Keren would have created them.
+const boxCatalog = (size) => ({ data: [{ id: 1000 + size, price: 80 + size, image: null, category: `chocolate-box-${size}` }] });
 
 // CRA resets mock implementations before every test, so set it here.
 beforeEach(() => {
-  require('../../service/apiService').getAllChocolate.mockResolvedValue({ data: [] });
+  api().getAllChocolate.mockResolvedValue({ data: [] });
+  api().getChocolateBox.mockImplementation((size) => Promise.resolve(boxCatalog(size)));
 });
 
-const openBox = async (size) => {
-  render(<ChocolateBoxBuilder />);
+const openBox = async (size, props = {}) => {
+  render(<ChocolateBoxBuilder {...props} />);
   const box = CHOCOLATE_BOXES.find((b) => b.size === size);
   fireEvent.click(await screen.findByText(box.label));
   return box;
@@ -49,7 +55,9 @@ test('filling every square enables the button; clearing a square disables it aga
     fireEvent.click(screen.getByLabelText(`ריבוע ${i}: ריק`));
     fireEvent.click(await screen.findByRole('button', { name: 'בחירת קרמל מלוח' }));
   }
-  expect(screen.getByRole('button', { name: /הוספה להזמנה/ })).toBeEnabled();
+  // Full, but these are demo chocolates, so ordering stays off (see the demo note).
+  expect(screen.getByRole('button', { name: /הוספה להזמנה/ })).toBeDisabled();
+  expect(screen.getByText(/אי אפשר להזמין אותם/)).toBeInTheDocument();
 
   fireEvent.click(screen.getByLabelText('ריבוע 1: קרמל מלוח'));
   fireEvent.click(await screen.findByRole('button', { name: /הסרת הפרלין/ }));
@@ -117,4 +125,53 @@ test('the largest box renders its squares in order, gaps do not count', async ()
   await openBox(big.size);
   expect(screen.getAllByLabelText(/ריבוע \d+: ריק/)).toHaveLength(big.size);
   expect(screen.getByLabelText(`ריבוע ${big.size}: ריק`)).toBeInTheDocument();
+});
+
+test('a box without a catalog item shows as not available and cannot be ordered', async () => {
+  api().getChocolateBox.mockResolvedValue({ data: [] });
+  api().getAllChocolate.mockResolvedValue({ data: [{ id: 1, name: 'א' }] });
+  const onAddToOrder = jest.fn();
+  const box = await openBox(CHOCOLATE_BOXES[0].size, { onAddToOrder });
+  for (let i = 1; i <= box.size; i++) {
+    fireEvent.click(screen.getByLabelText(`ריבוע ${i}: ריק`));
+    fireEvent.click(await screen.findByRole('button', { name: 'בחירת א' }));
+  }
+  expect(screen.getByRole('button', { name: /הוספה להזמנה/ })).toBeDisabled();
+  expect(screen.getByText('המארז הזה עדיין לא זמין להזמנה.')).toBeInTheDocument();
+  expect(onAddToOrder).not.toHaveBeenCalled();
+});
+
+test('a full box is handed to onAddToOrder with its chocolate counts', async () => {
+  api().getAllChocolate.mockResolvedValue({ data: [{ id: 1, name: 'א' }, { id: 2, name: 'ב' }] });
+  const onAddToOrder = jest.fn().mockResolvedValue(null);
+  const box = await openBox(CHOCOLATE_BOXES[0].size, { onAddToOrder });
+  for (let i = 1; i <= box.size; i++) {
+    fireEvent.click(screen.getByLabelText(`ריבוע ${i}: ריק`));
+    fireEvent.click(await screen.findByRole('button', { name: i === 1 ? 'בחירת ב' : 'בחירת א' }));
+  }
+  const button = await screen.findByRole('button', { name: 'הוספה להזמנה' });
+  await waitFor(() => expect(button).toBeEnabled());
+  fireEvent.click(button);
+  await waitFor(() => expect(onAddToOrder).toHaveBeenCalledTimes(1));
+  const { box: sent, chocolates } = onAddToOrder.mock.calls[0][0];
+  expect(sent.itemId).toBe(1000 + box.size);
+  expect(chocolates).toEqual([
+    { id: 2, name: 'ב', quantity: 1 },
+    { id: 1, name: 'א', quantity: box.size - 1 },
+  ]);
+});
+
+test('a failed add shows the error and keeps the box', async () => {
+  api().getAllChocolate.mockResolvedValue({ data: [{ id: 1, name: 'א' }] });
+  const onAddToOrder = jest.fn().mockResolvedValue('המארז לא נמצא');
+  const box = await openBox(CHOCOLATE_BOXES[0].size, { onAddToOrder });
+  for (let i = 1; i <= box.size; i++) {
+    fireEvent.click(screen.getByLabelText(`ריבוע ${i}: ריק`));
+    fireEvent.click(await screen.findByRole('button', { name: 'בחירת א' }));
+  }
+  const button = await screen.findByRole('button', { name: 'הוספה להזמנה' });
+  await waitFor(() => expect(button).toBeEnabled());
+  fireEvent.click(button);
+  expect(await screen.findByRole('alert')).toHaveTextContent('המארז לא נמצא');
+  expect(screen.getByText(`${box.size} / ${box.size} פרלינים`)).toBeInTheDocument();
 });

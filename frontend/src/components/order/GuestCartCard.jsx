@@ -4,23 +4,16 @@ import AddIcon from '@mui/icons-material/Add';
 import RemoveIcon from '@mui/icons-material/Remove';
 import LoginIcon from '@mui/icons-material/Login';
 import { useNavigate } from 'react-router-dom';
-import ChocolatePackageStatus from './ChocolatePackageStatus';
+import DeleteIcon from '@mui/icons-material/Delete';
+import BoxContents from './BoxContents';
 import { readyEstimateText } from '../../utils/readyEstimate';
 
 // Guest equivalent of OrderCard - same look, but backed by CartContext's
 // local (not-yet-a-real-order) items instead of a server order, and its
 // "send" action is just a login redirect: the actual order only gets
 // created once mergeGuestDataToAccount runs after that login succeeds.
-function GuestCartCard({ items, totalPrice, onIncrement, onDecrement }) {
+function GuestCartCard({ items, boxes = [], totalPrice, onIncrement, onDecrement, onRemoveBox }) {
     const navigate = useNavigate();
-    // Informational here, not blocking: OrderCard enforces this for real
-    // once the guest logs in and lands on their actual order (same fixed
-    // box-size rule as /chocolates) - showing it already avoids surprising
-    // them with a suddenly-disabled send button right after login.
-    const chocolateQuantity = items
-        .filter(({ item }) => item.category === 'chocolate')
-        .reduce((sum, { quantity }) => sum + quantity, 0);
-
     return (
         <div className='orderCard'>
             <div className='orderHeader'>
@@ -48,9 +41,24 @@ function GuestCartCard({ items, totalPrice, onIncrement, onDecrement }) {
                         </div>
                     </div>
                 ))}
+                {boxes.map((box) => (
+                    <div key={box.key} className='orderItem'>
+                        {box.image
+                            ? <img src={box.image} alt={box.label} />
+                            : <div className='img-placeholder' aria-hidden="true" />}
+                        <div className='orderItemInfo'>
+                            <h3>{box.label}</h3>
+                            <BoxContents composition={box.chocolates} />
+                        </div>
+                        <div className='orderItemQuantity'>
+                            <button type='button' className='btn btn-ghost' onClick={() => onRemoveBox(box.key)}>
+                                <DeleteIcon fontSize="small" /> הסרת המארז
+                            </button>
+                            <h3 className='number'>₪{box.price}</h3>
+                        </div>
+                    </div>
+                ))}
             </div>
-
-            <ChocolatePackageStatus totalQuantity={chocolateQuantity} />
 
             <div className='orderTotal'>
                 <span className='label'>סה"כ לתשלום</span>

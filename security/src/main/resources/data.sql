@@ -40,6 +40,7 @@ CREATE TABLE order_items (
     product_id INT NOT NULL,
     quantity INT NOT NULL,
     price DECIMAL(10,2) NOT NULL,
+    composition VARCHAR(2000),
     PRIMARY KEY (id),
     FOREIGN KEY (order_id) REFERENCES orders (id)
 );

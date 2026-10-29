@@ -1,13 +1,15 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { getAllChocolate } from '../../service/apiService';
-import { CHOCOLATE_BOXES, DEMO_CHOCOLATES, boxCells } from '../../config/chocolateBoxes';
+import { DEMO_CHOCOLATES, boxCells } from '../../config/chocolateBoxes';
+import useChocolateBoxes from './useChocolateBoxes';
 import Modal from '../common/Modal';
 import ImageLightbox from '../common/ImageLightbox';
 import './ChocolateBoxBuilder.css';
 
-// Prototype of the new chocolates page: 1) pick a box, 2) click a square,
-// 3) pick a chocolate for it. The same chocolate can fill any number of
-// squares. NOT connected to ordering yet - see the final button.
+// The chocolates page: 1) pick a box, 2) click a square, 3) pick a chocolate
+// for it. The same chocolate can fill any number of squares. When the box is
+// full, onAddToOrder({ box, chocolates }) adds it to the order (see
+// ChocolateBoxesPage); it resolves to an error message or null.
 
 const CATALOG_PAGE_SIZE = 100;
 
@@ -89,14 +91,20 @@ function PickCard({ chocolate, onChoose, onEnlarge }) {
   );
 }
 
-function ChocolateBoxBuilder() {
+function ChocolateBoxBuilder({ onAddToOrder }) {
+  const { boxes, loaded: boxesLoaded } = useChocolateBoxes();
   const [chocolates, setChocolates] = useState([]);
   const [isDemo, setIsDemo] = useState(false);
   const [loadFailed, setLoadFailed] = useState(false);
-  const [box, setBox] = useState(null);
+  // Only the size is kept: the box itself (price, availability) is looked up
+  // from the latest catalog data on every render.
+  const [boxSize, setBoxSize] = useState(null);
   const [slots, setSlots] = useState([]);
   const [activeSlot, setActiveSlot] = useState(null);
   const [enlarged, setEnlarged] = useState(null);
+  const [adding, setAdding] = useState(false);
+  const [orderError, setOrderError] = useState('');
+  const box = boxes.find((b) => b.size === boxSize) || null;
 
   useEffect(() => {
     let ignore = false;
@@ -117,8 +125,8 @@ function ChocolateBoxBuilder() {
     return () => { ignore = true; };
   }, []);
 
-  const chooseBox = (b) => { setBox(b); setSlots(Array(b.size).fill(null)); };
-  const backToBoxes = () => { setBox(null); setSlots([]); setActiveSlot(null); };
+  const chooseBox = (b) => { setBoxSize(b.size); setSlots(Array(b.size).fill(null)); setOrderError(''); };
+  const backToBoxes = () => { setBoxSize(null); setSlots([]); setActiveSlot(null); setOrderError(''); };
 
   const setSlot = (value) => {
     setSlots((prev) => prev.map((s, i) => (i === activeSlot ? value : s)));
@@ -136,6 +144,25 @@ function ChocolateBoxBuilder() {
     return { filled: total, counts: [...map.values()] };
   }, [slots]);
 
+  const addToOrder = async () => {
+    setAdding(true);
+    setOrderError('');
+    const error = await onAddToOrder({
+      box,
+      chocolates: counts.map(({ item, qty }) => ({ id: item.id, name: item.name, quantity: qty })),
+    });
+    // On success the page navigates away, so only a failure needs handling.
+    if (error) setOrderError(error);
+    setAdding(false);
+  };
+
+  const priceText = (b) => {
+    if (b.price != null) return `₪${b.price}`;
+    return boxesLoaded ? 'עדיין לא זמין להזמנה' : '';
+  };
+
+  const canOrder = Boolean(box && box.available) && !isDemo && typeof onAddToOrder === 'function';
+
   const catalogNote = isDemo && (
     <p className="box-builder-demo">דוגמה: עדיין אין פרלינים בקטלוג, מוצגים פרלינים לדוגמה</p>
   );
@@ -151,13 +178,13 @@ function ChocolateBoxBuilder() {
         {catalogNote}
         {errorNote}
         <div className="box-builder-boxes">
-          {CHOCOLATE_BOXES.map((b) => (
+          {boxes.map((b) => (
             <button key={b.size} type="button" className="box-builder-box-card" onClick={() => chooseBox(b)}>
               {b.image
                 ? <img className="box-builder-photo" src={b.image} alt="" />
                 : <BoxPreview box={b} preview />}
               <h3>{b.label}</h3>
-              <span className="box-builder-price">₪{b.price}</span>
+              <span className="box-builder-price">{priceText(b)}</span>
             </button>
           ))}
         </div>
@@ -184,15 +211,21 @@ function ChocolateBoxBuilder() {
             ))}
           </ul>
         )}
-        <div className="box-builder-total">מחיר המארז: <strong>₪{box.price}</strong></div>
+        {box.price != null && <div className="box-builder-total">מחיר המארז: <strong>₪{box.price}</strong></div>}
         <button
           type="button"
           className="btn btn-primary"
-          disabled={filled < box.size}
-          title="בגרסת הדוגמה הכפתור עדיין לא מוסיף להזמנה"
+          disabled={filled < box.size || !canOrder || adding}
+          onClick={addToOrder}
         >
-          {filled < box.size ? `עוד ${box.size - filled} פרלינים להשלמת המארז` : 'הוספה להזמנה (דוגמה)'}
+          {filled < box.size ? `עוד ${box.size - filled} פרלינים להשלמת המארז` : (adding ? 'מוסיפים להזמנה...' : 'הוספה להזמנה')}
         </button>
+        {filled === box.size && !canOrder && (
+          <p className="box-builder-error">
+            {isDemo ? 'אלה פרלינים לדוגמה, אי אפשר להזמין אותם.' : 'המארז הזה עדיין לא זמין להזמנה.'}
+          </p>
+        )}
+        {orderError && <p className="box-builder-error" role="alert">{orderError}</p>}
       </div>
 
       <Modal

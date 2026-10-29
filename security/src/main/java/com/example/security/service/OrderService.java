@@ -6,7 +6,10 @@ import com.example.security.repository.OrderRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -35,6 +38,25 @@ public class OrderService {
     private static final List<String> SETTABLE_STATUSES = List.of("IN_PROGRESS", "READY", "SENT", "CANCELLED");
 
 
+    // Chocolate boxes are catalog items whose category is "chocolate-box-<size>"
+    // (e.g. chocolate-box-9) - the size is how many chocolates the box holds.
+    // The chocolates that fill them are ordinary "chocolate" items, which are
+    // never ordered on their own.
+    private static final String BOX_CATEGORY_PREFIX = "chocolate-box-";
+    private static final String CHOCOLATE_CATEGORY = "chocolate";
+    private static final ObjectMapper JSON = new ObjectMapper();
+
+    private static Integer boxSize(Item item) {
+        if (item == null || item.getCategory() == null || !item.getCategory().startsWith(BOX_CATEGORY_PREFIX)) {
+            return null;
+        }
+        try {
+            return Integer.parseInt(item.getCategory().substring(BOX_CATEGORY_PREFIX.length()));
+        } catch (NumberFormatException e) {
+            return null;
+        }
+    }
+
     public Integer createOrder(String email) {
         Order order = new Order();
         order.setStatus(Status.OPEN);
@@ -54,6 +76,10 @@ public class OrderService {
           Item product = itemService.getItemById(productId);
           if (product == null) {
               return "Item not found";
+          }
+          if (CHOCOLATE_CATEGORY.equals(product.getCategory())
+                  || (product.getCategory() != null && product.getCategory().startsWith(BOX_CATEGORY_PREFIX))) {
+              throw new IllegalArgumentException("שוקולדים מוזמנים במארז - יש לבחור מארז בעמוד המארזים");
           }
           List<Order> openOrders = orderRepository.getAllOrderOpen(email);
            if (openOrders.isEmpty()) {
@@ -76,6 +102,72 @@ public class OrderService {
            orderRepository.addOrderItem(orderItem);
            updateOrderTotal(orderId);
         return "Order item added successfully";
+    }
+
+    // Adds one chocolate box to the customer's open order. Everything that
+    // matters is decided here, not by the client: the price comes from the
+    // box's catalog item, the box must be a real chocolate-box-<size> item,
+    // every chocolate must be a real chocolate, and the quantities must fill
+    // the box exactly.
+    public String addBoxToOrder(String email, AddBoxRequest request) {
+        if (request == null || request.chocolates() == null || request.chocolates().isEmpty()) {
+            throw new IllegalArgumentException("לא נבחרו פרלינים למארז");
+        }
+        Item box = itemService.getItemById(request.boxItemId());
+        Integer size = boxSize(box);
+        if (size == null) {
+            throw new IllegalArgumentException("המארז לא נמצא");
+        }
+        List<BoxChocolate> composition = new ArrayList<>();
+        int total = 0;
+        for (BoxChoice choice : request.chocolates()) {
+            if (choice.quantity() < 1) {
+                throw new IllegalArgumentException("כמות לא תקינה במארז");
+            }
+            Item chocolate = itemService.getItemById(choice.id());
+            if (chocolate == null || !CHOCOLATE_CATEGORY.equals(chocolate.getCategory())) {
+                throw new IllegalArgumentException("פרלין לא נמצא");
+            }
+            composition.add(new BoxChocolate(chocolate.getId(), chocolate.getName(), choice.quantity()));
+            total += choice.quantity();
+        }
+        if (total != size) {
+            throw new IllegalArgumentException("המארז צריך להכיל בדיוק " + size + " פרלינים");
+        }
+        String compositionJson;
+        try {
+            compositionJson = JSON.writeValueAsString(composition);
+        } catch (Exception e) {
+            throw new IllegalStateException("Could not store the box contents", e);
+        }
+
+        List<Order> openOrders = orderRepository.getAllOrderOpen(email);
+        int orderId = openOrders.isEmpty() ? createOrder(email) : openOrders.getFirst().getId();
+        OrderItem line = new OrderItem();
+        line.setProductId(box.getId());
+        line.setOrderId(orderId);
+        line.setQuantity(1);
+        line.setPrice(box.getPrice());
+        orderRepository.addBoxOrderItem(line, compositionJson);
+        updateOrderTotal(orderId);
+        return "Box added successfully";
+    }
+
+    public String removeBoxFromOrder(String email, int orderItemId) {
+        List<Order> openOrders = orderRepository.getAllOrderOpen(email);
+        if (openOrders.isEmpty()) {
+            return "Order not found";
+        }
+        int orderId = openOrders.getFirst().getId();
+        if (orderRepository.deleteOrderItemById(orderId, orderItemId) == 0) {
+            return "Box not found in order";
+        }
+        if (orderRepository.getOrderItemsByOrderId(orderId).isEmpty()) {
+            orderRepository.deleteOrder(orderId);
+        } else {
+            updateOrderTotal(orderId);
+        }
+        return "Box removed successfully";
     }
 
     // Was: both call sites above reloaded the customer's ENTIRE order

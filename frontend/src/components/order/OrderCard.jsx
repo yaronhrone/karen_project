@@ -5,14 +5,13 @@ import RemoveIcon from '@mui/icons-material/Remove';
 import DeleteIcon from '@mui/icons-material/Delete';
 import SendIcon from '@mui/icons-material/Send';
 import { getOrderStatusLabel } from '../../utils/orderStatus';
-import { calculatePackages } from '../../utils/chocolatePackaging';
-import ChocolatePackageStatus from './ChocolatePackageStatus';
+import BoxContents from './BoxContents';
 import { readyEstimateText } from '../../utils/readyEstimate';
 
 // Matches orders.note VARCHAR(500) and the check in OrderController.
 const MAX_NOTE_LENGTH = 500;
 
-function OrderCard({ order, remove, add, deleteOrder, sendOrder }) {
+function OrderCard({ order, remove, add, removeBox, deleteOrder, sendOrder }) {
     const [note, setNote] = useState('');
     // Defensive - a "TypeError: .map is not a function" crashed this whole
     // page (before the ErrorBoundary existed to at least catch it) on an
@@ -22,17 +21,6 @@ function OrderCard({ order, remove, add, deleteOrder, sendOrder }) {
     // the null-favorite crash fix, rather than leaving every render of this
     // component one bad response away from taking down the page again.
     const orderItems = Array.isArray(order.order_items) ? order.order_items : [];
-    // Chocolates are the only category sold in fixed box sizes - the +/-
-    // steppers below adjust one unit at a time with no awareness of that, so
-    // this is what actually stops "שליחת הזמנה" once they no longer add up
-    // to a valid combination of boxes (same rule /chocolates enforces before
-    // an order is even created - this is what closes the same gap once
-    // chocolates are already in a real order and adjusted here instead).
-    const chocolateQuantity = orderItems
-        .filter(oi => oi.category === 'chocolate')
-        .reduce((sum, oi) => sum + oi.quantity, 0);
-    const chocolatePackagingInvalid = chocolateQuantity > 0 && calculatePackages(chocolateQuantity).remaining > 0;
-
     return (
         <>
             <div key={order.id} className='orderCard'>
@@ -53,20 +41,26 @@ function OrderCard({ order, remove, add, deleteOrder, sendOrder }) {
                             <div className='orderItemInfo'>
                                 <h3>{oi.name}</h3>
                                 <p>{oi.description}</p>
+                                <BoxContents composition={oi.composition} />
                             </div>
                             <div className='orderItemQuantity'>
-                                <div className='quantity'>
-                                    <RemoveIcon className='icon' onClick={() => { remove(oi.product_id, oi.product_type) }} />
-                                    <h3 className='number'>{oi.quantity}</h3>
-                                    <AddIcon className='icon' onClick={() => { add(oi.product_id, oi.product_type) }} />
-                                </div>
+                                {oi.composition ? (
+                                    // A box is one fixed line: no +/- steppers, it can only be removed.
+                                    <button type='button' className='btn btn-ghost' onClick={() => { removeBox(oi.id) }}>
+                                        <DeleteIcon fontSize="small" /> הסרת המארז
+                                    </button>
+                                ) : (
+                                    <div className='quantity'>
+                                        <RemoveIcon className='icon' onClick={() => { remove(oi.product_id, oi.product_type) }} />
+                                        <h3 className='number'>{oi.quantity}</h3>
+                                        <AddIcon className='icon' onClick={() => { add(oi.product_id, oi.product_type) }} />
+                                    </div>
+                                )}
                                 <h3 className='number'>₪{oi.total_price}</h3>
                             </div>
                         </div>
                     ))}
                 </div>
-
-                <ChocolatePackageStatus totalQuantity={chocolateQuantity} />
 
                 <div className='orderTotal'>
                     <span className='label'>סה"כ לתשלום</span>
@@ -95,8 +89,6 @@ function OrderCard({ order, remove, add, deleteOrder, sendOrder }) {
                     <button
                         className='btn btn-primary'
                         onClick={() => { sendOrder(note) }}
-                        disabled={chocolatePackagingInvalid}
-                        title={chocolatePackagingInvalid ? 'כמות השוקולדים לא מתאימה למארז מלא - השלימו או הורידו כמות' : undefined}
                     >
                         שליחת הזמנה <SendIcon fontSize="small" />
                     </button>

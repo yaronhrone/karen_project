@@ -3,6 +3,7 @@ package com.example.security.model;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.math.BigDecimal;
+import java.util.List;
 
 public class OrderItem {
     private int id;
@@ -23,6 +24,8 @@ public class OrderItem {
     // the only category sold in fixed package sizes (5/6/9/12/22/30), to
     // show package-completion status on the order/cart view.
     private String category;
+    // Only set for chocolate box lines (see OrderService.addBoxToOrder).
+    private List<BoxChocolate> composition;
 
     public OrderItem() {
     }
@@ -114,6 +117,14 @@ public class OrderItem {
         this.orderId = orderId;
     }
 
+
+    public List<BoxChocolate> getComposition() {
+        return composition;
+    }
+
+    public void setComposition(List<BoxChocolate> composition) {
+        this.composition = composition;
+    }
 
     public String getCategory() {
         return category;

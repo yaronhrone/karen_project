@@ -95,6 +95,11 @@ export const getAllCookie =  (page , size) => {
     return axios.get(`${BASE_URL_PROTUCT}/get_by_category/cookie/?page=${page}&size=${size}`);
     
 }
+// Chocolate boxes are catalog items in the category chocolate-box-<size>
+// (the size is how many chocolates the box holds).
+export const getChocolateBox = (size) => {
+    return axios.get(`${BASE_URL_PROTUCT}/get_by_category/chocolate-box-${size}/?page=1&size=1`);
+}
 export const getItemById =async (id) => {
     const {data} = await axios.get(`${BASE_URL_PROTUCT}/get-by-id/${id}`);
     return data;
@@ -143,6 +148,14 @@ export const getAllFavoriteItems = () => {
 // order
 export const addItemToOrder =  (id) => {
     return axios.post(`${BASE_URL}/order/${id}`, null, { headers: getAuthHeader() });
+}
+// chocolates: [{ id, quantity }] - which chocolates fill the box and in how
+// many squares. The server recomputes price and checks the box is full.
+export const addBoxToOrder = (boxItemId, chocolates) => {
+    return axios.post(`${BASE_URL}/order/box`, { box_item_id: boxItemId, chocolates }, { headers: getAuthHeader() });
+}
+export const removeBoxFromOrder = (orderItemId) => {
+    return axios.delete(`${BASE_URL}/order/box/${orderItemId}`, { headers: getAuthHeader() });
 }
 export const getAllOrderByEmail = (email) => {
     return axios.get(`${BASE_URL}/admin/order/${email}`, { headers: getAuthHeader() });

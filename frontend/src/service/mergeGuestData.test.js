@@ -1,9 +1,10 @@
 import { mergeGuestDataToAccount } from './mergeGuestData';
-import { addItemToOrder, addItemToFavorite } from './apiService';
+import { addItemToOrder, addItemToFavorite, addBoxToOrder } from './apiService';
 
 jest.mock('./apiService', () => ({
     addItemToOrder: jest.fn(),
     addItemToFavorite: jest.fn(),
+    addBoxToOrder: jest.fn(),
 }));
 
 const httpError = (status) => Object.assign(new Error('x'), { response: { status } });
@@ -15,6 +16,7 @@ beforeEach(() => {
     jest.clearAllMocks();
     addItemToOrder.mockResolvedValue({});
     addItemToFavorite.mockResolvedValue({});
+    addBoxToOrder.mockResolvedValue({});
     clearCart = jest.fn();
     clearFavorites = jest.fn();
     addToCart = jest.fn();
@@ -56,4 +58,37 @@ test('a permanent failure (4xx) is dropped, not retried and not kept', async () 
 test('an empty cart reports false and touches nothing', async () => {
     expect(await run([])).toBe(false);
     expect(addItemToOrder).not.toHaveBeenCalled();
+});
+
+describe('chocolate boxes', () => {
+    const box = { key: 'k1', boxItemId: 1009, chocolates: [{ id: 1, name: 'א', quantity: 4 }, { id: 2, name: 'ב', quantity: 5 }] };
+    let addBox;
+    beforeEach(() => { addBox = jest.fn(); });
+    const runBoxes = (boxes, cart = []) => mergeGuestDataToAccount(cart, [], { clearCart, clearFavorites, addToCart, boxes, addBox });
+
+    test('each box becomes its own order line, sending only ids and quantities', async () => {
+        const had = await runBoxes([box, { ...box, key: 'k2' }]);
+        expect(addBoxToOrder).toHaveBeenCalledTimes(2);
+        expect(addBoxToOrder).toHaveBeenCalledWith(1009, [{ id: 1, quantity: 4 }, { id: 2, quantity: 5 }]);
+        expect(clearCart).toHaveBeenCalled();
+        expect(had).toBe(true);
+    });
+
+    test('a box alone counts as a guest cart', async () => {
+        expect(await runBoxes([box])).toBe(true);
+    });
+
+    test('a box that keeps failing for a temporary reason goes back into the cart', async () => {
+        addBoxToOrder.mockRejectedValue(noResponse());
+        await runBoxes([box]);
+        expect(addBoxToOrder).toHaveBeenCalledTimes(2);
+        expect(addBox).toHaveBeenCalledWith(box);
+    });
+
+    test('a box the server rejects is dropped, not kept', async () => {
+        addBoxToOrder.mockRejectedValue(httpError(400));
+        await runBoxes([box]);
+        expect(addBoxToOrder).toHaveBeenCalledTimes(1);
+        expect(addBox).not.toHaveBeenCalled();
+    });
 });

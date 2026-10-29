@@ -1,4 +1,4 @@
-import { addItemToOrder, addItemToFavorite } from './apiService';
+import { addItemToOrder, addItemToFavorite, addBoxToOrder } from './apiService';
 
 // Called right after a successful login/register (password or Google), once
 // the JWT is already saved to localStorage. Replays whatever a guest built
@@ -35,13 +35,28 @@ const mergeItem = async (action, itemId) => {
   return first === 'transient' ? tryOnce(action, itemId) : first;
 };
 
-export const mergeGuestDataToAccount = async (cartItems, favorites, { clearCart, clearFavorites, addToCart }) => {
-  const hadCartItems = cartItems.length > 0;
+const addBoxLine = (box) => addBoxToOrder(
+  box.boxItemId,
+  box.chocolates.map(({ id, quantity }) => ({ id, quantity })),
+);
+
+// boxes: the guest's chocolate boxes (CartContext's cartBoxes). Each becomes
+// its own order line; one that keeps failing for a temporary reason goes back
+// into the guest cart through addBox, like plain items do through addToCart.
+export const mergeGuestDataToAccount = async (cartItems, favorites, { clearCart, clearFavorites, addToCart, boxes = [], addBox }) => {
+  const hadCartItems = cartItems.length > 0 || boxes.length > 0;
   const stillFailing = [];
+  const stillFailingBoxes = [];
 
   for (const itemId of cartItems) {
     if (await mergeItem(addItemToOrder, itemId) === 'transient') {
       stillFailing.push(itemId);
+    }
+  }
+
+  for (const box of boxes) {
+    if (await mergeItem(addBoxLine, box) === 'transient') {
+      stillFailingBoxes.push(box);
     }
   }
 
@@ -54,6 +69,9 @@ export const mergeGuestDataToAccount = async (cartItems, favorites, { clearCart,
   clearFavorites();
   if (addToCart) {
     stillFailing.forEach((itemId) => addToCart(itemId));
+  }
+  if (addBox) {
+    stillFailingBoxes.forEach((box) => addBox(box));
   }
 
   return hadCartItems;
