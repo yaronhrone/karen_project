@@ -1,13 +1,13 @@
 import React, { useContext, useEffect, useState } from 'react'
 import UserContext from '../../contexts/UserContext';
 import CardItem from '../card/CardItem';
-import { getAllFavoriteItems, getItemById, removeItemFromFavorite } from '../../service/apiServise';
+import { getAllFavoriteItems, getItemById, removeItemFromFavorite } from '../../service/apiService';
 import { useNavigate } from 'react-router-dom';
 import './Favorite.css'
 import { FavoriteContext } from '../../contexts/FavoriteContext';
-import ChocolateLoader from '../loading/ChocolateLoader';
+import ChocolateLoader from '../common/ChocolateLoader';
 function Favorite() {
-  const { currentUser, isRequstToGetCurrentUserDone } = useContext(UserContext);
+  const { currentUser, isRequestToGetCurrentUserDone } = useContext(UserContext);
   const [favoriteItems, setFavoriteItems] = useState([]);
   const navigate = useNavigate();
   const {favorites, toggleFavoriteContext} = useContext(FavoriteContext);

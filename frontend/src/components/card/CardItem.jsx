@@ -2,7 +2,7 @@ import React, { useContext, useEffect, useState } from 'react'
 import InfoIcon from '@mui/icons-material/Info';
 import './CardItem.css'
 import UserContext from '../../contexts/UserContext';
-import { addItemToFavorite, addItemToOrder, removeItemFromFavorite, removeItemFromOredr } from '../../service/apiServise';
+import { addItemToFavorite, addItemToOrder, removeItemFromFavorite, removeItemFromOrder } from '../../service/apiService';
 import AddShoppingCartIcon from '@mui/icons-material/AddShoppingCart';
 import { Clear, Done } from '@mui/icons-material';
 import FavoriteIcon from '@mui/icons-material/Favorite';
@@ -11,7 +11,7 @@ import { FavoriteContext } from '../../contexts/FavoriteContext';
 import { cartContext } from '../../contexts/CartContext';
 import { OpenOrderContext } from '../../contexts/OpenOrderContext';
 import { useNavigate } from 'react-router-dom';
-import ImageLightbox from '../lightbox/ImageLightbox';
+import ImageLightbox from '../common/ImageLightbox';
 
 // categoryPath: when set (Home's preview lists pass e.g. "/chocolates"), the
 // cart button no longer orders the item directly - it routes to the item's
@@ -19,7 +19,7 @@ import ImageLightbox from '../lightbox/ImageLightbox';
 // (for chocolates specifically, the box-size package-builder), which a
 // direct add-to-order here would silently bypass.
 function CardItem({ item, isFavoriteDefault, categoryPath }) {
-    const { currentUser, isRequstToGetCurrentUserDone } = useContext(UserContext);
+    const { currentUser, isRequestToGetCurrentUserDone } = useContext(UserContext);
     const { toggleFavoriteContext } = useContext(FavoriteContext);
     const navigate = useNavigate();
     const [error, setError] = useState("");
@@ -47,8 +47,8 @@ function CardItem({ item, isFavoriteDefault, categoryPath }) {
 
     const toggleFavorite = async (id) => {
         // See the matching fix/comment in CardChocolate.jsx's toggleFavorite -
-        // same missing isRequstToGetCurrentUserDone guard, same bug.
-        if (!isRequstToGetCurrentUserDone) {
+        // same missing isRequestToGetCurrentUserDone guard, same bug.
+        if (!isRequestToGetCurrentUserDone) {
             return;
         }
         if(!currentUser){
@@ -133,7 +133,7 @@ function CardItem({ item, isFavoriteDefault, categoryPath }) {
             return;
         }
         try {
-            await removeItemFromOredr(item.id);
+            await removeItemFromOrder(item.id);
             refreshOpenOrder();
         } catch (error) {
             if (error.response && error.response.data) {

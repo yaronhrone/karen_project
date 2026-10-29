@@ -1,6 +1,6 @@
 import React, { useContext, useEffect, useState } from 'react'
 import './Register.css';
-import { fetchCurrentUser, register, loginWithGoogle } from '../../service/apiServise';
+import { fetchCurrentUser, register, loginWithGoogle } from '../../service/apiService';
 import { mergeGuestDataToAccount } from '../../service/mergeGuestData';
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';

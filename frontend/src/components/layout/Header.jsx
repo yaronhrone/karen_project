@@ -1,5 +1,5 @@
-import CustomeLink from '../navbar/CustomeLink'
-import InstallApp from '../installApp/InstallApp'
+import CustomLink from './CustomLink'
+import InstallApp from '../install-app/InstallApp'
 import React from 'react'
 import './Header.css'
 // import DeliveryDiningIcon from '@mui/icons-material/DeliveryDining';
@@ -15,9 +15,9 @@ const Header = () => {
         <DeliveryDiningIcon className='delivery_icon'/>
       </div> */}
       <InstallApp />
-      <CustomeLink to={'/'}>
+      <CustomLink to={'/'}>
         <img src='/image/logo-v2.jpg' alt="היהלומים של קרן" className='icon'/>
-      </CustomeLink>
+      </CustomLink>
     </header>
   )
 }

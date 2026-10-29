@@ -1,7 +1,7 @@
 import React from 'react'
 import FacebookIcon from '@mui/icons-material/Facebook';
 import InstagramIcon from '@mui/icons-material/Instagram';
-import CustomerLink from '../navbar/CustomeLink';
+import CustomerLink from './CustomLink';
 import './Footer.css'
 function Footer() {
   return (

@@ -3,18 +3,18 @@ import UserContext from '../../contexts/UserContext';
 import { useNavigate, Outlet } from 'react-router-dom';
 import AdminNav from './AdminNav';
 import './Admin.css';
-import ChocolateLoader from '../loading/ChocolateLoader';
+import ChocolateLoader from '../common/ChocolateLoader';
 
 // Was one 400-line monolith rendering orders/products/users all on one
 // scrolling page - now a thin layout: does the auth check once, then
 // AdminOrders/AdminProducts/AdminUsers each own their own page via
 // nested routes (see App.js) + this <Outlet/>.
 function Admin() {
-    const { currentUser, isRequstToGetCurrentUserDone } = useContext(UserContext);
+    const { currentUser, isRequestToGetCurrentUserDone } = useContext(UserContext);
     const navigate = useNavigate();
     const isAdmin = currentUser?.role?.includes('ADMIN');
 
-    if (!isRequstToGetCurrentUserDone) {
+    if (!isRequestToGetCurrentUserDone) {
         return <div className='center'><ChocolateLoader /></div>;
     }
     if (!isAdmin) {

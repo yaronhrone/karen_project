@@ -1,6 +1,6 @@
 import React, { useRef, useState } from 'react'
 import { Link } from 'react-router-dom';
-import { requestPasswordReset } from '../../service/apiServise';
+import { requestPasswordReset } from '../../service/apiService';
 import './Login.css'
 
 // Deliberately shows the exact same message no matter what the server

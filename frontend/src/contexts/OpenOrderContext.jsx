@@ -1,6 +1,6 @@
 import React, { createContext, useCallback, useContext, useEffect, useState } from 'react';
 import UserContext from './UserContext';
-import { getAllOrders } from '../service/apiServise';
+import { getAllOrders } from '../service/apiService';
 
 // Which products are already in the logged-in customer's open (cart) order.
 // Product cards read this to show their "added" state, so the mark survives
@@ -15,7 +15,7 @@ export const OpenOrderContext = createContext({
 });
 
 export const OpenOrderProvider = ({ children }) => {
-    const { currentUser, isRequstToGetCurrentUserDone } = useContext(UserContext);
+    const { currentUser, isRequestToGetCurrentUserDone } = useContext(UserContext);
     const [openOrderItemIds, setOpenOrderItemIds] = useState(() => new Set());
 
     // Takes the customer's orders as GET /order returned them - lets a page
@@ -46,10 +46,10 @@ export const OpenOrderProvider = ({ children }) => {
     }, []);
 
     useEffect(() => {
-        if (isRequstToGetCurrentUserDone) {
+        if (isRequestToGetCurrentUserDone) {
             refreshOpenOrder();
         }
-    }, [isRequstToGetCurrentUserDone, refreshOpenOrder]);
+    }, [isRequestToGetCurrentUserDone, refreshOpenOrder]);
 
     return (
         <OpenOrderContext.Provider value={{ openOrderItemIds, refreshOpenOrder, markInOrder, syncFromOrders }}>

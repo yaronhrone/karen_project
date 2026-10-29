@@ -1,8 +1,8 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { getAllChocolate } from '../../service/apiServise';
+import { getAllChocolate } from '../../service/apiService';
 import { CHOCOLATE_BOXES, DEMO_CHOCOLATES } from '../../config/chocolateBoxes';
-import Modal from '../modal/Modal';
-import ImageLightbox from '../lightbox/ImageLightbox';
+import Modal from '../common/Modal';
+import ImageLightbox from '../common/ImageLightbox';
 import './ChocolateBoxBuilder.css';
 
 // Prototype of the new chocolates page: 1) pick a box, 2) click a square,

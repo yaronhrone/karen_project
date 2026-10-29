@@ -1,4 +1,4 @@
-import { addItemToOrder, addItemToFavorite } from './apiServise';
+import { addItemToOrder, addItemToFavorite } from './apiService';
 
 // Called right after a successful login/register (password or Google), once
 // the JWT is already saved to localStorage. Replays whatever a guest built
@@ -6,7 +6,7 @@ import { addItemToOrder, addItemToFavorite } from './apiServise';
 // local copies so it isn't replayed again on a future login.
 //
 // addItemToOrder/addItemToFavorite already carry the auth header themselves
-// (apiServise's getAuthHeader reads the token that was just saved), and this
+// (apiService's getAuthHeader reads the token that was just saved), and this
 // is the same "call once per unit" technique ChocolateList's logged-in
 // sendOrder already uses to build up an order - no new backend behavior.
 //

@@ -1,5 +1,5 @@
 import React, { useContext, useState } from 'react'
-import { fetchCurrentUser, loging, loginWithGoogle } from '../../service/apiServise';
+import { fetchCurrentUser, loging, loginWithGoogle } from '../../service/apiService';
 import { mergeGuestDataToAccount } from '../../service/mergeGuestData';
 import UserContext from '../../contexts/UserContext';
 import { cartContext } from '../../contexts/CartContext';

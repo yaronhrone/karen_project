@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 import { useNavigate, useParams, Link } from 'react-router-dom';
-import { resetPassword } from '../../service/apiServise';
+import { resetPassword } from '../../service/apiService';
 import { passwordRegex } from '../../utils/validation';
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';

@@ -1,13 +1,13 @@
 import React, { useContext } from 'react'
 import './CookieList.css';
 import { useState, useEffect } from 'react';
-import { getAllCookie, getAllFavoriteItems } from '../../service/apiServise';
+import { getAllCookie, getAllFavoriteItems } from '../../service/apiService';
 import UserContext from '../../contexts/UserContext';
 import CardItem from '../card/CardItem';
 import { FavoriteContext } from '../../contexts/FavoriteContext';
 
 export const CookieList = () => {
-  const { currentUser, isRequstToGetCurrentUserDone } = useContext(UserContext);
+  const { currentUser, isRequestToGetCurrentUserDone } = useContext(UserContext);
   const [cookie, setCookie] = useState([]);
   const [favorites, setFavorites] = useState([]);
   const [page, setPage] = useState(1);
@@ -19,7 +19,7 @@ export const CookieList = () => {
       // fetching them used to throw out of this whole function and silently
       // skip the actual product fetch below, leaving the page looking empty
       // until a manual refresh. Isolated so it can never block products.
-      if (currentUser && isRequstToGetCurrentUserDone) {
+      if (currentUser && isRequestToGetCurrentUserDone) {
         try {
           const { data: fav } = await getAllFavoriteItems();
           setFavorites(fav.filter(Boolean).map(fav => fav.id));
@@ -49,14 +49,14 @@ export const CookieList = () => {
   }, []);
 
   // getCookies() above ran once on mount, closing over whatever
-  // currentUser/isRequstToGetCurrentUserDone were at that instant - the "who
+  // currentUser/isRequestToGetCurrentUserDone were at that instant - the "who
   // am I" check (App.js) usually hasn't resolved yet at that point, so a
   // logged-in user landing directly here (refresh/direct link) got guest
   // favorites and it never self-corrected. Re-sync just the favorites once
   // the auth check actually resolves, same dependency Favorite.jsx already
   // uses correctly.
   useEffect(() => {
-    if (!isRequstToGetCurrentUserDone) {
+    if (!isRequestToGetCurrentUserDone) {
       return;
     }
     if (currentUser) {
@@ -64,7 +64,7 @@ export const CookieList = () => {
     } else {
       setFavorites(favoriteItems);
     }
-  }, [currentUser, isRequstToGetCurrentUserDone]);
+  }, [currentUser, isRequestToGetCurrentUserDone]);
 
   return (
     <>

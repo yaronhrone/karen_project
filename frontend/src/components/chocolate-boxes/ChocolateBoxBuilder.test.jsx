@@ -3,13 +3,13 @@ import { render, screen, fireEvent } from '@testing-library/react';
 import ChocolateBoxBuilder from './ChocolateBoxBuilder';
 import { CHOCOLATE_BOXES } from '../../config/chocolateBoxes';
 
-jest.mock('../../service/apiServise', () => ({
+jest.mock('../../service/apiService', () => ({
   getAllChocolate: jest.fn(),
 }));
 
 // CRA resets mock implementations before every test, so set it here.
 beforeEach(() => {
-  require('../../service/apiServise').getAllChocolate.mockResolvedValue({ data: [] });
+  require('../../service/apiService').getAllChocolate.mockResolvedValue({ data: [] });
 });
 
 const openBox = async (size) => {
@@ -67,14 +67,14 @@ test('going back to box selection resets the squares', async () => {
 });
 
 test('a failed catalog request shows an error, not demo chocolates', async () => {
-  require('../../service/apiServise').getAllChocolate.mockRejectedValue(new Error('down'));
+  require('../../service/apiService').getAllChocolate.mockRejectedValue(new Error('down'));
   await openBox(CHOCOLATE_BOXES[0].size).catch(() => {});
   expect(await screen.findByRole('alert')).toHaveTextContent('לא הצלחנו לטעון');
   expect(screen.queryByText(/מוצגים פרלינים לדוגמה/)).not.toBeInTheDocument();
 });
 
 test('rows without id/name and repeated ids are ignored', async () => {
-  require('../../service/apiServise').getAllChocolate.mockResolvedValue({
+  require('../../service/apiService').getAllChocolate.mockResolvedValue({
     data: [{ id: 1, name: 'א' }, { id: 1, name: 'כפול' }, { name: 'בלי מזהה' }, { id: 2 }],
   });
   await openBox(CHOCOLATE_BOXES[0].size);
@@ -85,7 +85,7 @@ test('rows without id/name and repeated ids are ignored', async () => {
 });
 
 test('"עוד מידע" reveals the description and the photo opens enlarged', async () => {
-  require('../../service/apiServise').getAllChocolate.mockResolvedValue({
+  require('../../service/apiService').getAllChocolate.mockResolvedValue({
     data: [{ id: 1, name: 'פרלין', description: 'פירוט הפרלין', image: '/x.jpg' }],
   });
   await openBox(CHOCOLATE_BOXES[0].size);

@@ -1,7 +1,7 @@
 import React from 'react'
 import HomeBoxes from './HomeBoxes';
-import CakeList2 from '../cake-list/CakeList2';
-import CookieList2 from '../cookie-list/CookieList2';
+import CakeCarousel from '../product-lists/CakeCarousel';
+import CookieCarousel from '../product-lists/CookieCarousel';
 import './Home.css'
 
 const Home = () => {
@@ -29,8 +29,8 @@ const Home = () => {
 
       <h2 className='section_title'>היהלומים שלי</h2>
       <HomeBoxes />
-      <CakeList2 />
-      <CookieList2 />
+      <CakeCarousel />
+      <CookieCarousel />
     </div>
   )
 }

@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { deltedUser, fetchAllUsers, getAllOrderByEmail } from '../../service/apiServise';
+import { deltedUser, fetchAllUsers, getAllOrderByEmail } from '../../service/apiService';
 import OrderFinish from '../order/OrderFinish';
 import './Admin.css';
 

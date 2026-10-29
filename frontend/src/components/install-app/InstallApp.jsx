@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import GetAppIcon from '@mui/icons-material/GetApp';
-import Modal from '../modal/Modal';
+import Modal from '../common/Modal';
 import './InstallApp.css';
 
 function isStandalone() {

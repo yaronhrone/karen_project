@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react'
-import { advanceOrderStatus, getAdminOrdersBoard, getOrderByIdForAdmin } from '../../service/apiServise';
+import { advanceOrderStatus, getAdminOrdersBoard, getOrderByIdForAdmin } from '../../service/apiService';
 import OrderFinish from '../order/OrderFinish';
 import { getOrderStatusLabel } from '../../utils/orderStatus';
 import './Admin.css';

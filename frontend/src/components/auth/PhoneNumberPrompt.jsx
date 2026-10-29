@@ -1,7 +1,7 @@
 import React, { useContext, useState } from 'react'
-import Modal from '../modal/Modal';
+import Modal from '../common/Modal';
 import UserContext from '../../contexts/UserContext';
-import { updateCurrentUser } from '../../service/apiServise';
+import { updateCurrentUser } from '../../service/apiService';
 
 // Google Sign-In never provides a phone number, so an account created that
 // way has an empty `phone` field - and Keren has no way to reach that

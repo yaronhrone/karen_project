@@ -3,29 +3,29 @@ import './App.css';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import UserContext from './contexts/UserContext';
 import ChocolateBoxBuilder from './components/chocolate-boxes/ChocolateBoxBuilder';
-import CakeList from './components/cake-list/CakeList';
+import CakeList from './components/product-lists/CakeList';
 import Home from './components/home/Home';
-import NavBar from './components/navbar/NavBar';
-import Login from './components/login/Login';
-import ForgotPassword from './components/login/ForgotPassword';
-import ResetPassword from './components/login/ResetPassword';
+import NavBar from './components/layout/NavBar';
+import Login from './components/auth/Login';
+import ForgotPassword from './components/auth/ForgotPassword';
+import ResetPassword from './components/auth/ResetPassword';
 import Order from './components/order/Order';
-import Register from './components/register/Register';
-import NotFound from './components/not found/NotFound';
-import Favorite from './components/Favorite/Favorite';
-import { fetchCurrentUser } from './service/apiServise';
-import CookieList from './components/cookie-list/CookieList';
+import Register from './components/auth/Register';
+import NotFound from './components/not-found/NotFound';
+import Favorite from './components/favorite/Favorite';
+import { fetchCurrentUser } from './service/apiService';
+import CookieList from './components/product-lists/CookieList';
 import Admin from './components/admin/Admin';
 import AdminOrders from './components/admin/AdminOrders';
 import AdminProducts from './components/admin/AdminProducts';
 import AdminUsers from './components/admin/AdminUsers';
-import Footer from './components/footer/Footer';
-import SearchPage from './components/searchPage/SearchPage';
-import Header from './components/header/Header';
+import Footer from './components/layout/Footer';
+import SearchPage from './components/search-page/SearchPage';
+import Header from './components/layout/Header';
 import { CartProvider } from './contexts/CartContext';
 import { OpenOrderProvider } from './contexts/OpenOrderContext';
-import PhoneNumberPrompt from './components/phone-prompt/PhoneNumberPrompt';
-import ErrorBoundary from './components/error/ErrorBoundary';
+import PhoneNumberPrompt from './components/auth/PhoneNumberPrompt';
+import ErrorBoundary from './components/common/ErrorBoundary';
 import useAutoReload from './utils/useAutoReload';
 
 
@@ -34,7 +34,7 @@ function App() {
   // Picks up new deploys in already-open tabs/installed apps - see the hook.
   useAutoReload();
   const [currentUser, setCurrentUser] = useState(null);
-  const [isRequstToGetCurrentUserDone, setIsRequstToGetCurrentUserDone] = useState(false);
+  const [isRequestToGetCurrentUserDone, setIsRequstToGetCurrentUserDone] = useState(false);
   const updateCurrentUserContext = (user) => {
 
     setCurrentUser(user);
@@ -57,7 +57,7 @@ function App() {
   }, []);
   return (
     <div className="App">
-      <UserContext.Provider value={{ currentUser, updateCurrentUserContext, isRequstToGetCurrentUserDone }}>
+      <UserContext.Provider value={{ currentUser, updateCurrentUserContext, isRequestToGetCurrentUserDone }}>
           <CartProvider>
            <OpenOrderProvider>
             <Router>
@@ -65,7 +65,7 @@ function App() {
                   number, and Keren needs one to reach the customer over
                   WhatsApp. Catches every entry point (login/register/an
                   older Google account), not just right after signing up. */}
-              {isRequstToGetCurrentUserDone && currentUser && !currentUser.phone && <PhoneNumberPrompt />}
+              {isRequestToGetCurrentUserDone && currentUser && !currentUser.phone && <PhoneNumberPrompt />}
               <Header />
               <NavBar />
               {/* A render crash anywhere in a routed page used to blank the

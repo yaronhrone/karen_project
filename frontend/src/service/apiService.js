@@ -150,7 +150,7 @@ export const getAllOrderByEmail = (email) => {
 export const getAllOrders = () => {
     return axios.get(`${BASE_URL}/order`,{ headers: getAuthHeader() });
 }
-export const removeItemFromOredr = (id) => { 
+export const removeItemFromOrder = (id) => { 
     return axios.delete(`${BASE_URL}/order/item/${id}`, { headers: getAuthHeader() });
 }
 export const updateOrder = (note) => {

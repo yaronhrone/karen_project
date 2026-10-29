@@ -1,17 +1,17 @@
 import React, { useContext, useState } from 'react'
-import CustomeLink from './CustomeLink';
+import CustomLink from './CustomLink';
 import './NavBar.css';
 import UserContext from '../../contexts/UserContext';
 import { useNavigate } from 'react-router-dom';
 import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
-import {  getItemByName, logout } from '../../service/apiServise';
+import {  getItemByName, logout } from '../../service/apiService';
 import SearchIcon from '@mui/icons-material/Search';
 import MenuIcon from '@mui/icons-material/Menu';
 import CloseIcon from '@mui/icons-material/Close';
-import ChocolateLoader from '../loading/ChocolateLoader';
+import ChocolateLoader from '../common/ChocolateLoader';
 
 function NavBar() {
-const {currentUser,updateCurrentUserContext ,isRequstToGetCurrentUserDone} = useContext(UserContext);
+const {currentUser,updateCurrentUserContext ,isRequestToGetCurrentUserDone} = useContext(UserContext);
 const navigate = useNavigate();
 const [isOpen, setIsOpen] = useState(true);
 const [search, setSearch] = useState('');
@@ -86,9 +86,9 @@ const handleSearch =  (e) => {
  <div className='products' >
   <p onClick={toggleItem}   className='item'><ArrowDropDownIcon/> מוצרים</p>
 <div className= {`items${isOpen ? '_Close' : '_Open'}`} onMouseLeave={toggleItem}>
-<CustomeLink to={'/chocolates'}>פרלינים</CustomeLink>
-<CustomeLink to={'/cakes'}>עוגות</CustomeLink>
-<CustomeLink to={'/cookies'}>עוגיות</CustomeLink>
+<CustomLink to={'/chocolates'}>פרלינים</CustomLink>
+<CustomLink to={'/cakes'}>עוגות</CustomLink>
+<CustomLink to={'/cookies'}>עוגיות</CustomLink>
 </div>
 <div 
   className='search-area'
@@ -109,23 +109,23 @@ const handleSearch =  (e) => {
 </div>
 <div className='auth '>
 
-<CustomeLink to={'/favorite'}>מועדפים</CustomeLink>
-<CustomeLink to={'/order'}>הזמנות</CustomeLink>
+<CustomLink to={'/favorite'}>מועדפים</CustomLink>
+<CustomLink to={'/order'}>הזמנות</CustomLink>
 </div>
-{( isRequstToGetCurrentUserDone && !currentUser ) && 
+{( isRequestToGetCurrentUserDone && !currentUser ) && 
 <div className='auth'>
-<CustomeLink to={'/login'}>כניסה</CustomeLink>
-<CustomeLink to={'/register'}>הרשמה</CustomeLink>
+<CustomLink to={'/login'}>כניסה</CustomLink>
+<CustomLink to={'/register'}>הרשמה</CustomLink>
  </div>
 }
-{(currentUser && isRequstToGetCurrentUserDone) && 
+{(currentUser && isRequestToGetCurrentUserDone) && 
 <div className='auth'>
 
-<CustomeLink to={'/'} onClick={handleLogout}>התנתק</CustomeLink>
-{currentUser?.role?.includes('ADMIN') && <CustomeLink to={'/admin'}>מנהל</CustomeLink>}
+<CustomLink to={'/'} onClick={handleLogout}>התנתק</CustomLink>
+{currentUser?.role?.includes('ADMIN') && <CustomLink to={'/admin'}>מנהל</CustomLink>}
 </div>
 }
-{!isRequstToGetCurrentUserDone && <ChocolateLoader />}
+{!isRequestToGetCurrentUserDone && <ChocolateLoader />}
  </div>
     </div>
 

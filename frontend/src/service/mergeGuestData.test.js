@@ -1,7 +1,7 @@
 import { mergeGuestDataToAccount } from './mergeGuestData';
-import { addItemToOrder, addItemToFavorite } from './apiServise';
+import { addItemToOrder, addItemToFavorite } from './apiService';
 
-jest.mock('./apiServise', () => ({
+jest.mock('./apiService', () => ({
     addItemToOrder: jest.fn(),
     addItemToFavorite: jest.fn(),
 }));

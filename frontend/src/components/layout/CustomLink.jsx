@@ -1,6 +1,6 @@
 import React from 'react'
 import { Link, useMatch, useResolvedPath } from 'react-router-dom'
-import './CustomeLink.css'
+import './CustomLink.css'
 const CustomLink = ({to, children , ...rest}) => {
     const {pathname} = useResolvedPath(to);
     const isActive = useMatch({path: pathname, end: true});

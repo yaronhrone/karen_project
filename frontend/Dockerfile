@@ -17,7 +17,7 @@ COPY . .
 # the deployed bundle had no client_id in it at all). ARGs default to empty
 # when not passed (e.g. a bare `docker build` with no --build-arg), which
 # falls back to the localhost/"unset" defaults already handled in code
-# (apiServise.js's `||` fallbacks, GoogleOAuthProvider's own error if empty).
+# (apiService.js's `||` fallbacks, GoogleOAuthProvider's own error if empty).
 ARG REACT_APP_GOOGLE_CLIENT_ID
 ARG REACT_APP_ITEMS_API_URL
 ARG REACT_APP_USERS_API_URL

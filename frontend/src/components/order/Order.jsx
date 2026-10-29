@@ -1,21 +1,21 @@
 import React, { useContext, useEffect, useState } from 'react'
-import { getAllOrders, getItemById } from '../../service/apiServise';
+import { getAllOrders, getItemById } from '../../service/apiService';
 import OrderCard from './OrderCard';
 import GuestCartCard from './GuestCartCard';
 import UserContext from '../../contexts/UserContext';
 import { useNavigate } from 'react-router-dom';
 import OrderFinish from './OrderFinish';
 import './Order.css';
-import { addItemToOrder, deleteOrderById, removeItemFromOredr, updateOrder } from '../../service/apiServise';
+import { addItemToOrder, deleteOrderById, removeItemFromOrder, updateOrder } from '../../service/apiService';
 import { cartContext } from '../../contexts/CartContext';
 import { OpenOrderContext } from '../../contexts/OpenOrderContext';
-import ChocolateLoader from '../loading/ChocolateLoader';
+import ChocolateLoader from '../common/ChocolateLoader';
 
 
 
 
 function Order() {
-  const { currentUser, isRequstToGetCurrentUserDone } = useContext(UserContext);
+  const { currentUser, isRequestToGetCurrentUserDone } = useContext(UserContext);
   const [orders, setOrder] = useState([]);
   const navigate = useNavigate();
   const [errorFromServer, setErrorFromServer] = useState('');
@@ -85,7 +85,7 @@ function Order() {
   };
 
   useEffect(() => {
-    if (!isRequstToGetCurrentUserDone) {
+    if (!isRequestToGetCurrentUserDone) {
       return;
     }
     if (currentUser) {
@@ -93,10 +93,10 @@ function Order() {
     } else {
       fetchGuestCartDetails();
     }
-  }, [currentUser, isRequstToGetCurrentUserDone, cartItems]);
+  }, [currentUser, isRequestToGetCurrentUserDone, cartItems]);
 const remove = async (id) => {
         try {
-            await removeItemFromOredr(id )
+            await removeItemFromOrder(id )
             fetchOrders();
         } catch (err) {};
     }
@@ -152,7 +152,7 @@ const remove = async (id) => {
 
   const guestTotalPrice = guestCartDetails.reduce((sum, { item, quantity }) => sum + item.price * quantity, 0);
 
-  if (!isRequstToGetCurrentUserDone || isLoading) {
+  if (!isRequestToGetCurrentUserDone || isLoading) {
     return <div className='center'><ChocolateLoader /></div>;
   }
 

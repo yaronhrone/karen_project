@@ -1,7 +1,7 @@
 import React, { useState, useRef } from 'react'
-import { createItem, deleteItemById, getAllItems, updateItem } from '../../service/apiServise';
+import { createItem, deleteItemById, getAllItems, updateItem } from '../../service/apiService';
 import CardItem from '../card/CardItem';
-import Modal from '../modal/Modal';
+import Modal from '../common/Modal';
 import './Admin.css';
 
 // Matches items.description VARCHAR(1255) in items-service (and the check in
