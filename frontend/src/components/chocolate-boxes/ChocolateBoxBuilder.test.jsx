@@ -1,7 +1,7 @@
 import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
 import ChocolateBoxBuilder from './ChocolateBoxBuilder';
-import { CHOCOLATE_BOXES } from '../../config/chocolateBoxes';
+import { CHOCOLATE_BOXES, boxCells } from '../../config/chocolateBoxes';
 
 jest.mock('../../service/apiService', () => ({
   getAllChocolate: jest.fn(),
@@ -103,4 +103,18 @@ test('Escape closes the picker', async () => {
   expect(await screen.findByText('בחרו פרלין')).toBeInTheDocument();
   fireEvent.keyDown(window, { key: 'Escape' });
   expect(screen.queryByText('בחרו פרלין')).not.toBeInTheDocument();
+});
+
+test('every box layout has exactly `size` squares', () => {
+  for (const b of CHOCOLATE_BOXES) {
+    expect(boxCells(b).filter(Boolean)).toHaveLength(b.size);
+    if (b.shape) expect(b.shape.every((row) => row.length === b.cols)).toBe(true);
+  }
+});
+
+test('the largest box renders its squares in order, gaps do not count', async () => {
+  const big = CHOCOLATE_BOXES[CHOCOLATE_BOXES.length - 1];
+  await openBox(big.size);
+  expect(screen.getAllByLabelText(/ריבוע \d+: ריק/)).toHaveLength(big.size);
+  expect(screen.getByLabelText(`ריבוע ${big.size}: ריק`)).toBeInTheDocument();
 });

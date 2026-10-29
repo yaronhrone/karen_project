@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { getAllChocolate } from '../../service/apiService';
-import { CHOCOLATE_BOXES, DEMO_CHOCOLATES } from '../../config/chocolateBoxes';
+import { CHOCOLATE_BOXES, DEMO_CHOCOLATES, boxCells } from '../../config/chocolateBoxes';
 import Modal from '../common/Modal';
 import ImageLightbox from '../common/ImageLightbox';
 import './ChocolateBoxBuilder.css';
@@ -33,10 +33,13 @@ const Swatch = ({ item, className = '' }) => {
 // `preview` draws the squares as plain decoration (used inside a box card,
 // which is itself a button - interactive squares there would nest buttons).
 function BoxPreview({ box, slots, onSlotClick, preview = false }) {
+  let squareIndex = 0;
   return (
     <span className={`box-builder-tray ${preview ? 'box-builder-tray-small' : ''}`}>
       <span className="box-builder-grid" style={{ gridTemplateColumns: `repeat(${box.cols}, 1fr)` }}>
-        {Array.from({ length: box.size }).map((_, i) => {
+        {boxCells(box).map((isSquare, cell) => {
+          if (!isSquare) return <span key={`gap-${cell}`} aria-hidden="true" />;
+          const i = squareIndex++;
           const chocolate = slots ? slots[i] : null;
           const className = `box-builder-slot ${chocolate ? 'box-builder-slot-filled' : ''}`;
           if (preview) {
