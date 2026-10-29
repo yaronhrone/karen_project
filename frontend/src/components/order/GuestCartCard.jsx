@@ -5,6 +5,7 @@ import RemoveIcon from '@mui/icons-material/Remove';
 import LoginIcon from '@mui/icons-material/Login';
 import { useNavigate } from 'react-router-dom';
 import DeleteIcon from '@mui/icons-material/Delete';
+import EditIcon from '@mui/icons-material/Edit';
 import BoxContents from './BoxContents';
 import { readyEstimateText } from '../../utils/readyEstimate';
 
@@ -12,7 +13,7 @@ import { readyEstimateText } from '../../utils/readyEstimate';
 // local (not-yet-a-real-order) items instead of a server order, and its
 // "send" action is just a login redirect: the actual order only gets
 // created once mergeGuestDataToAccount runs after that login succeeds.
-function GuestCartCard({ items, boxes = [], totalPrice, onIncrement, onDecrement, onRemoveBox }) {
+function GuestCartCard({ items, boxes = [], totalPrice, onIncrement, onDecrement, onRemoveBox, onEditBox }) {
     const navigate = useNavigate();
     return (
         <div className='orderCard'>
@@ -51,9 +52,14 @@ function GuestCartCard({ items, boxes = [], totalPrice, onIncrement, onDecrement
                             <BoxContents composition={box.chocolates} />
                         </div>
                         <div className='orderItemQuantity'>
-                            <button type='button' className='btn btn-ghost' onClick={() => onRemoveBox(box.key)}>
-                                <DeleteIcon fontSize="small" /> הסרת המארז
-                            </button>
+                            <div className='box-actions'>
+                                <button type='button' className='btn btn-ghost' onClick={() => onEditBox(box)}>
+                                    <EditIcon fontSize="small" /> עריכת המארז
+                                </button>
+                                <button type='button' className='btn btn-ghost' onClick={() => onRemoveBox(box.key)}>
+                                    <DeleteIcon fontSize="small" /> הסרת המארז
+                                </button>
+                            </div>
                             <h3 className='number'>₪{box.price}</h3>
                         </div>
                     </div>

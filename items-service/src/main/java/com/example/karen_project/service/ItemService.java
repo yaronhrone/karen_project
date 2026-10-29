@@ -20,13 +20,25 @@ public class ItemService {
     private ItemCacheService itemCacheService;
 
 
+    // Chocolates (pralines) are never sold on their own - they only matter
+    // inside a box, and the box carries the price - so the person adding one
+    // does not have to enter a price, and 0 is allowed for them.
+    private static boolean hasValidPrice(Items item) {
+        if (item.getPrice() == null) {
+            return false;
+        }
+        return "chocolate".equals(item.getCategory())
+                ? item.getPrice().signum() >= 0
+                : item.getPrice().signum() > 0;
+    }
+
     public String createItem(Items item){
         // The single-item create/update paths (this method and updateItem
         // below) didn't validate this, so a negative/zero price could reach
         // the public catalog and order-total math through this route even
         // though the admin frontend form also checks it (a direct API call
         // skips that).
-        if (item.getPrice() == null || item.getPrice().signum() <= 0) {
+        if (!hasValidPrice(item)) {
             return "המחיר חייב להיות גדול מ-0";
         }
         // Was inverted: getItemByName never actually returns null in the
@@ -119,7 +131,7 @@ public class ItemService {
         return result;
     }
     public String updateItem(Items item){
-        if (item.getPrice() == null || item.getPrice().signum() <= 0) {
+        if (!hasValidPrice(item)) {
             return "המחיר חייב להיות גדול מ-0";
         }
         // Deliberately itemRepository.getItemById, not this class's own

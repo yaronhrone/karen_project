@@ -154,6 +154,9 @@ export const addItemToOrder =  (id) => {
 export const addBoxToOrder = (boxItemId, chocolates) => {
     return axios.post(`${BASE_URL}/order/box`, { box_item_id: boxItemId, chocolates }, { headers: getAuthHeader() });
 }
+export const updateBoxInOrder = (orderItemId, chocolates) => {
+    return axios.put(`${BASE_URL}/order/box/${orderItemId}`, { chocolates }, { headers: getAuthHeader() });
+}
 export const removeBoxFromOrder = (orderItemId) => {
     return axios.delete(`${BASE_URL}/order/box/${orderItemId}`, { headers: getAuthHeader() });
 }

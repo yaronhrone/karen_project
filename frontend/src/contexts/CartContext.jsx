@@ -61,6 +61,9 @@ const decrementFromCart = (itemId) => {
 const addBox = (box) => {
     setCartBoxes(prev => [...prev, { ...box, key: `${Date.now()}-${Math.random().toString(36).slice(2, 8)}` }]);
 };
+const updateBox = (key, changes) => {
+    setCartBoxes(prev => prev.map(box => (box.key === key ? { ...box, ...changes } : box)));
+};
 const removeBox = (key) => {
     setCartBoxes(prev => prev.filter(box => box.key !== key));
 };
@@ -69,7 +72,7 @@ const clearCart = () => {
     setCartBoxes([]);
 }
 return (
-    <cartContext.Provider value={{ cartItems, addToCart, removeFromCart, decrementFromCart, clearCart, cartBoxes, addBox, removeBox }} >
+    <cartContext.Provider value={{ cartItems, addToCart, removeFromCart, decrementFromCart, clearCart, cartBoxes, addBox, updateBox, removeBox }} >
         {children}
     </cartContext.Provider>
 );

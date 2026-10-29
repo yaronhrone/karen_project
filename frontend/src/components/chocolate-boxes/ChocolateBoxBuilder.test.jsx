@@ -175,3 +175,26 @@ test('a failed add shows the error and keeps the box', async () => {
   expect(await screen.findByRole('alert')).toHaveTextContent('המארז לא נמצא');
   expect(screen.getByText(`${box.size} / ${box.size} פרלינים`)).toBeInTheDocument();
 });
+
+test('edit mode opens the box already filled and saves through onAddToOrder', async () => {
+  api().getAllChocolate.mockResolvedValue({ data: [{ id: 1, name: 'א' }, { id: 2, name: 'ב' }] });
+  const onAddToOrder = jest.fn().mockResolvedValue(null);
+  const size = CHOCOLATE_BOXES[0].size;
+  const initial = { size, chocolates: [{ id: 1, name: 'א', quantity: size - 2 }, { id: 2, name: 'ב', quantity: 2 }] };
+  render(<ChocolateBoxBuilder onAddToOrder={onAddToOrder} initial={initial} />);
+
+  expect(await screen.findByText(`${size} / ${size} פרלינים`)).toBeInTheDocument();
+  expect(screen.getByText(/ביטול העריכה/)).toBeInTheDocument();
+  const save = await screen.findByRole('button', { name: 'שמירת השינויים' });
+  await waitFor(() => expect(save).toBeEnabled());
+
+  // change one square from ב to א, then save
+  fireEvent.click(screen.getByLabelText(`ריבוע ${size - 1}: ב`));
+  fireEvent.click(await screen.findByRole('button', { name: 'בחירת א' }));
+  fireEvent.click(screen.getByRole('button', { name: 'שמירת השינויים' }));
+  await waitFor(() => expect(onAddToOrder).toHaveBeenCalledTimes(1));
+  expect(onAddToOrder.mock.calls[0][0].chocolates).toEqual([
+    { id: 1, name: 'א', quantity: size - 1 },
+    { id: 2, name: 'ב', quantity: 1 },
+  ]);
+});

@@ -10,6 +10,7 @@ import { addItemToOrder, deleteOrderById, removeBoxFromOrder, removeItemFromOrde
 import { cartContext } from '../../contexts/CartContext';
 import { OpenOrderContext } from '../../contexts/OpenOrderContext';
 import ChocolateLoader from '../common/ChocolateLoader';
+import { boxSizeFromCategory } from '../../config/chocolateBoxes';
 
 
 
@@ -100,6 +101,17 @@ const remove = async (id) => {
             fetchOrders();
         } catch (err) {};
     }
+    // Reopens a box in the builder, already filled, to change what is inside.
+    const editOrderBox = (orderItem) => {
+        navigate('/chocolates', {
+            state: { edit: { source: 'order', id: orderItem.id, size: boxSizeFromCategory(orderItem.category), chocolates: orderItem.composition } },
+        });
+    };
+    const editGuestBox = (box) => {
+        navigate('/chocolates', {
+            state: { edit: { source: 'guest', key: box.key, size: box.size, chocolates: box.chocolates } },
+        });
+    };
     const removeBox = async (orderItemId) => {
         try {
             await removeBoxFromOrder(orderItemId);
@@ -175,6 +187,7 @@ const remove = async (id) => {
               items={guestCartDetails}
               boxes={cartBoxes}
               onRemoveBox={removeGuestBox}
+              onEditBox={editGuestBox}
               totalPrice={guestTotalPrice}
               onIncrement={(id) => addToCart(id)}
               onDecrement={(id) => decrementFromCart(id)}
@@ -198,6 +211,7 @@ const remove = async (id) => {
                     remove={remove}
                     add={add}
                     removeBox={removeBox}
+                    editBox={editOrderBox}
                     deleteOrder={deleteOrder}
                     sendOrder={sendOrder}
 

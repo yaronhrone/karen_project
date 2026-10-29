@@ -250,3 +250,5 @@
 
 .box-contents { margin-top: 6px; }
 .box-contents ul { margin: 8px 0 0; padding-inline-start: 18px; font-size: 14px; color: var(--color-text); }
+
+.box-actions { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; }

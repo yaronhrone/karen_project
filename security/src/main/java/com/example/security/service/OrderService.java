@@ -118,9 +118,30 @@ public class OrderService {
         if (size == null) {
             throw new IllegalArgumentException("המארז לא נמצא");
         }
+        String compositionJson = buildComposition(size, request.chocolates());
+
+        List<Order> openOrders = orderRepository.getAllOrderOpen(email);
+        int orderId = openOrders.isEmpty() ? createOrder(email) : openOrders.getFirst().getId();
+        OrderItem line = new OrderItem();
+        line.setProductId(box.getId());
+        line.setOrderId(orderId);
+        line.setQuantity(1);
+        line.setPrice(box.getPrice());
+        orderRepository.addBoxOrderItem(line, compositionJson);
+        updateOrderTotal(orderId);
+        return "Box added successfully";
+    }
+
+    // Checks the chosen chocolates against the box size and returns what gets
+    // stored on the order line (names are looked up here, never trusted from
+    // the client).
+    private String buildComposition(int size, List<BoxChoice> choices) {
+        if (choices == null || choices.isEmpty()) {
+            throw new IllegalArgumentException("לא נבחרו פרלינים למארז");
+        }
         List<BoxChocolate> composition = new ArrayList<>();
         int total = 0;
-        for (BoxChoice choice : request.chocolates()) {
+        for (BoxChoice choice : choices) {
             if (choice.quantity() < 1) {
                 throw new IllegalArgumentException("כמות לא תקינה במארז");
             }
@@ -134,23 +155,35 @@ public class OrderService {
         if (total != size) {
             throw new IllegalArgumentException("המארז צריך להכיל בדיוק " + size + " פרלינים");
         }
-        String compositionJson;
         try {
-            compositionJson = JSON.writeValueAsString(composition);
+            return JSON.writeValueAsString(composition);
         } catch (Exception e) {
             throw new IllegalStateException("Could not store the box contents", e);
         }
+    }
 
+    // Changes what is inside a box that is still in the open (not yet sent)
+    // order. A sent order has no OPEN status, so it can no longer be edited.
+    public String updateBoxInOrder(String email, int orderItemId, UpdateBoxRequest request) {
         List<Order> openOrders = orderRepository.getAllOrderOpen(email);
-        int orderId = openOrders.isEmpty() ? createOrder(email) : openOrders.getFirst().getId();
-        OrderItem line = new OrderItem();
-        line.setProductId(box.getId());
-        line.setOrderId(orderId);
-        line.setQuantity(1);
-        line.setPrice(box.getPrice());
-        orderRepository.addBoxOrderItem(line, compositionJson);
-        updateOrderTotal(orderId);
-        return "Box added successfully";
+        if (openOrders.isEmpty()) {
+            return "Order not found";
+        }
+        int orderId = openOrders.getFirst().getId();
+        OrderItem line = orderRepository.getOrderItemsByOrderId(orderId).stream()
+                .filter(oi -> oi.getId() == orderItemId && oi.getComposition() != null)
+                .findFirst()
+                .orElse(null);
+        if (line == null) {
+            return "Box not found in order";
+        }
+        Integer size = boxSize(itemService.getItemById(line.getProductId()));
+        if (size == null) {
+            throw new IllegalArgumentException("המארז לא נמצא");
+        }
+        String compositionJson = buildComposition(size, request == null ? null : request.chocolates());
+        orderRepository.updateBoxComposition(orderId, orderItemId, compositionJson);
+        return "Box updated successfully";
     }
 
     public String removeBoxFromOrder(String email, int orderItemId) {

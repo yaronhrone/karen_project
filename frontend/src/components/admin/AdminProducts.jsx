@@ -42,6 +42,10 @@ function AdminProducts() {
 
     });
 
+    // Chocolates (pralines) have no price of their own - the box they go into
+    // is what is priced - so the form neither asks for one nor requires it.
+    const isChocolate = itemsFrom.category === 'chocolate';
+
     const handelItems = async () => {
         try {
             const { data } = await getAllItems(pageItem);
@@ -55,11 +59,11 @@ function AdminProducts() {
     }
     const handleCreateItem = async (e) => {
         e.preventDefault();
-        if (!file || !itemsFrom.name || !itemsFrom.description || !itemsFrom.price || !itemsFrom.category) {
+        if (!file || !itemsFrom.name || !itemsFrom.description || (!isChocolate && !itemsFrom.price) || !itemsFrom.category) {
             showError('יש למלא את כל השדות ולהעלות תמונה');
             return;
         }
-        if (Number(itemsFrom.price) <= 0) {
+        if (!isChocolate && Number(itemsFrom.price) <= 0) {
             showError('המחיר חייב להיות גדול מ-0');
             return;
         }
@@ -75,7 +79,7 @@ if (!(file instanceof File)) {
             name: itemsFrom.name.trim(),
             category: itemsFrom.category.trim(),
             description: itemsFrom.description.trim(),
-            price: Number(itemsFrom.price),
+            price: isChocolate ? 0 : Number(itemsFrom.price),
             veg: itemsFrom.veg
         })], { type: 'application/json' }));
         try {
@@ -134,7 +138,7 @@ if (!(file instanceof File)) {
     };
     const updateItemId = async (e) => {
         e.preventDefault();
-        if (Number(itemsFrom.price) <= 0) {
+        if (!isChocolate && Number(itemsFrom.price) <= 0) {
             showError('המחיר חייב להיות גדול מ-0');
             return;
         }
@@ -156,7 +160,7 @@ if (!(file instanceof File)) {
             name: itemsFrom.name.trim(),
             category: itemsFrom.category.trim(),
             description: itemsFrom.description.trim(),
-            price: Number(itemsFrom.price),
+            price: isChocolate ? 0 : Number(itemsFrom.price),
             veg: itemsFrom.veg
         })], { type: 'application/json' }));
         try {
@@ -188,7 +192,7 @@ if (!(file instanceof File)) {
                 <input type="text" placeholder="שם במוצר" value={itemsFrom.name} onChange={(e) => setItemsFrom({ ...itemsFrom, name: e.target.value })} />
                 <textarea placeholder="תיאור" rows={4} maxLength={MAX_DESCRIPTION_LENGTH} value={itemsFrom.description} onChange={(e) => setItemsFrom({ ...itemsFrom, description: e.target.value })} />
                 <span className="desc-counter">{itemsFrom.description.length}/{MAX_DESCRIPTION_LENGTH}</span>
-                <input type="number" placeholder="מחיר" value={itemsFrom.price} onChange={(e) => setItemsFrom({ ...itemsFrom, price: parseFloat(e.target.value) })} />
+                {!isChocolate && <input type="number" placeholder="מחיר" value={itemsFrom.price} onChange={(e) => setItemsFrom({ ...itemsFrom, price: parseFloat(e.target.value) })} />}
                 <input type="file" placeholder="העלאת תמונה"   accept="image/*"  onChange={(e) => setFile(  e.target.files[0] )} />
                 <select value={itemsFrom.category} onChange={(e) => setItemsFrom({ ...itemsFrom, category: e.target.value })}>
                     <option value="">בחר קטגוריה</option>
@@ -220,7 +224,7 @@ if (!(file instanceof File)) {
                                 <input type="text" placeholder="שם המוצר" value={itemsFrom.name} onChange={(e) => setItemsFrom({ ...itemsFrom, name: e.target.value })} />
                                 <textarea placeholder="תיאור" rows={4} maxLength={MAX_DESCRIPTION_LENGTH} value={itemsFrom.description} onChange={(e) => setItemsFrom({ ...itemsFrom, description: e.target.value })} />
                                 <span className="desc-counter">{itemsFrom.description.length}/{MAX_DESCRIPTION_LENGTH}</span>
-                                <input type="number" placeholder="מחיר" value={itemsFrom.price} onChange={(e) => setItemsFrom({ ...itemsFrom, price: parseFloat(e.target.value) })} />
+                                {!isChocolate && <input type="number" placeholder="מחיר" value={itemsFrom.price} onChange={(e) => setItemsFrom({ ...itemsFrom, price: parseFloat(e.target.value) })} />}
                                 <input type="file" placeholder="העלאת תמונה" accept="image/*" onChange={(e) => setUpdateFile(e.target.files[0])} />
                                 <select value={itemsFrom.category} onChange={(e) => setItemsFrom({ ...itemsFrom, category: e.target.value })}>
                                     <option value="">בחר קטגוריה</option>

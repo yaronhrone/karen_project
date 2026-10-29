@@ -21,11 +21,17 @@ export const CHOCOLATE_BOXES = [
   { size: 22, cols: 6, shape: ['xx..xx', 'xxxxxx', 'xxxxxx', '.xxxx.', '..xx..'], frame: 'heart', label: 'מארז 22 פרלינים', image: '/image/boxes/box-22.jpeg' },
 ];
 
-// The configured photo for an order line of a box, found by the catalog
-// category chocolate-box-<size> - used when the catalog item has no photo.
-export const boxImageForCategory = (category) => {
+// The box size encoded in a catalog category (chocolate-box-<size>), or null.
+export const boxSizeFromCategory = (category) => {
   const match = /^chocolate-box-(\d+)$/.exec(category || '');
-  const box = match && CHOCOLATE_BOXES.find((b) => b.size === Number(match[1]));
+  return match ? Number(match[1]) : null;
+};
+
+// The configured photo for an order line of a box, found by its catalog
+// category - used when the catalog item has no photo of its own.
+export const boxImageForCategory = (category) => {
+  const size = boxSizeFromCategory(category);
+  const box = size && CHOCOLATE_BOXES.find((b) => b.size === size);
   return (box && box.image) || null;
 };
 

@@ -1,9 +1,9 @@
 import React, { useContext } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import UserContext from '../../contexts/UserContext';
 import { cartContext } from '../../contexts/CartContext';
 import { OpenOrderContext } from '../../contexts/OpenOrderContext';
-import { addBoxToOrder } from '../../service/apiService';
+import { addBoxToOrder, updateBoxInOrder } from '../../service/apiService';
 import ChocolateBoxBuilder from './ChocolateBoxBuilder';
 
 // The /chocolates route: the builder plus what "add to order" means for this
@@ -12,9 +12,12 @@ import ChocolateBoxBuilder from './ChocolateBoxBuilder';
 // mergeGuestDataToAccount). Either way the next stop is the order page.
 function ChocolateBoxesPage() {
   const { currentUser, isRequestToGetCurrentUserDone } = useContext(UserContext);
-  const { addBox } = useContext(cartContext);
+  const { addBox, updateBox } = useContext(cartContext);
   const { refreshOpenOrder } = useContext(OpenOrderContext);
   const navigate = useNavigate();
+  // "Edit" on a box in the order/cart arrives here with the box to reopen:
+  // { source: 'order' | 'guest', id (order line id) | key (guest box key), size, chocolates }
+  const edit = (useLocation().state || {}).edit || null;
 
   // Resolves to an error message to show, or null once the box is added.
   const addToOrder = async ({ box, chocolates }) => {
@@ -22,7 +25,12 @@ function ChocolateBoxesPage() {
       return 'עוד רגע, בודקים את ההתחברות. נסו שוב.';
     }
     try {
-      if (currentUser) {
+      if (edit && edit.source === 'order') {
+        await updateBoxInOrder(edit.id, chocolates.map(({ id, quantity }) => ({ id, quantity })));
+        await refreshOpenOrder();
+      } else if (edit && edit.source === 'guest') {
+        updateBox(edit.key, { chocolates });
+      } else if (currentUser) {
         await addBoxToOrder(box.itemId, chocolates.map(({ id, quantity }) => ({ id, quantity })));
         await refreshOpenOrder();
       } else {
@@ -43,7 +51,13 @@ function ChocolateBoxesPage() {
     }
   };
 
-  return <ChocolateBoxBuilder onAddToOrder={addToOrder} />;
+  return (
+    <ChocolateBoxBuilder
+      onAddToOrder={addToOrder}
+      initial={edit ? { size: edit.size, chocolates: edit.chocolates } : null}
+      onCancel={() => navigate('/order')}
+    />
+  );
 }
 
 export default ChocolateBoxesPage;

@@ -134,6 +134,11 @@ public class OrderRepository {
         jdbcTemplate.update(sql, orderItem.getOrderId(), orderItem.getProductId(), orderItem.getQuantity(), orderItem.getPrice(), compositionJson);
     }
 
+    public int updateBoxComposition(int orderId, int orderItemId, String compositionJson) {
+        String sql = "UPDATE " + ORDER_ITEM_TABLE + " SET composition = ? WHERE order_id = ? AND id = ? AND composition IS NOT NULL";
+        return jdbcTemplate.update(sql, compositionJson, orderId, orderItemId);
+    }
+
     // Deleting by order_item id, scoped to the order, so one box line can go
     // without touching another line that shares its product_id.
     public int deleteOrderItemById(int orderId, int orderItemId) {

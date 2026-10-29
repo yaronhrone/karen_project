@@ -7,12 +7,13 @@ import SendIcon from '@mui/icons-material/Send';
 import { getOrderStatusLabel } from '../../utils/orderStatus';
 import BoxContents from './BoxContents';
 import { boxImageForCategory } from '../../config/chocolateBoxes';
+import EditIcon from '@mui/icons-material/Edit';
 import { readyEstimateText } from '../../utils/readyEstimate';
 
 // Matches orders.note VARCHAR(500) and the check in OrderController.
 const MAX_NOTE_LENGTH = 500;
 
-function OrderCard({ order, remove, add, removeBox, deleteOrder, sendOrder }) {
+function OrderCard({ order, remove, add, removeBox, editBox, deleteOrder, sendOrder }) {
     const [note, setNote] = useState('');
     // Defensive - a "TypeError: .map is not a function" crashed this whole
     // page (before the ErrorBoundary existed to at least catch it) on an
@@ -46,10 +47,15 @@ function OrderCard({ order, remove, add, removeBox, deleteOrder, sendOrder }) {
                             </div>
                             <div className='orderItemQuantity'>
                                 {oi.composition ? (
-                                    // A box is one fixed line: no +/- steppers, it can only be removed.
-                                    <button type='button' className='btn btn-ghost' onClick={() => { removeBox(oi.id) }}>
-                                        <DeleteIcon fontSize="small" /> הסרת המארז
-                                    </button>
+                                    // A box is one fixed line: no +/- steppers, it can be edited or removed.
+                                    <div className='box-actions'>
+                                        <button type='button' className='btn btn-ghost' onClick={() => { editBox(oi) }}>
+                                            <EditIcon fontSize="small" /> עריכת המארז
+                                        </button>
+                                        <button type='button' className='btn btn-ghost' onClick={() => { removeBox(oi.id) }}>
+                                            <DeleteIcon fontSize="small" /> הסרת המארז
+                                        </button>
+                                    </div>
                                 ) : (
                                     <div className='quantity'>
                                         <RemoveIcon className='icon' onClick={() => { remove(oi.product_id, oi.product_type) }} />

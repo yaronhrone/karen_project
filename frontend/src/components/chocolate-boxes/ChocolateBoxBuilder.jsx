@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { getAllChocolate } from '../../service/apiService';
 import { DEMO_CHOCOLATES, boxCells } from '../../config/chocolateBoxes';
 import useChocolateBoxes from './useChocolateBoxes';
@@ -91,7 +91,11 @@ function PickCard({ chocolate, onChoose, onEnlarge }) {
   );
 }
 
-function ChocolateBoxBuilder({ onAddToOrder }) {
+// initial (optional): { size, chocolates: [{ id, name, quantity }] } opens that
+// box already filled - used to edit a box that is already in the order. Then
+// the main button reads "save changes" and onCancel (if given) replaces the
+// "pick another box" link.
+function ChocolateBoxBuilder({ onAddToOrder, initial = null, onCancel }) {
   const { boxes, loaded: boxesLoaded } = useChocolateBoxes();
   const [chocolates, setChocolates] = useState([]);
   const [isDemo, setIsDemo] = useState(false);
@@ -105,6 +109,22 @@ function ChocolateBoxBuilder({ onAddToOrder }) {
   const [adding, setAdding] = useState(false);
   const [orderError, setOrderError] = useState('');
   const box = boxes.find((b) => b.size === boxSize) || null;
+  const editing = Boolean(initial);
+  const hydrated = useRef(false);
+
+  // Fill the squares from the saved contents once the catalog is here, so each
+  // chocolate gets its photo; one that is gone from the catalog still counts.
+  useEffect(() => {
+    if (!initial || hydrated.current || chocolates.length === 0) return;
+    hydrated.current = true;
+    const filledSquares = [];
+    initial.chocolates.forEach(({ id, name, quantity }) => {
+      const known = chocolates.find((c) => c.id === id) || { id, name };
+      for (let i = 0; i < quantity; i += 1) filledSquares.push(known);
+    });
+    setBoxSize(initial.size);
+    setSlots(Array.from({ length: initial.size }, (_, i) => filledSquares[i] || null));
+  }, [initial, chocolates]);
 
   useEffect(() => {
     let ignore = false;
@@ -194,7 +214,9 @@ function ChocolateBoxBuilder({ onAddToOrder }) {
 
   return (
     <div className="box-builder-page" dir="rtl">
-      <button type="button" className="box-builder-back" onClick={backToBoxes}>בחירת מארז אחר</button>
+      <button type="button" className="box-builder-back" onClick={editing && onCancel ? onCancel : backToBoxes}>
+        {editing ? 'ביטול העריכה' : 'בחירת מארז אחר'}
+      </button>
       <h1 className="title">{box.label}</h1>
       <p className="box-builder-sub">לחצו על ריבוע כדי לבחור פרלין. אפשר לבחור את אותו פרלין כמה פעמים.</p>
       {catalogNote}
@@ -218,7 +240,7 @@ function ChocolateBoxBuilder({ onAddToOrder }) {
           disabled={filled < box.size || !canOrder || adding}
           onClick={addToOrder}
         >
-          {filled < box.size ? `עוד ${box.size - filled} פרלינים להשלמת המארז` : (adding ? 'מוסיפים להזמנה...' : 'הוספה להזמנה')}
+          {filled < box.size ? `עוד ${box.size - filled} פרלינים להשלמת המארז` : (adding ? (editing ? 'שומרים...' : 'מוסיפים להזמנה...') : (editing ? 'שמירת השינויים' : 'הוספה להזמנה'))}
         </button>
         {filled === box.size && !canOrder && (
           <p className="box-builder-error">
