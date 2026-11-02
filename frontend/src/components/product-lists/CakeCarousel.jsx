@@ -8,8 +8,7 @@ import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import { FavoriteContext } from '../../contexts/FavoriteContext';
 import UserContext from '../../contexts/UserContext';
-import useCarouselPageSize from '../../utils/useCarouselPageSize';
-import { visibleWindow, stepStart } from '../../utils/carouselWindow';
+import useCarousel from '../../utils/useCarousel';
 
 // A boutique catalog, not a warehouse - fetching the whole category once and
 // paging through it client-side avoids guessing a page count from the
@@ -19,11 +18,10 @@ const FETCH_ALL_SIZE = 100;
 
 function CakeCarousel() {
     const [cakes, setCakes] = useState([]);
-    const [startIndex, setStartIndex] = useState(0);
     const [favorites, setFavorites] = useState([]);
     const { currentUser, isRequestToGetCurrentUserDone } = useContext(UserContext);
     const { favorites: favoriteItems } = useContext(FavoriteContext);
-    const pageSize = useCarouselPageSize();
+    const { visible: visibleCakes, startIndex, next, previous, hoverProps } = useCarousel(cakes);
 
     const fetchCakes = async () => {
         try {
@@ -46,30 +44,20 @@ function CakeCarousel() {
         }
     }
 
-    const handleNextPage = () => {
-        setStartIndex((prev) => stepStart(prev, 1, pageSize, cakes.length));
-    }
-    const handlePreviousPage = () => {
-        setStartIndex((prev) => stepStart(prev, -1, pageSize, cakes.length));
-    }
     useEffect(() => {
         fetchCakes();
     }, []);
-    useEffect(() => {
-        setStartIndex(0);
-    }, [pageSize]);
-    const visibleCakes = visibleWindow(cakes, startIndex, pageSize);
     return (
         <div>
-            <div className="cards-container ">
+            <div className="cards-container " {...hoverProps}>
                 <h2>עוגות</h2>
                 <div key={startIndex} className="cards-wrapper fade">
-                    <ArrowBackIcon onClick={handleNextPage} className='arrow' />
+                    <ArrowBackIcon onClick={next} className='arrow' />
                     {visibleCakes.map((cake, index) => (
                         <div key={cake.id} className="card-wrapper" style={{ animationDelay: `${index * 0.3}s` }}>
                             <CardItem key={cake.id} item={cake} isFavoriteDefault={favorites.includes(cake.id)} categoryPath="/cakes" />
                         </div>))}
-                    <ArrowForwardIcon onClick={handlePreviousPage} className='arrow' />
+                    <ArrowForwardIcon onClick={previous} className='arrow' />
                 </div>
                 <div className="carousel-more"><Link className="btn btn-ghost" to="/cakes">לכל העוגות</Link></div>
             </div>
