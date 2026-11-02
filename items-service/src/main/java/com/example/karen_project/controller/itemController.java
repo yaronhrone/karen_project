@@ -2,6 +2,7 @@ package com.example.karen_project.controller;
 
 
 import com.example.karen_project.model.Items;
+import com.example.karen_project.model.StockLine;
 import com.example.karen_project.service.ItemService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -41,6 +42,31 @@ public class itemController {
             }
         }
 
+
+    // Stock take/restore for sent and cancelled orders. Not for people: only the
+    // orders service holds a token with STOCK_SERVICE, so no customer or admin
+    // token can call these. Always 200 (same Feign reason as createItem above) -
+    // the body is the names of the items that were short; empty = it worked.
+    @PostMapping("/stock/take")
+    @PreAuthorize("hasAuthority('STOCK_SERVICE')")
+    public ResponseEntity<List<String>> takeStock(@RequestBody List<StockLine> lines) {
+        try {
+            return new ResponseEntity<>(itemService.takeStock(lines), HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @PostMapping("/stock/restore")
+    @PreAuthorize("hasAuthority('STOCK_SERVICE')")
+    public ResponseEntity<Void> restoreStock(@RequestBody List<StockLine> lines) {
+        try {
+            itemService.restoreStock(lines);
+            return new ResponseEntity<>(HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
 
     @GetMapping("/get_by_category/{category}/")
     public ResponseEntity<List<Items>> getItemByCategory(@PathVariable String category,@RequestParam (defaultValue = "1") int page ,@RequestParam (defaultValue = "10") int size){

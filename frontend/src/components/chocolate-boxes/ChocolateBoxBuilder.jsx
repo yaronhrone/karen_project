@@ -37,10 +37,18 @@ const Swatch = ({ item, className = '' }) => {
 // which is itself a button - interactive squares there would nest buttons).
 function BoxPreview({ box, slots, onSlotClick, preview = false }) {
   let squareIndex = 0;
-  return (
-    <span className={`box-builder-tray ${preview ? 'box-builder-tray-small' : ''} ${box.frame ? `box-builder-frame-${box.frame}` : ''}`}>
+  const cells = boxCells(box);
+  const layers = box.layers || 1;
+  const perLayer = cells.length / layers;
+
+  const renderTray = (trayCells, key) => (
+    <span
+      key={key}
+      className={`box-builder-tray ${preview ? 'box-builder-tray-small' : ''} ${box.frame ? `box-builder-frame-${box.frame}` : ''}`}
+      style={{ '--cols': box.cols }}
+    >
       <span className="box-builder-grid" style={{ gridTemplateColumns: `repeat(${box.cols}, 1fr)` }}>
-        {boxCells(box).map((isSquare, cell) => {
+        {trayCells.map((isSquare, cell) => {
           if (!isSquare) return <span key={`gap-${cell}`} aria-hidden="true" />;
           const i = squareIndex++;
           const chocolate = slots ? slots[i] : null;
@@ -63,9 +71,22 @@ function BoxPreview({ box, slots, onSlotClick, preview = false }) {
       </span>
     </span>
   );
+
+  if (layers === 1) return renderTray(cells, 'tray');
+  // Floors are drawn top to bottom in the order they are filled.
+  return (
+    <span className="box-builder-layers">
+      {Array.from({ length: layers }, (_, layer) => (
+        <span key={layer} className="box-builder-layer">
+          {!preview && <span className="box-builder-layer-title">קומה {layer + 1}</span>}
+          {renderTray(cells.slice(layer * perLayer, (layer + 1) * perLayer), layer)}
+        </span>
+      ))}
+    </span>
+  );
 }
 
-function PickCard({ chocolate, onChoose, onEnlarge }) {
+function PickCard({ chocolate, onChoose, onEnlarge, soldOut }) {
   const [showInfo, setShowInfo] = useState(false);
   return (
     <div className="box-builder-pick-card">
@@ -85,9 +106,13 @@ function PickCard({ chocolate, onChoose, onEnlarge }) {
           {showInfo && <span className="box-builder-pick-desc">{chocolate.description}</span>}
         </>
       )}
-      <button type="button" className="btn btn-primary box-builder-pick-choose" onClick={() => onChoose(chocolate)} aria-label={`בחירת ${chocolate.name}`}>
-        בחירה
-      </button>
+      {soldOut
+        ? <span className="box-builder-soldout">חסר במלאי</span>
+        : (
+          <button type="button" className="btn btn-primary box-builder-pick-choose" onClick={() => onChoose(chocolate)} aria-label={`בחירת ${chocolate.name}`}>
+            בחירה
+          </button>
+        )}
     </div>
   );
 }
@@ -182,7 +207,17 @@ function ChocolateBoxBuilder({ onAddToOrder, initial = null, onCancel }) {
     return boxesLoaded ? 'עדיין לא זמין להזמנה' : '';
   };
 
-  const canOrder = Boolean(box && box.available) && !isDemo && typeof onAddToOrder === 'function';
+  // An out-of-stock box can still be edited when it is already in the order
+  // (only what is inside changes), just not added again.
+  const canOrder = Boolean(box && box.available) && (editing || !box.outOfStock) && !isDemo && typeof onAddToOrder === 'function';
+
+  // A chocolate can fill only as many squares as Keren has of it (no stock
+  // number = no limit). The square being changed does not count against it.
+  const isSoldOut = (c) => {
+    if (c.stock == null) return false;
+    const usedElsewhere = slots.filter((s, i) => s && s.id === c.id && i !== activeSlot).length;
+    return usedElsewhere >= c.stock;
+  };
 
   const catalogNote = isDemo && (
     <p className="box-builder-demo">דוגמה: עדיין אין פרלינים בקטלוג, מוצגים פרלינים לדוגמה</p>
@@ -200,12 +235,14 @@ function ChocolateBoxBuilder({ onAddToOrder, initial = null, onCancel }) {
         {errorNote}
         <div className="box-builder-boxes">
           {boxes.map((b) => (
-            <button key={b.size} type="button" className="box-builder-box-card" onClick={() => chooseBox(b)}>
+            <button key={b.size} type="button" className="box-builder-box-card" disabled={b.outOfStock} onClick={() => chooseBox(b)}>
               {b.image
                 ? <RoundPhoto src={b.image} />
                 : <BoxPreview box={b} preview />}
               <h3>{b.label}</h3>
-              <span className="box-builder-price">{priceText(b)}</span>
+              {b.outOfStock
+                ? <span className="box-builder-soldout">חסר במלאי</span>
+                : <span className="box-builder-price">{priceText(b)}</span>}
             </button>
           ))}
         </div>
@@ -250,7 +287,7 @@ function ChocolateBoxBuilder({ onAddToOrder, initial = null, onCancel }) {
         </button>
         {filled === box.size && !canOrder && (
           <p className="box-builder-error">
-            {isDemo ? 'אלה פרלינים לדוגמה, אי אפשר להזמין אותם.' : 'המארז הזה עדיין לא זמין להזמנה.'}
+            {isDemo ? 'אלה פרלינים לדוגמה, אי אפשר להזמין אותם.' : (box.outOfStock ? 'המארז הזה חסר במלאי.' : 'המארז הזה עדיין לא זמין להזמנה.')}
           </p>
         )}
         {orderError && <p className="box-builder-error" role="alert">{orderError}</p>}
@@ -263,7 +300,7 @@ function ChocolateBoxBuilder({ onAddToOrder, initial = null, onCancel }) {
       >
         <div className="box-builder-picker">
           {chocolates.map((c) => (
-            <PickCard key={c.id} chocolate={c} onChoose={setSlot} onEnlarge={setEnlarged} />
+            <PickCard key={c.id} chocolate={c} onChoose={setSlot} onEnlarge={setEnlarged} soldOut={isSoldOut(c)} />
           ))}
           {activeSlot !== null && slots[activeSlot] && (
             <button type="button" className="btn btn-ghost" onClick={() => setSlot(null)}>הסרת הפרלין מהריבוע</button>

@@ -8,6 +8,8 @@
 //           square, '.' = empty space (cols is then the row width). The number
 //           of 'x' must equal size.
 // - frame:  optional outline drawn around the squares ('heart')
+// - layers: optional, a box made of stacked trays ("floors"). size is the total
+//           and every floor holds size / layers squares in `cols` columns.
 // - image:  fallback photo of the real box (file in public/image/boxes/),
 //           used when the box's catalog item has no photo of its own. The
 //           squares are always drawn, so a box without a photo still works.
@@ -17,8 +19,10 @@
 // created and priced by Keren in Admin. A size listed here with no such
 // product shows as "not available for ordering yet".
 export const CHOCOLATE_BOXES = [
-  { size: 9, cols: 3, label: 'מארז 9 פרלינים', image: '/image/boxes/box-9.jpg' },
+  { size: 5, cols: 1, label: 'מארז 5 פרלינים', image: '/image/boxes/box-5.jpeg' },
+  { size: 18, cols: 3, label: 'מארז 18 פרלינים', image: '/image/boxes/box-18.jpeg' },
   { size: 22, cols: 6, shape: ['xx..xx', 'xxxxxx', 'xxxxxx', '.xxxx.', '..xx..'], frame: 'heart', label: 'מארז 22 פרלינים', image: '/image/boxes/box-22.jpeg' },
+  { size: 27, cols: 3, layers: 3, label: 'מארז 3 קומות (27 פרלינים)', image: '/image/boxes/box-27.jpeg' },
 ];
 
 // The box size encoded in a catalog category (chocolate-box-<size>), or null.

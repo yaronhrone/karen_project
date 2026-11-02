@@ -51,6 +51,7 @@ public class SecurityConfig {
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/h2-console/**", "/actuator/health").permitAll()
+                        .requestMatchers("/api/items/stock/**").hasAuthority("STOCK_SERVICE")
                         .requestMatchers(HttpMethod.GET, "/api/items/**").permitAll()
                         .requestMatchers("/api/items/**").hasAuthority("ADMIN")
                         .anyRequest().authenticated()

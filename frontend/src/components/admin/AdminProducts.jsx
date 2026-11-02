@@ -39,8 +39,20 @@ function AdminProducts() {
         image: file,
         category: '',
         veg: false,
+        // Units left to sell; null/empty = stock is not tracked for this product.
+        stock: null,
 
     });
+
+    // The stock field as the backend wants it: a whole number, or null for "not tracked".
+    const stockValue = () => (itemsFrom.stock === null || itemsFrom.stock === undefined || itemsFrom.stock === ''
+        ? null
+        : Number(itemsFrom.stock));
+    const stockIsInvalid = () => {
+        const stock = stockValue();
+        return stock !== null && (!Number.isInteger(stock) || stock < 0);
+    };
+    const onStockChange = (e) => setItemsFrom({ ...itemsFrom, stock: e.target.value === '' ? null : parseInt(e.target.value, 10) });
 
     // Chocolates (pralines) have no price of their own - the box they go into
     // is what is priced - so the form neither asks for one nor requires it.
@@ -67,6 +79,10 @@ function AdminProducts() {
             showError('המחיר חייב להיות גדול מ-0');
             return;
         }
+        if (stockIsInvalid()) {
+            showError('המלאי חייב להיות מספר שלם, 0 או יותר');
+            return;
+        }
         const formData = new FormData();
 if (!(file instanceof File)) {
     showError('הקובץ לא תקין, יש לבחור תמונה');
@@ -80,7 +96,8 @@ if (!(file instanceof File)) {
             category: itemsFrom.category.trim(),
             description: itemsFrom.description.trim(),
             price: isChocolate ? 0 : Number(itemsFrom.price),
-            veg: itemsFrom.veg
+            veg: itemsFrom.veg,
+            stock: stockValue()
         })], { type: 'application/json' }));
         try {
 
@@ -93,7 +110,8 @@ if (!(file instanceof File)) {
                 price: 0,
                 image: null,
                 category: '',
-                veg: false
+                veg: false,
+                stock: null
             });
             setItem([]);
             setPageItem(1);
@@ -142,6 +160,10 @@ if (!(file instanceof File)) {
             showError('המחיר חייב להיות גדול מ-0');
             return;
         }
+        if (stockIsInvalid()) {
+            showError('המלאי חייב להיות מספר שלם, 0 או יותר');
+            return;
+        }
         // A new photo is optional here (unlike create) - only attach a
         // 'file' part when the admin actually picked one this edit; its
         // absence tells the backend to keep the item's existing image
@@ -161,7 +183,8 @@ if (!(file instanceof File)) {
             category: itemsFrom.category.trim(),
             description: itemsFrom.description.trim(),
             price: isChocolate ? 0 : Number(itemsFrom.price),
-            veg: itemsFrom.veg
+            veg: itemsFrom.veg,
+            stock: stockValue()
         })], { type: 'application/json' }));
         try {
             await updateItem(formData);
@@ -193,13 +216,17 @@ if (!(file instanceof File)) {
                 <textarea placeholder="תיאור" rows={4} maxLength={MAX_DESCRIPTION_LENGTH} value={itemsFrom.description} onChange={(e) => setItemsFrom({ ...itemsFrom, description: e.target.value })} />
                 <span className="desc-counter">{itemsFrom.description.length}/{MAX_DESCRIPTION_LENGTH}</span>
                 {!isChocolate && <input type="number" placeholder="מחיר" value={itemsFrom.price} onChange={(e) => setItemsFrom({ ...itemsFrom, price: parseFloat(e.target.value) })} />}
+                <label className='stock-field'>
+                    מלאי (כמה יחידות במלאי, ריק = לא סופרים):
+                    <input type="number" min="0" step="1" value={itemsFrom.stock ?? ''} onChange={onStockChange} />
+                </label>
                 <input type="file" placeholder="העלאת תמונה"   accept="image/*"  onChange={(e) => setFile(  e.target.files[0] )} />
                 <select value={itemsFrom.category} onChange={(e) => setItemsFrom({ ...itemsFrom, category: e.target.value })}>
                     <option value="">בחר קטגוריה</option>
                     <option value="chocolate">שוקולד</option>
                     <option value="cake">עוגה</option>
                     <option value="cookie">עוגיה</option>
-                    {CHOCOLATE_BOXES.map((b) => <option key={b.size} value={`chocolate-box-${b.size}`}>מארז {b.size} פרלינים</option>)}
+                    {CHOCOLATE_BOXES.map((b) => <option key={b.size} value={`chocolate-box-${b.size}`}>{b.label}</option>)}
                 </select>
                 <label>
                     צמחוני:
@@ -214,6 +241,7 @@ if (!(file instanceof File)) {
                 {item.length > 0 && item.map(item => (
                     <div key={item.id} >
                         <CardItem item={item} />
+                        <p className='admin-stock'>{item.stock == null ? 'מלאי: לא נספר' : (item.stock <= 0 ? 'מלאי: 0 - חסר במלאי' : `מלאי: ${item.stock}`)}</p>
                         <button className='btn' type='button' onClick={() => setDeleteTarget(item.id)}>מחיקה</button>
                         <button className='btn' type='button' onClick={() => toggleupdate(item.id)}>
                             {updateId === item.id ? 'ביטול' : 'עריכה'}
@@ -225,13 +253,17 @@ if (!(file instanceof File)) {
                                 <textarea placeholder="תיאור" rows={4} maxLength={MAX_DESCRIPTION_LENGTH} value={itemsFrom.description} onChange={(e) => setItemsFrom({ ...itemsFrom, description: e.target.value })} />
                                 <span className="desc-counter">{itemsFrom.description.length}/{MAX_DESCRIPTION_LENGTH}</span>
                                 {!isChocolate && <input type="number" placeholder="מחיר" value={itemsFrom.price} onChange={(e) => setItemsFrom({ ...itemsFrom, price: parseFloat(e.target.value) })} />}
+                                <label className='stock-field'>
+                                    מלאי (כמה יחידות במלאי, ריק = לא סופרים):
+                                    <input type="number" min="0" step="1" value={itemsFrom.stock ?? ''} onChange={onStockChange} />
+                                </label>
                                 <input type="file" placeholder="העלאת תמונה" accept="image/*" onChange={(e) => setUpdateFile(e.target.files[0])} />
                                 <select value={itemsFrom.category} onChange={(e) => setItemsFrom({ ...itemsFrom, category: e.target.value })}>
                                     <option value="">בחר קטגוריה</option>
                                     <option value="chocolate">שוקולד</option>
                                     <option value="cake">עוגה</option>
                                     <option value="cookie">עוגיה</option>
-                    {CHOCOLATE_BOXES.map((b) => <option key={b.size} value={`chocolate-box-${b.size}`}>מארז {b.size} פרלינים</option>)}
+                    {CHOCOLATE_BOXES.map((b) => <option key={b.size} value={`chocolate-box-${b.size}`}>{b.label}</option>)}
                                 </select>
                                 <label>  צמחוני:  <input className='veg' type="checkbox" checked={itemsFrom.veg} onChange={(e) => setItemsFrom({ ...itemsFrom, veg: e.target.checked })} /> </label>
                                 <button className='btn' type="submit">שמירה</button>

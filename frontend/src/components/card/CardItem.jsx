@@ -30,6 +30,8 @@ function CardItem({ item, isFavoriteDefault, categoryPath }) {
     // "Already added" is derived from the real cart/order instead of a flag
     // local to this card - a local flag reset every time the card remounted,
     // so leaving the page and coming back showed the product as not added.
+    // Keren tracks this product's stock and none is left (stock null = not tracked).
+    const soldOut = item.stock != null && item.stock <= 0;
     const clicked = currentUser ? openOrderItemIds.has(item.id) : cartItems.includes(item.id);
 
     // Empty deps meant this only ever ran once, on mount - if the parent's
@@ -157,11 +159,13 @@ function CardItem({ item, isFavoriteDefault, categoryPath }) {
                         <div className="details">
                             {error && <div className="error">{error}</div>}
                             <h3>{item.name} </h3>
-                            <h3>₪{item.price}</h3>
+                            {soldOut ? <h3 className='sold-out-tag'>חסר במלאי</h3> : <h3>₪{item.price}</h3>}
                         </div>
 
                         <div>
-                            <div className='buy' onClick={addToOrder}><AddShoppingCartIcon className='icon' /> </div>
+                            {soldOut
+                                ? <div className='buy sold-out' aria-disabled='true' title='חסר במלאי'><AddShoppingCartIcon className='icon' /> </div>
+                                : <div className='buy' onClick={addToOrder}><AddShoppingCartIcon className='icon' /> </div>}
                         </div>
 
                     </div>

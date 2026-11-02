@@ -15,6 +15,9 @@ public class Items {
     private BigDecimal price;
     @JsonProperty("delete_img_id")
     private String deleteImgId;
+    // How many are left to sell. null = not tracked (always available), which
+    // is what every product has until its stock is first set in Admin.
+    private Integer stock;
 
     public Items() {
     }
@@ -28,6 +31,14 @@ public class Items {
         this.image = image;
         this.price = price;
         this.deleteImgId = deleteImgId;
+    }
+
+    public Integer getStock() {
+        return stock;
+    }
+
+    public void setStock(Integer stock) {
+        this.stock = stock;
     }
 
     public String getDeleteImgId() {

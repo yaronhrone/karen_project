@@ -27,7 +27,8 @@ public class ItemsClientConfig {
             }
             HttpServletRequest request = attrs.getRequest();
             String auth = request.getHeader("Authorization");
-            if (auth != null) {
+            // A call that sets its own Authorization (the stock calls) keeps it.
+            if (auth != null && !template.headers().containsKey("Authorization")) {
                 template.header("Authorization", auth);
             }
         };

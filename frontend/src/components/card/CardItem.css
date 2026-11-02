@@ -288,3 +288,9 @@
   font-size: 12px;
   font-weight: 600;
 }
+
+/* Sold out: the cart button stays visible but does nothing. */
+.wrapper .buy.sold-out { cursor: not-allowed; opacity: 0.45; }
+.wrapper .buy.sold-out:hover { background: var(--color-accent-soft); }
+.wrapper .buy.sold-out:hover .icon { transform: none; color: var(--color-accent-hover); }
+.wrapper .sold-out-tag { color: #b3261e; }

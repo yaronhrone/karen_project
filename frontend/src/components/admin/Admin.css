@@ -316,3 +316,5 @@
 .btn.btn-cancel:hover{
     filter: brightness(0.9);
 }
+.admin-stock { margin: 4px 0 8px; font-weight: 600; }
+.stock-field { display: flex; flex-direction: column; gap: 4px; font-size: 14px; }

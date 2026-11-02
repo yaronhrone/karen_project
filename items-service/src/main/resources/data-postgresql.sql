@@ -47,3 +47,8 @@ ALTER TABLE items ADD COLUMN IF NOT EXISTS search_vector tsvector
     GENERATED ALWAYS AS (to_tsvector('simple', coalesce(name, '') || ' ' || coalesce(description, ''))) STORED;
 
 CREATE INDEX IF NOT EXISTS items_search_vector_idx ON items USING GIN (search_vector);
+
+-- Units left to sell. NULL = stock is not tracked for this product (always
+-- available) - every existing product stays that way until Keren sets a number
+-- in Admin. Its own ALTER for the same reason as search_vector above.
+ALTER TABLE items ADD COLUMN IF NOT EXISTS stock INT;

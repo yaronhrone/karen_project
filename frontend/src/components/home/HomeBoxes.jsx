@@ -18,7 +18,9 @@ function HomeBoxes() {
               ? <RoundPhoto src={b.image} />
               : <span className="home-box-placeholder" aria-hidden="true">{b.size}</span>}
             <span className="home-box-label">{b.label}</span>
-            {b.price != null && <span className="home-box-price">₪{b.price}</span>}
+            {b.outOfStock
+              ? <span className="home-box-soldout">חסר במלאי</span>
+              : (b.price != null && <span className="home-box-price">₪{b.price}</span>)}
           </Link>
         ))}
       </div>

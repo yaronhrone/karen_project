@@ -88,6 +88,7 @@ public class AdminController {
                     item.setPrice(itemRequest.getPrice());
                     item.setImage(uploadResult.url());
                     item.setVeg(itemRequest.isVeg());
+                    item.setStock(itemRequest.getStock());
                     String result = itemService.createItem(item);
                     if (result.contains("created")) {
 
@@ -157,6 +158,7 @@ public class AdminController {
             item.setDescription(itemRequest.getDescription());
             item.setPrice(itemRequest.getPrice());
             item.setVeg(itemRequest.isVeg());
+            item.setStock(itemRequest.getStock());
 
             if (file != null && !file.isEmpty()) {
                 S3Service.UploadResult uploadResult = s3Service.upload(file);

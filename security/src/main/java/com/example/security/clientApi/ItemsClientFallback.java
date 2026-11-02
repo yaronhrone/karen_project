@@ -1,6 +1,7 @@
 package com.example.security.clientApi;
 
 import com.example.security.model.Item;
+import com.example.security.model.StockLine;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -39,6 +40,15 @@ public class ItemsClientFallback implements ItemsClient {
     @Override
     public String deleteItemById(int id) {
         return "";
+    }
+    @Override
+    public List<String> takeStock(String authorization, List<StockLine> lines) {
+        // null, not an empty list: "could not check" must never read as "taken".
+        return null;
+    }
+    @Override
+    public void restoreStock(String authorization, List<StockLine> lines) {
+        System.err.println("Could not give stock back to items-service: " + lines);
     }
 
 }

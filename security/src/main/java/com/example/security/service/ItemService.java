@@ -2,6 +2,8 @@ package com.example.security.service;
 
 import com.example.security.clientApi.ItemsClient;
 import com.example.security.model.Item;
+import com.example.security.model.StockLine;
+import com.example.security.utils.JwtUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -14,6 +16,8 @@ public class ItemService {
     private ItemsClient itemClient;
     @Autowired
     private S3Service s3Service;
+    @Autowired
+    private JwtUtil jwtUtil;
 
 
 
@@ -53,6 +57,14 @@ public class ItemService {
 
         return itemClient.updateItem(item);
 
+    }
+    // Names of the items that do not have enough stock (nothing is taken then),
+    // empty when everything was taken, null when items-service could not be reached.
+    public List<String> takeStock(List<StockLine> lines) {
+        return itemClient.takeStock("Bearer " + jwtUtil.generateServiceToken(), lines);
+    }
+    public void restoreStock(List<StockLine> lines) {
+        itemClient.restoreStock("Bearer " + jwtUtil.generateServiceToken(), lines);
     }
     public List<Item> getAllItem(int page, int size) {return itemClient.getAllItem(page,size); }
     public String deleteItemById(int id) {

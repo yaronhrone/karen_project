@@ -198,3 +198,65 @@ test('edit mode opens the box already filled and saves through onAddToOrder', as
     { id: 2, name: 'ב', quantity: 1 },
   ]);
 });
+
+test('a box with no stock left is marked sold out and cannot be opened', async () => {
+  const size = CHOCOLATE_BOXES[0].size;
+  api().getChocolateBox.mockImplementation((s) => Promise.resolve(
+    s === size ? { data: [{ id: 1000 + s, price: 50, stock: 0, category: `chocolate-box-${s}` }] } : boxCatalog(s),
+  ));
+  render(<ChocolateBoxBuilder />);
+  const card = (await screen.findByText(CHOCOLATE_BOXES[0].label)).closest('button');
+  await waitFor(() => expect(card).toBeDisabled());
+  expect(screen.getAllByText('חסר במלאי')).toHaveLength(1);
+});
+
+test('a box with stock left (or no stock count) can be opened', async () => {
+  const size = CHOCOLATE_BOXES[0].size;
+  api().getChocolateBox.mockImplementation((s) => Promise.resolve(
+    s === size ? { data: [{ id: 1000 + s, price: 50, stock: 3, category: `chocolate-box-${s}` }] } : boxCatalog(s),
+  ));
+  await openBox(size);
+  expect(screen.getByText(`0 / ${size} פרלינים`)).toBeInTheDocument();
+});
+
+test('a chocolate can fill only as many squares as there are in stock', async () => {
+  api().getAllChocolate.mockResolvedValue({ data: [{ id: 1, name: 'א', stock: 1 }, { id: 2, name: 'ב' }] });
+  await openBox(CHOCOLATE_BOXES[0].size);
+  fireEvent.click(screen.getByLabelText('ריבוע 1: ריק'));
+  fireEvent.click(await screen.findByRole('button', { name: 'בחירת א' }));
+  // א (1 in stock) is used up: the next square cannot take it, ב is free
+  fireEvent.click(screen.getByLabelText('ריבוע 2: ריק'));
+  expect(await screen.findByText('חסר במלאי')).toBeInTheDocument();
+  expect(screen.queryByRole('button', { name: 'בחירת א' })).toBeNull();
+  expect(screen.getByRole('button', { name: 'בחירת ב' })).toBeInTheDocument();
+});
+
+test('changing the square that holds the last one of a chocolate is still allowed', async () => {
+  api().getAllChocolate.mockResolvedValue({ data: [{ id: 1, name: 'א', stock: 1 }] });
+  await openBox(CHOCOLATE_BOXES[0].size);
+  fireEvent.click(screen.getByLabelText('ריבוע 1: ריק'));
+  fireEvent.click(await screen.findByRole('button', { name: 'בחירת א' }));
+  fireEvent.click(screen.getByLabelText('ריבוע 1: א'));
+  expect(await screen.findByRole('button', { name: 'בחירת א' })).toBeInTheDocument();
+});
+
+test('a box that is out of stock can still be edited when it is already in the order', async () => {
+  const size = CHOCOLATE_BOXES[0].size;
+  api().getChocolateBox.mockImplementation((s) => Promise.resolve(
+    s === size ? { data: [{ id: 1000 + s, price: 50, stock: 0, category: `chocolate-box-${s}` }] } : boxCatalog(s),
+  ));
+  api().getAllChocolate.mockResolvedValue({ data: [{ id: 1, name: 'א' }, { id: 2, name: 'ב' }] });
+  const onAddToOrder = jest.fn().mockResolvedValue(null);
+  render(<ChocolateBoxBuilder onAddToOrder={onAddToOrder} initial={{ size, chocolates: [{ id: 1, name: 'א', quantity: size }] }} />);
+  const save = await screen.findByRole('button', { name: 'שמירת השינויים' });
+  await waitFor(() => expect(save).toBeEnabled());
+});
+
+test('a box of floors draws one titled tray per floor', async () => {
+  const layered = CHOCOLATE_BOXES.find((b) => b.layers);
+  await openBox(layered.size);
+  for (let floor = 1; floor <= layered.layers; floor++) {
+    expect(screen.getByText(`קומה ${floor}`)).toBeInTheDocument();
+  }
+  expect(screen.getAllByLabelText(/ריבוע \d+: ריק/)).toHaveLength(layered.size);
+});

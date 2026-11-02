@@ -10,7 +10,10 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 @Service
 public class OrderService {
@@ -57,6 +60,85 @@ public class OrderService {
         }
     }
 
+    // Statuses of an order whose stock was taken and is not yet with the customer. SENT (handed over) is left out on purpose: deleting an old delivered order must not put stock back.
+    private static final List<String> STOCK_TAKEN_STATUSES = List.of("RECEIVED", "IN_PROGRESS", "READY");
+    private static final String STOCK_UNVERIFIED_MESSAGE = "לא הצלחנו לאמת את המלאי כרגע, נסו שוב בעוד רגע";
+
+    // What a set of order lines takes out of stock, per product id: a normal
+    // line takes its quantity of that product; a box line takes the box itself
+    // plus every chocolate in it.
+    private static Map<Integer, Integer> stockNeeds(List<OrderItem> lines) {
+        Map<Integer, Integer> needs = new LinkedHashMap<>();
+        for (OrderItem line : lines) {
+            needs.merge(line.getProductId(), line.getQuantity(), Integer::sum);
+            if (line.getComposition() != null) {
+                for (BoxChocolate chocolate : line.getComposition()) {
+                    needs.merge(chocolate.id(), chocolate.quantity() * line.getQuantity(), Integer::sum);
+                }
+            }
+        }
+        return needs;
+    }
+
+    private static List<StockLine> toStockLines(Map<Integer, Integer> needs) {
+        List<StockLine> lines = new ArrayList<>();
+        needs.forEach((id, quantity) -> lines.add(new StockLine(id, quantity)));
+        return lines;
+    }
+
+    // Refuses (with a message the customer sees) when one of `ids` needs more
+    // than is in stock. Only the ids being added or changed are checked, so an
+    // unrelated item in the cart that ran out later does not block this action.
+    // A product with no stock number is not tracked and always passes. This is
+    // the early warning - the real check is the atomic take when the order is sent.
+    private void assertInStock(Map<Integer, Integer> needs, Collection<Integer> ids) {
+        for (int id : ids) {
+            Item item = itemService.getItemById(id);
+            if (item == null || item.getStock() == null) {
+                continue;
+            }
+            if (item.getStock() < needs.getOrDefault(id, 0)) {
+                throw new IllegalArgumentException(item.getName() + (item.getStock() <= 0 ? " - חסר במלאי" : " - אין מספיק במלאי"));
+            }
+        }
+    }
+
+    // Takes the order's stock after the order was claimed (marked RECEIVED). If
+    // anything is short, or the check could not be done, the order goes back to
+    // OPEN and the customer gets the reason - nothing was taken in that case.
+    private void takeStockOrRevert(int orderId, List<StockLine> lines) {
+        if (lines.isEmpty()) {
+            return;
+        }
+        List<String> missing;
+        try {
+            missing = itemService.takeStock(lines);
+        } catch (RuntimeException e) {
+            orderRepository.revertOrderToOpen(orderId);
+            throw new IllegalStateException(STOCK_UNVERIFIED_MESSAGE, e);
+        }
+        if (missing == null) {
+            orderRepository.revertOrderToOpen(orderId);
+            throw new IllegalStateException(STOCK_UNVERIFIED_MESSAGE);
+        }
+        if (!missing.isEmpty()) {
+            orderRepository.revertOrderToOpen(orderId);
+            throw new OutOfStockException("המלאי אזל עבור: " + String.join(", ", missing) + ". הסירו אותם מההזמנה ונסו שוב.");
+        }
+    }
+
+    // Gives the stock back when an order that had taken it is cancelled or deleted.
+    private void restoreStockOf(Order order) {
+        if (order == null || order.getStatus() == null || !STOCK_TAKEN_STATUSES.contains(order.getStatus().name())) {
+            return;
+        }
+        try {
+            itemService.restoreStock(toStockLines(stockNeeds(orderRepository.getOrderItemsByOrderId(order.getId()))));
+        } catch (Exception e) {
+            System.err.println("Failed to give stock back for order " + order.getId() + ": " + e.getMessage());
+        }
+    }
+
     public Integer createOrder(String email) {
         Order order = new Order();
         order.setStatus(Status.OPEN);
@@ -82,6 +164,8 @@ public class OrderService {
               throw new IllegalArgumentException("שוקולדים מוזמנים במארז - יש לבחור מארז בעמוד המארזים");
           }
           List<Order> openOrders = orderRepository.getAllOrderOpen(email);
+          int inCart = openOrders.isEmpty() ? 0 : orderRepository.getProductQuantityFromOrder(openOrders.getFirst().getId(), productId);
+          assertInStock(Map.of(productId, inCart + 1), List.of(productId));
            if (openOrders.isEmpty()) {
              orderId =  createOrder(email);
 
@@ -121,6 +205,16 @@ public class OrderService {
         String compositionJson = buildComposition(size, request.chocolates());
 
         List<Order> openOrders = orderRepository.getAllOrderOpen(email);
+        Map<Integer, Integer> needs = openOrders.isEmpty()
+                ? new LinkedHashMap<>()
+                : stockNeeds(orderRepository.getOrderItemsByOrderId(openOrders.getFirst().getId()));
+        needs.merge(box.getId(), 1, Integer::sum);
+        List<Integer> touched = new ArrayList<>(List.of(box.getId()));
+        for (BoxChoice choice : request.chocolates()) {
+            needs.merge(choice.id(), choice.quantity(), Integer::sum);
+            touched.add(choice.id());
+        }
+        assertInStock(needs, touched);
         int orderId = openOrders.isEmpty() ? createOrder(email) : openOrders.getFirst().getId();
         OrderItem line = new OrderItem();
         line.setProductId(box.getId());
@@ -182,6 +276,17 @@ public class OrderService {
             throw new IllegalArgumentException("המארז לא נמצא");
         }
         String compositionJson = buildComposition(size, request == null ? null : request.chocolates());
+        // The box itself is already in the order; only the chocolates change.
+        List<OrderItem> otherLines = orderRepository.getOrderItemsByOrderId(orderId).stream()
+                .filter(oi -> oi.getId() != orderItemId)
+                .toList();
+        Map<Integer, Integer> needs = stockNeeds(otherLines);
+        List<Integer> touched = new ArrayList<>();
+        for (BoxChoice choice : request.chocolates()) {
+            needs.merge(choice.id(), choice.quantity(), Integer::sum);
+            touched.add(choice.id());
+        }
+        assertInStock(needs, touched);
         orderRepository.updateBoxComposition(orderId, orderItemId, compositionJson);
         return "Box updated successfully";
     }
@@ -237,7 +342,22 @@ public class OrderService {
     public String changeOrderStatus(String email, String note) {
         // Blank means "no remark" - store NULL rather than an empty string.
         String cleanNote = note == null || note.isBlank() ? null : note.trim();
-        String result = orderRepository.changeOrderStatusToReceived(email, cleanNote);
+        String result = "Order status updated successfully";
+
+        // Sending is also where the stock goes down. Claim the order first (only
+        // one request can turn it from OPEN to RECEIVED, so a double click takes
+        // stock once), then take the stock; if it is short, the order goes back
+        // to OPEN and the customer is told which items ran out.
+        List<Order> openOrders = orderRepository.getAllOrderOpen(email);
+        if (openOrders.isEmpty()) {
+            return result;
+        }
+        int orderId = openOrders.getFirst().getId();
+        List<StockLine> stockLines = toStockLines(stockNeeds(orderRepository.getOrderItemsByOrderId(orderId)));
+        if (orderRepository.markOrderReceived(orderId, cleanNote) == 0) {
+            return result;
+        }
+        takeStockOrRevert(orderId, stockLines);
 
         // Notify Keren over WhatsApp that a new order came in, so she isn't
         // relying on manually checking Admin for it. A failure here (GreenAPI
@@ -270,6 +390,7 @@ public class OrderService {
         if (!SETTABLE_STATUSES.contains(newStatus)) {
             return "Invalid status";
         }
+        Order before = "CANCELLED".equals(newStatus) ? orderRepository.getOrderById(orderId) : null;
         // readyBy only ever gets written on the RECEIVED -> IN_PROGRESS
         // transition; ready_at/sent_at only on their own matching
         // transition - every other target status uses the plain update,
@@ -284,6 +405,10 @@ public class OrderService {
             orderRepository.updateOrderStatusAndSentAt(orderId, newStatus);
         } else {
             orderRepository.updateOrderStatus(orderId, newStatus);
+        }
+        // A cancelled order no longer needs what it took from stock.
+        if (before != null && !"CANCELLED".equals(before.getStatus().name())) {
+            restoreStockOf(before);
         }
         return "Order status updated successfully";
     }
@@ -321,12 +446,14 @@ public class OrderService {
         if (!isAdmin && !order.getUserEmail().equals(callerEmail)) {
             return "Not authorized to delete this order";
         }
+        restoreStockOf(order);
         orderRepository.deleteAllOrderItemsByOrderId(orderId);
         return orderRepository.deleteOrder(orderId);
     }
     public String deleteAllOrders(String email) {
         List<Order> orders = orderRepository.getAllOrderByEmail(email);
         for (Order order : orders) {
+            restoreStockOf(order);
             orderRepository.deleteAllOrderItemsByOrderId(order.getId());
             orderRepository.deleteOrder(order.getId());
 

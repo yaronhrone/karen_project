@@ -19,6 +19,8 @@ public class ItemMapper implements RowMapper<Items> {
         item.setPrice(rs.getBigDecimal(("price")));
         item.setCategory(rs.getString("category"));
         item.setDeleteImgId(rs.getString("delete_img_id"));
+        int stock = rs.getInt("stock");
+        item.setStock(rs.wasNull() ? null : stock);
 
         return item;
     }

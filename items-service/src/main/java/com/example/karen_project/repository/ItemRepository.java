@@ -20,8 +20,8 @@ public class ItemRepository {
 
 
     public String  createItem(Items item){
-      String sql = String.format("INSERT INTO %s (name, description, IsVeg, image,price, category,delete_img_id) VALUES (?,?,?,?,?,?,?)",ITEMS_TABLE);
-      jdbcTemplate.update(sql,item.getName(), item.getDescription(),item.getVeg(),item.getImage(),item.getPrice(),item.getCategory(),item.getDeleteImgId());
+      String sql = String.format("INSERT INTO %s (name, description, IsVeg, image,price, category,delete_img_id, stock) VALUES (?,?,?,?,?,?,?,?)",ITEMS_TABLE);
+      jdbcTemplate.update(sql,item.getName(), item.getDescription(),item.getVeg(),item.getImage(),item.getPrice(),item.getCategory(),item.getDeleteImgId(),item.getStock());
 
       return "The item is created!";
     }
@@ -68,8 +68,8 @@ public class ItemRepository {
         return Math.max(1, Math.min(size, 100));
     }
     public String updateItem(Items item){
-        String sql = String.format("UPDATE %s SET name = ?, description = ?, IsVeg = ?, image = ?, price = ?, category = ?, delete_img_id = ? WHERE id = ?",ITEMS_TABLE);
-        jdbcTemplate.update(sql,item.getName(),item.getDescription(),item.getVeg(),item.getImage(),item.getPrice(),item.getCategory(),item.getDeleteImgId(),item.getId());
+        String sql = String.format("UPDATE %s SET name = ?, description = ?, IsVeg = ?, image = ?, price = ?, category = ?, delete_img_id = ?, stock = ? WHERE id = ?",ITEMS_TABLE);
+        jdbcTemplate.update(sql,item.getName(),item.getDescription(),item.getVeg(),item.getImage(),item.getPrice(),item.getCategory(),item.getDeleteImgId(),item.getStock(),item.getId());
         return "The item is updated!";
     }
     public List<Items> getItemsByCategory(String category,int page,int size){
@@ -144,6 +144,20 @@ public class ItemRepository {
         } catch (Exception e) {
             return null;
         }
+    }
+    // Takes `quantity` off the item's stock in one atomic statement, so two
+    // customers ordering the last one at the same moment can't both get it.
+    // An item whose stock is NULL is not tracked and always succeeds. False
+    // means not enough left (or the item no longer exists).
+    public boolean takeStock(int id, int quantity){
+        String sql = String.format("UPDATE %s SET stock = stock - ? WHERE id = ? AND (stock IS NULL OR stock >= ?)",ITEMS_TABLE);
+        return jdbcTemplate.update(sql, quantity, id, quantity) == 1;
+    }
+    // Gives back what takeStock took (a cancelled/deleted order). Untracked
+    // items (NULL stock) stay untracked.
+    public void restoreStock(int id, int quantity){
+        String sql = String.format("UPDATE %s SET stock = stock + ? WHERE id = ? AND stock IS NOT NULL",ITEMS_TABLE);
+        jdbcTemplate.update(sql, quantity, id);
     }
     public String deleteItemById(int id){
         String sql = String.format("DELETE FROM %s WHERE id = ?",ITEMS_TABLE);

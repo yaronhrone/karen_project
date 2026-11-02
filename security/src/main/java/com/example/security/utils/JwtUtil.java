@@ -85,6 +85,22 @@ public class JwtUtil {
                 .compact();
     }
 
+    // A short-lived token for this service's own calls to items-service (stock
+    // take/restore). It carries only STOCK_SERVICE, an authority no login ever
+    // gets (Role is USER/ADMIN), so a customer cannot forge it and an admin's
+    // token gives no access to those endpoints.
+    public String generateServiceToken() {
+        Map<String, Object> claims = new HashMap<>();
+        claims.put("sub", "orders-service");
+        claims.put("roles", List.of("STOCK_SERVICE"));
+        return Jwts.builder()
+                .setClaims(claims)
+                .setIssuedAt(new Date(System.currentTimeMillis()))
+                .setExpiration(new Date(System.currentTimeMillis() + 60_000))
+                .signWith(getSignInKey())
+                .compact();
+    }
+
     public Boolean validateToken(String token, UserDetails userDetails) {
         final String email = extractEmail(token);
         final List<GrantedAuthority> rolesFromToken = extractAuthorities(token);

@@ -3,11 +3,14 @@ package com.example.karen_project.service;
 
 
 import com.example.karen_project.model.Items;
+import com.example.karen_project.model.StockLine;
 import com.example.karen_project.repository.ItemRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.support.TransactionTemplate;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -18,6 +21,65 @@ public class ItemService {
     public ItemRepository itemRepository;
     @Autowired
     private ItemCacheService itemCacheService;
+    @Autowired
+    private TransactionTemplate transactionTemplate;
+
+    private static final String INVALID_STOCK_MESSAGE = "המלאי חייב להיות מספר שלם, 0 או יותר";
+
+    // Stock is optional (null = not tracked), but a number must not be negative.
+    private static boolean hasValidStock(Items item) {
+        return item.getStock() == null || item.getStock() >= 0;
+    }
+
+    // Called only by the orders service (see SecurityConfig: STOCK_SERVICE),
+    // when a customer sends an order. All or nothing: if any line is short
+    // nothing is taken, and the names of the items that are short come back
+    // (an empty list = everything was taken).
+    public List<String> takeStock(List<StockLine> lines) {
+        List<String> shortItems = transactionTemplate.execute(status -> {
+            List<String> missing = new ArrayList<>();
+            for (StockLine line : lines) {
+                if (line.quantity() < 1) {
+                    continue;
+                }
+                Items item = itemRepository.getItemById(line.id());
+                if (item == null) {
+                    missing.add("#" + line.id());
+                } else if (!itemRepository.takeStock(line.id(), line.quantity())) {
+                    missing.add(item.getName());
+                }
+            }
+            if (!missing.isEmpty()) {
+                status.setRollbackOnly();
+            }
+            return missing;
+        });
+        // After the commit, not inside it - evicting first would let a read in
+        // between put the old stock back into the cache for hours.
+        evictStockCaches(lines);
+        return shortItems;
+    }
+
+    public void restoreStock(List<StockLine> lines) {
+        transactionTemplate.executeWithoutResult(status -> {
+            for (StockLine line : lines) {
+                if (line.quantity() > 0) {
+                    itemRepository.restoreStock(line.id(), line.quantity());
+                }
+            }
+        });
+        evictStockCaches(lines);
+    }
+
+    private void evictStockCaches(List<StockLine> lines) {
+        for (StockLine line : lines) {
+            Items item = itemRepository.getItemById(line.id());
+            if (item != null) {
+                itemCacheService.evictCategory(item.getCategory());
+            }
+            itemCacheService.evictById(line.id());
+        }
+    }
 
 
     // Chocolates (pralines) are never sold on their own - they only matter
@@ -40,6 +102,9 @@ public class ItemService {
         // skips that).
         if (!hasValidPrice(item)) {
             return "המחיר חייב להיות גדול מ-0";
+        }
+        if (!hasValidStock(item)) {
+            return INVALID_STOCK_MESSAGE;
         }
         // Was inverted: getItemByName never actually returns null in the
         // normal case (it returns an empty List when nothing matches, only
@@ -133,6 +198,9 @@ public class ItemService {
     public String updateItem(Items item){
         if (!hasValidPrice(item)) {
             return "המחיר חייב להיות גדול מ-0";
+        }
+        if (!hasValidStock(item)) {
+            return INVALID_STOCK_MESSAGE;
         }
         // Deliberately itemRepository.getItemById, not this class's own
         // getItemById - that method is cache-wrapped, and routing this

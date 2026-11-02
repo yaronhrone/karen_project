@@ -124,7 +124,13 @@ const remove = async (id) => {
         try {
             await addItemToOrder(id )
             fetchOrders();
-        } catch (err) {};
+        } catch (err) {
+            // e.g. "<product> - אין מספיק במלאי"
+            if (err.response?.status == 400 && typeof err.response.data === 'string') {
+                setErrorFromServer(err.response.data);
+                setTimeout(() => { setErrorFromServer(''); }, 5000);
+            }
+        };
     }
     const deleteOrder = async (id) => {
         try {
@@ -149,7 +155,8 @@ const remove = async (id) => {
             // already the confirmation that it went through.
             fetchOrders();
         }catch(err){
-      if (err.response?.status == 400 || err.response?.status == 500) {
+      // 409: something in the order ran out of stock (the message names it).
+      if (err.response?.status == 400 || err.response?.status == 409 || err.response?.status == 500) {
         setErrorFromServer(err.response.data);
       } if (err.code === "ERR_NETWORK") {
         setErrorFromServer("שגיאת רשת: בדוק/י את החיבור לאינטרנט ונסה/י שוב.");

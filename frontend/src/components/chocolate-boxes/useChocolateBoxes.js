@@ -6,6 +6,8 @@ import { CHOCOLATE_BOXES } from '../../config/chocolateBoxes';
 // config, while price, photo and the id an order needs come from the product
 // in the category chocolate-box-<size> that Keren maintains in Admin.
 // A box with no catalog item yet has `available: false` and `price: null`.
+// `outOfStock` is true when Keren tracks the box's stock and none is left
+// (stock null = not tracked = never out of stock).
 function useChocolateBoxes() {
   const [items, setItems] = useState({});
   const [loaded, setLoaded] = useState(false);
@@ -32,6 +34,7 @@ function useChocolateBoxes() {
       price: item ? item.price : null,
       image: (item && item.image) || b.image || null,
       available: Boolean(item),
+      outOfStock: Boolean(item) && item.stock != null && item.stock <= 0,
     };
   });
   return { boxes, loaded };

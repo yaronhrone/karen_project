@@ -8,6 +8,8 @@ public class ItemRequest {
     private BigDecimal price;
     private String category;
     private boolean isVeg;
+    // Optional: null = stock is not tracked for this product.
+    private Integer stock;
 
     public ItemRequest() {
     }
@@ -28,6 +30,14 @@ public class ItemRequest {
                 ", price=" + price +
                 ", category='" + category + '\'' +
                 '}';
+    }
+
+    public Integer getStock() {
+        return stock;
+    }
+
+    public void setStock(Integer stock) {
+        this.stock = stock;
     }
 
     public String getName() {

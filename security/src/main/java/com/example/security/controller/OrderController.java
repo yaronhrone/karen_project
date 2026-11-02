@@ -7,6 +7,7 @@ import com.example.security.model.ProductRequest;
 import com.example.security.model.SendOrderRequest;
 import com.example.security.model.UpdateBoxRequest;
 import com.example.security.service.OrderService;
+import com.example.security.service.OutOfStockException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -115,6 +116,9 @@ public class OrderController {
             String response = orderService.changeOrderStatus(authentication.getName(), note);
 
             return ResponseEntity.ok().body(response);
+        }  catch (OutOfStockException e) {
+            // 409: the order is fine, the shop just ran out of something in it.
+            return ResponseEntity.status(HttpStatus.CONFLICT).body(e.getMessage());
         }  catch (Exception e) {
             return new ResponseEntity(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }

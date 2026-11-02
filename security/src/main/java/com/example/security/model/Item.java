@@ -21,6 +21,8 @@ public class Item {
         // catalog. Lets the frontend show "המוצר כבר לא במלאי" instead of either
         // crashing on a bare null or just silently dropping the favorite.
         private boolean missing = false;
+        // Units left to sell; null = stock is not tracked for this product.
+        private Integer stock;
 
         public Item() {
         }
@@ -111,6 +113,14 @@ public class Item {
 
         public void setImage(String image) {
             this.image = image;
+        }
+
+        public Integer getStock() {
+            return stock;
+        }
+
+        public void setStock(Integer stock) {
+            this.stock = stock;
         }
 
         public boolean isMissing() {

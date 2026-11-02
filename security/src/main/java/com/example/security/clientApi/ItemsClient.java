@@ -1,6 +1,7 @@
 package com.example.security.clientApi;
 
 import com.example.security.model.Item;
+import com.example.security.model.StockLine;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.*;
 
@@ -28,5 +29,12 @@ public interface ItemsClient
     Item getItemById(@PathVariable int id);
     @DeleteMapping("/delete_by_id/{id}")
     String deleteItemById(@PathVariable int id);
+    // Stock calls carry their own service token (see JwtUtil.generateServiceToken),
+    // not the customer's forwarded one. Returns the names of items that were
+    // short; empty = taken. null (from the fallback) = could not be checked.
+    @PostMapping("/stock/take")
+    List<String> takeStock(@RequestHeader("Authorization") String authorization, @RequestBody List<StockLine> lines);
+    @PostMapping("/stock/restore")
+    void restoreStock(@RequestHeader("Authorization") String authorization, @RequestBody List<StockLine> lines);
 
 }

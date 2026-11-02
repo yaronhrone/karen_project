@@ -71,6 +71,20 @@ public class OrderRepository {
         return "Order status updated successfully";
     }
 
+    // The atomic "claim" used when a customer sends an order: only one caller
+    // can turn a given OPEN order into RECEIVED (the count is 0 for a second,
+    // simultaneous click), so stock is taken once per order.
+    public int markOrderReceived(int orderId, String note) {
+        String sql = "UPDATE " + ORDER_TABLE + " SET order_status = 'RECEIVED', note = ? WHERE id = ? AND order_status = 'OPEN'";
+        return jdbcTemplate.update(sql, note, orderId);
+    }
+
+    // Undoes markOrderReceived when the stock could not be taken.
+    public void revertOrderToOpen(int orderId) {
+        String sql = "UPDATE " + ORDER_TABLE + " SET order_status = 'OPEN', note = NULL WHERE id = ? AND order_status = 'RECEIVED'";
+        jdbcTemplate.update(sql, orderId);
+    }
+
     public void updateOrderStatus(int orderId, String status) {
         String sql = "UPDATE " + ORDER_TABLE + " SET order_status = ? WHERE id = ?";
         jdbcTemplate.update(sql, status, orderId);
