@@ -28,6 +28,13 @@ public class S3Service {
     @Value("${aws.s3.region}")
     private String region;
 
+    // Local testing only (AWS_S3_FAKE_UPLOAD=true): the picked photo is accepted
+    // but neither uploaded nor stored, so product/box forms can be tried without
+    // AWS credentials. The product is then saved with no image of its own. Off
+    // unless explicitly turned on - production never sets it.
+    @Value("${aws.s3.fake-upload:false}")
+    private boolean fakeUpload;
+
     private S3Client s3Client;
 
     @PostConstruct
@@ -36,6 +43,9 @@ public class S3Service {
     }
 
     public UploadResult upload(MultipartFile file) throws IOException {
+        if (fakeUpload) {
+            return new UploadResult(null, null);
+        }
         String key = "products/" + UUID.randomUUID() + extensionFor(file.getContentType());
         s3Client.putObject(
                 PutObjectRequest.builder()

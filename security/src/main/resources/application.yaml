@@ -101,6 +101,8 @@ aws:
   s3:
     bucket: ${AWS_S3_BUCKET:keren-diamonds-product-images}
     region: ${AWS_S3_REGION:eu-central-1}
+    # Local testing only: accept photos without uploading or keeping them.
+    fake-upload: ${AWS_S3_FAKE_UPLOAD:false}
 
 # WhatsApp new-order notifications to Keren, via GreenAPI (green-api.com).
 # Placeholders until Yaron sets up the account - see .env.example for how to

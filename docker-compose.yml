@@ -127,6 +127,10 @@ services:
       AWS_ACCESS_KEY_ID: ${AWS_ACCESS_KEY_ID:-}
       AWS_SECRET_ACCESS_KEY: ${AWS_SECRET_ACCESS_KEY:-}
       # Override AWS_S3_BUCKET/AWS_S3_REGION only if not using the defaults.
+      # AWS_S3_FAKE_UPLOAD=true (shell or .env, local only): product/box forms
+      # accept a photo but do not upload or keep it - for trying the forms
+      # without AWS credentials. Never set in production.
+      AWS_S3_FAKE_UPLOAD: ${AWS_S3_FAKE_UPLOAD:-false}
       GREEN_API_ID_INSTANCE: ${GREEN_API_ID_INSTANCE:-}
       GREEN_API_TOKEN_INSTANCE: ${GREEN_API_TOKEN_INSTANCE:-}
       KEREN_WHATSAPP_NUMBER: ${KEREN_WHATSAPP_NUMBER:-}
