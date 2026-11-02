@@ -32,6 +32,8 @@ function CardItem({ item, isFavoriteDefault, categoryPath }) {
     // so leaving the page and coming back showed the product as not added.
     // Keren tracks this product's stock and none is left (stock null = not tracked).
     const soldOut = item.stock != null && item.stock <= 0;
+    // A chocolate has no price of its own: it is only chosen inside a box.
+    const isChocolate = item.category === 'chocolate';
     const clicked = currentUser ? openOrderItemIds.has(item.id) : cartItems.includes(item.id);
 
     // Empty deps meant this only ever ran once, on mount - if the parent's
@@ -159,7 +161,7 @@ function CardItem({ item, isFavoriteDefault, categoryPath }) {
                         <div className="details">
                             {error && <div className="error">{error}</div>}
                             <h3>{item.name} </h3>
-                            {soldOut ? <h3 className='sold-out-tag'>חסר במלאי</h3> : <h3>₪{item.price}</h3>}
+                            {soldOut ? <h3 className='sold-out-tag'>חסר במלאי</h3> : <h3>{isChocolate ? '—' : `₪${item.price}`}</h3>}
                         </div>
 
                         <div>
@@ -187,6 +189,7 @@ function CardItem({ item, isFavoriteDefault, categoryPath }) {
                 <div className="contents">
                     <h4>מידע: {item.description}</h4>
                     <h4>טיבעוני: {item.veg ? 'כן' : 'לא'}</h4>
+                    {isChocolate && <h4>הפרלין נבחר בתוך מארז, לא נמכר בנפרד</h4>}
 
                 </div>
             </div>
