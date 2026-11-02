@@ -21,6 +21,7 @@ public class ItemMapper implements RowMapper<Items> {
         item.setDeleteImgId(rs.getString("delete_img_id"));
         int stock = rs.getInt("stock");
         item.setStock(rs.wasNull() ? null : stock);
+        item.setLayout(rs.getString("layout"));
 
         return item;
     }

@@ -10,6 +10,8 @@ public class ItemRequest {
     private boolean isVeg;
     // Optional: null = stock is not tracked for this product.
     private Integer stock;
+    // Chocolate boxes only: the squares' layout as a JSON string.
+    private String layout;
 
     public ItemRequest() {
     }
@@ -30,6 +32,14 @@ public class ItemRequest {
                 ", price=" + price +
                 ", category='" + category + '\'' +
                 '}';
+    }
+
+    public String getLayout() {
+        return layout;
+    }
+
+    public void setLayout(String layout) {
+        this.layout = layout;
     }
 
     public Integer getStock() {

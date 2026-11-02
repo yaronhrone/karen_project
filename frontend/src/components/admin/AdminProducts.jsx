@@ -1,8 +1,9 @@
-import { CHOCOLATE_BOXES } from '../../config/chocolateBoxes';
 import React, { useState, useRef } from 'react'
 import { createItem, deleteItemById, getAllItems, updateItem } from '../../service/apiService';
 import CardItem from '../card/CardItem';
 import Modal from '../common/Modal';
+import BoxForm from './BoxForm';
+import StockField from './StockField';
 import './Admin.css';
 
 // Matches items.description VARCHAR(1255) in items-service (and the check in
@@ -12,6 +13,8 @@ const MAX_DESCRIPTION_LENGTH = 1255;
 function AdminProducts() {
     const [pageItem, setPageItem] = useState(1);
     const [updateId, setUpdateId] = useState(null);
+    // Which box product is open for editing (boxes have their own form, BoxForm).
+    const [editBoxId, setEditBoxId] = useState(null);
     const [error, setError] = useState('');
     // Every error message clears itself after 8 seconds (it used to stay on
     // screen until the next successful action). A newer message restarts the
@@ -126,6 +129,27 @@ if (!(file instanceof File)) {
             }
         }
     };
+    // Back to the first page of products (handelItems alone would fetch the
+    // page after the one already loaded).
+    const reloadItems = async () => {
+        try {
+            const { data } = await getAllItems(1);
+            setItem(data);
+            setPageItem(2);
+        } catch (error) {
+            showError('לא הצלחנו לרענן את רשימת המוצרים');
+        }
+    };
+    // BoxForm shows the server's error itself, so these only send and refresh.
+    const createBox = async (formData) => {
+        await createItem(formData);
+        reloadItems();
+    };
+    const saveBox = async (formData) => {
+        await updateItem(formData);
+        setEditBoxId(null);
+        reloadItems();
+    };
     // Was window.confirm() - a native browser popup, not styled at all.
     // Now opens the shared Modal (same one PhoneNumberPrompt already uses)
     // instead - deleteTarget holds the pending item's id while it's open.
@@ -216,17 +240,13 @@ if (!(file instanceof File)) {
                 <textarea placeholder="תיאור" rows={4} maxLength={MAX_DESCRIPTION_LENGTH} value={itemsFrom.description} onChange={(e) => setItemsFrom({ ...itemsFrom, description: e.target.value })} />
                 <span className="desc-counter">{itemsFrom.description.length}/{MAX_DESCRIPTION_LENGTH}</span>
                 {!isChocolate && <input type="number" placeholder="מחיר" value={itemsFrom.price} onChange={(e) => setItemsFrom({ ...itemsFrom, price: parseFloat(e.target.value) })} />}
-                <label className='stock-field'>
-                    מלאי (כמה יחידות במלאי, ריק = לא סופרים):
-                    <input type="number" min="0" step="1" value={itemsFrom.stock ?? ''} onChange={onStockChange} />
-                </label>
+                <StockField value={itemsFrom.stock} onChange={onStockChange} />
                 <input type="file" placeholder="העלאת תמונה"   accept="image/*"  onChange={(e) => setFile(  e.target.files[0] )} />
                 <select value={itemsFrom.category} onChange={(e) => setItemsFrom({ ...itemsFrom, category: e.target.value })}>
                     <option value="">בחר קטגוריה</option>
                     <option value="chocolate">שוקולד</option>
                     <option value="cake">עוגה</option>
                     <option value="cookie">עוגיה</option>
-                    {CHOCOLATE_BOXES.map((b) => <option key={b.size} value={`chocolate-box-${b.size}`}>{b.label}</option>)}
                 </select>
                 <label>
                     צמחוני:
@@ -234,6 +254,8 @@ if (!(file instanceof File)) {
                 </label>
                 <button className='btn' type="submit">תוסיף מוצר</button>
             </form>
+
+            <BoxForm onSave={createBox} />
 
             <h2 className='tital'>מוצרים</h2>
             <div className='items_container'>
@@ -243,27 +265,32 @@ if (!(file instanceof File)) {
                         <CardItem item={item} />
                         <p className='admin-stock'>{item.stock == null ? 'מלאי: לא נספר' : (item.stock <= 0 ? 'מלאי: 0 - חסר במלאי' : `מלאי: ${item.stock}`)}</p>
                         <button className='btn' type='button' onClick={() => setDeleteTarget(item.id)}>מחיקה</button>
-                        <button className='btn' type='button' onClick={() => toggleupdate(item.id)}>
-                            {updateId === item.id ? 'ביטול' : 'עריכה'}
-                        </button>
-                        {updateId === item.id && (
+                        {(item.category || '').startsWith('chocolate-box-') ? (
+                            <>
+                                <button className='btn' type='button' onClick={() => setEditBoxId(editBoxId === item.id ? null : item.id)}>
+                                    {editBoxId === item.id ? 'ביטול' : 'עריכה'}
+                                </button>
+                                {editBoxId === item.id && <BoxForm initial={item} onSave={saveBox} onCancel={() => setEditBoxId(null)} />}
+                            </>
+                        ) : (
+                            <button className='btn' type='button' onClick={() => toggleupdate(item.id)}>
+                                {updateId === item.id ? 'ביטול' : 'עריכה'}
+                            </button>
+                        )}
+                        {updateId === item.id && !(item.category || '').startsWith('chocolate-box-') && (
                             <form onSubmit={updateItemId} className='form_item'>
 
                                 <input type="text" placeholder="שם המוצר" value={itemsFrom.name} onChange={(e) => setItemsFrom({ ...itemsFrom, name: e.target.value })} />
                                 <textarea placeholder="תיאור" rows={4} maxLength={MAX_DESCRIPTION_LENGTH} value={itemsFrom.description} onChange={(e) => setItemsFrom({ ...itemsFrom, description: e.target.value })} />
                                 <span className="desc-counter">{itemsFrom.description.length}/{MAX_DESCRIPTION_LENGTH}</span>
                                 {!isChocolate && <input type="number" placeholder="מחיר" value={itemsFrom.price} onChange={(e) => setItemsFrom({ ...itemsFrom, price: parseFloat(e.target.value) })} />}
-                                <label className='stock-field'>
-                                    מלאי (כמה יחידות במלאי, ריק = לא סופרים):
-                                    <input type="number" min="0" step="1" value={itemsFrom.stock ?? ''} onChange={onStockChange} />
-                                </label>
+                                <StockField value={itemsFrom.stock} onChange={onStockChange} />
                                 <input type="file" placeholder="העלאת תמונה" accept="image/*" onChange={(e) => setUpdateFile(e.target.files[0])} />
                                 <select value={itemsFrom.category} onChange={(e) => setItemsFrom({ ...itemsFrom, category: e.target.value })}>
                                     <option value="">בחר קטגוריה</option>
                                     <option value="chocolate">שוקולד</option>
                                     <option value="cake">עוגה</option>
                                     <option value="cookie">עוגיה</option>
-                    {CHOCOLATE_BOXES.map((b) => <option key={b.size} value={`chocolate-box-${b.size}`}>{b.label}</option>)}
                                 </select>
                                 <label>  צמחוני:  <input className='veg' type="checkbox" checked={itemsFrom.veg} onChange={(e) => setItemsFrom({ ...itemsFrom, veg: e.target.checked })} /> </label>
                                 <button className='btn' type="submit">שמירה</button>

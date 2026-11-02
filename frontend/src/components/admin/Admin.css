@@ -318,3 +318,23 @@
 }
 .admin-stock { margin: 4px 0 8px; font-weight: 600; }
 .stock-field { display: flex; flex-direction: column; gap: 4px; font-size: 14px; }
+
+/* Stock and box fields: the name on its own line, the field full width below it, a hint under. */
+.form_item .stock-field,
+.form_item .box-form-field{ width: 100%; font-weight: normal; align-self: stretch; display: flex; flex-direction: column; align-items: stretch; gap: 4px; text-align: start; }
+.form_item .box-form-field select{ margin-bottom: 0; padding: 10px; border: 1px solid var(--color-bg-alt); border-radius: var(--radius-sm); background: var(--color-bg); color: var(--color-text); width: 100%; box-sizing: border-box; }
+.stock-title{ font-weight: 700; }
+.stock-hint{ font-size: 13px; color: var(--color-text-muted); margin: 0; }
+.box-form .box-form-free{ align-self: stretch; display: flex; flex-direction: column; align-items: center; gap: 10px; }
+.box-form-free-size{ display: flex; gap: 12px; align-self: stretch; }
+.box-form-free-size .box-form-field{ flex: 1; }
+.shape-grid{ display: grid; gap: 4px; direction: ltr; justify-content: center; }
+.shape-cell{ aspect-ratio: 1; border-radius: 50%; border: 2px dashed var(--color-bg-alt); background: transparent; cursor: pointer; padding: 0; }
+.shape-cell-on{ border: 2px solid var(--color-accent-hover); background: var(--color-accent); }
+.form_item .box-form-check{ width: auto; font-weight: normal; display: flex; align-items: center; gap: 8px; }
+.form_item .box-form-check input{ width: auto; margin: 0; }
+.box-form-count{ margin: 0; }
+.box-form-preview{ align-self: stretch; display: flex; justify-content: center; }
+.box-form-preview .box-builder-tray{ max-width: 200px; }
+.box-form-buttons{ display: flex; gap: 10px; justify-content: center; }
+.box-form-done{ color: var(--color-accent-hover); font-weight: 700; margin: 0; }

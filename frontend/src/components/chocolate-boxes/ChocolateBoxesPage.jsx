@@ -16,7 +16,7 @@ function ChocolateBoxesPage() {
   const { refreshOpenOrder } = useContext(OpenOrderContext);
   const navigate = useNavigate();
   // "Edit" on a box in the order/cart arrives here with the box to reopen:
-  // { source: 'order' | 'guest', id (order line id) | key (guest box key), size, chocolates }
+  // { source: 'order' | 'guest', id (order line id) | key (guest box key), itemId (the box's catalog id), size, chocolates }
   const edit = (useLocation().state || {}).edit || null;
 
   // Resolves to an error message to show, or null once the box is added.
@@ -54,7 +54,7 @@ function ChocolateBoxesPage() {
   return (
     <ChocolateBoxBuilder
       onAddToOrder={addToOrder}
-      initial={edit ? { size: edit.size, chocolates: edit.chocolates } : null}
+      initial={edit ? { itemId: edit.itemId, size: edit.size, chocolates: edit.chocolates } : null}
       onCancel={() => navigate('/order')}
     />
   );

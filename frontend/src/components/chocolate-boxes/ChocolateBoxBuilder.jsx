@@ -35,7 +35,7 @@ const Swatch = ({ item, className = '' }) => {
 
 // `preview` draws the squares as plain decoration (used inside a box card,
 // which is itself a button - interactive squares there would nest buttons).
-function BoxPreview({ box, slots, onSlotClick, preview = false }) {
+export function BoxPreview({ box, slots, onSlotClick, preview = false }) {
   let squareIndex = 0;
   const cells = boxCells(box);
   const layers = box.layers || 1;
@@ -117,8 +117,8 @@ function PickCard({ chocolate, onChoose, onEnlarge, soldOut }) {
   );
 }
 
-// initial (optional): { size, chocolates: [{ id, name, quantity }] } opens that
-// box already filled - used to edit a box that is already in the order. Then
+// initial (optional): { itemId, size, chocolates: [{ id, name, quantity }] } opens
+// that box (by its catalog id) already filled - used to edit a box that is already in the order. Then
 // the main button reads "save changes" and onCancel (if given) replaces the
 // "pick another box" link.
 function ChocolateBoxBuilder({ onAddToOrder, initial = null, onCancel }) {
@@ -126,15 +126,15 @@ function ChocolateBoxBuilder({ onAddToOrder, initial = null, onCancel }) {
   const [chocolates, setChocolates] = useState([]);
   const [isDemo, setIsDemo] = useState(false);
   const [loadFailed, setLoadFailed] = useState(false);
-  // Only the size is kept: the box itself (price, availability) is looked up
-  // from the latest catalog data on every render.
-  const [boxSize, setBoxSize] = useState(null);
+  // Only the box's catalog id is kept: the box itself (price, shape, stock) is
+  // looked up from the latest catalog data on every render.
+  const [boxItemId, setBoxItemId] = useState(null);
   const [slots, setSlots] = useState([]);
   const [activeSlot, setActiveSlot] = useState(null);
   const [enlarged, setEnlarged] = useState(null);
   const [adding, setAdding] = useState(false);
   const [orderError, setOrderError] = useState('');
-  const box = boxes.find((b) => b.size === boxSize) || null;
+  const box = boxes.find((b) => b.itemId === boxItemId) || null;
   const editing = Boolean(initial);
   const hydrated = useRef(false);
 
@@ -148,7 +148,7 @@ function ChocolateBoxBuilder({ onAddToOrder, initial = null, onCancel }) {
       const known = chocolates.find((c) => c.id === id) || { id, name };
       for (let i = 0; i < quantity; i += 1) filledSquares.push(known);
     });
-    setBoxSize(initial.size);
+    setBoxItemId(initial.itemId);
     setSlots(Array.from({ length: initial.size }, (_, i) => filledSquares[i] || null));
   }, [initial, chocolates]);
 
@@ -171,8 +171,8 @@ function ChocolateBoxBuilder({ onAddToOrder, initial = null, onCancel }) {
     return () => { ignore = true; };
   }, []);
 
-  const chooseBox = (b) => { setBoxSize(b.size); setSlots(Array(b.size).fill(null)); setOrderError(''); };
-  const backToBoxes = () => { setBoxSize(null); setSlots([]); setActiveSlot(null); setOrderError(''); };
+  const chooseBox = (b) => { setBoxItemId(b.itemId); setSlots(Array(b.size).fill(null)); setOrderError(''); };
+  const backToBoxes = () => { setBoxItemId(null); setSlots([]); setActiveSlot(null); setOrderError(''); };
 
   const setSlot = (value) => {
     setSlots((prev) => prev.map((s, i) => (i === activeSlot ? value : s)));
@@ -235,7 +235,7 @@ function ChocolateBoxBuilder({ onAddToOrder, initial = null, onCancel }) {
         {errorNote}
         <div className="box-builder-boxes">
           {boxes.map((b) => (
-            <button key={b.size} type="button" className="box-builder-box-card" disabled={b.outOfStock} onClick={() => chooseBox(b)}>
+            <button key={b.itemId} type="button" className="box-builder-box-card" disabled={b.outOfStock} onClick={() => chooseBox(b)}>
               {b.image
                 ? <RoundPhoto src={b.image} />
                 : <BoxPreview box={b} preview />}

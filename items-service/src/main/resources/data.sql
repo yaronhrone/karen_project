@@ -13,5 +13,6 @@ price DECIMAL(10,2) NOT NULL,
 category VARCHAR(100) NOT NULL,
 delete_img_id VARCHAR(1000),
 stock INT,
+layout TEXT,
 PRIMARY KEY(id)
 );

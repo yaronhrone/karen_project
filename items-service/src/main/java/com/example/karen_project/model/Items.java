@@ -18,6 +18,10 @@ public class Items {
     // How many are left to sell. null = not tracked (always available), which
     // is what every product has until its stock is first set in Admin.
     private Integer stock;
+    // Only for chocolate boxes: how the squares are laid out, as JSON
+    // ({"cols":3,"layers":3,"frame":"heart","shape":["xx..xx",...]}). The
+    // customer's box builder draws it. null for every other product.
+    private String layout;
 
     public Items() {
     }
@@ -31,6 +35,14 @@ public class Items {
         this.image = image;
         this.price = price;
         this.deleteImgId = deleteImgId;
+    }
+
+    public String getLayout() {
+        return layout;
+    }
+
+    public void setLayout(String layout) {
+        this.layout = layout;
     }
 
     public Integer getStock() {

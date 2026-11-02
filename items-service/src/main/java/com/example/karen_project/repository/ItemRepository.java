@@ -20,8 +20,8 @@ public class ItemRepository {
 
 
     public String  createItem(Items item){
-      String sql = String.format("INSERT INTO %s (name, description, IsVeg, image,price, category,delete_img_id, stock) VALUES (?,?,?,?,?,?,?,?)",ITEMS_TABLE);
-      jdbcTemplate.update(sql,item.getName(), item.getDescription(),item.getVeg(),item.getImage(),item.getPrice(),item.getCategory(),item.getDeleteImgId(),item.getStock());
+      String sql = String.format("INSERT INTO %s (name, description, IsVeg, image,price, category,delete_img_id, stock, layout) VALUES (?,?,?,?,?,?,?,?,?)",ITEMS_TABLE);
+      jdbcTemplate.update(sql,item.getName(), item.getDescription(),item.getVeg(),item.getImage(),item.getPrice(),item.getCategory(),item.getDeleteImgId(),item.getStock(),item.getLayout());
 
       return "The item is created!";
     }
@@ -68,8 +68,8 @@ public class ItemRepository {
         return Math.max(1, Math.min(size, 100));
     }
     public String updateItem(Items item){
-        String sql = String.format("UPDATE %s SET name = ?, description = ?, IsVeg = ?, image = ?, price = ?, category = ?, delete_img_id = ?, stock = ? WHERE id = ?",ITEMS_TABLE);
-        jdbcTemplate.update(sql,item.getName(),item.getDescription(),item.getVeg(),item.getImage(),item.getPrice(),item.getCategory(),item.getDeleteImgId(),item.getStock(),item.getId());
+        String sql = String.format("UPDATE %s SET name = ?, description = ?, IsVeg = ?, image = ?, price = ?, category = ?, delete_img_id = ?, stock = ?, layout = ? WHERE id = ?",ITEMS_TABLE);
+        jdbcTemplate.update(sql,item.getName(),item.getDescription(),item.getVeg(),item.getImage(),item.getPrice(),item.getCategory(),item.getDeleteImgId(),item.getStock(),item.getLayout(),item.getId());
         return "The item is updated!";
     }
     public List<Items> getItemsByCategory(String category,int page,int size){
@@ -144,6 +144,11 @@ public class ItemRepository {
         } catch (Exception e) {
             return null;
         }
+    }
+    // Every chocolate box (category chocolate-box-<number of chocolates>).
+    public List<Items> getBoxes(){
+        String sql = String.format("SELECT * FROM %s WHERE category LIKE 'chocolate-box-%%' ORDER BY id",ITEMS_TABLE);
+        return jdbcTemplate.query(sql, new ItemMapper());
     }
     // Takes `quantity` off the item's stock in one atomic statement, so two
     // customers ordering the last one at the same moment can't both get it.

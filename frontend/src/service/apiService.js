@@ -97,8 +97,8 @@ export const getAllCookie =  (page , size) => {
 }
 // Chocolate boxes are catalog items in the category chocolate-box-<size>
 // (the size is how many chocolates the box holds).
-export const getChocolateBox = (size) => {
-    return axios.get(`${BASE_URL_PROTUCT}/get_by_category/chocolate-box-${size}/?page=1&size=1`);
+export const getChocolateBoxes = () => {
+    return axios.get(`${BASE_URL_PROTUCT}/boxes`);
 }
 export const getItemById =async (id) => {
     const {data} = await axios.get(`${BASE_URL_PROTUCT}/get-by-id/${id}`);

@@ -52,3 +52,6 @@ CREATE INDEX IF NOT EXISTS items_search_vector_idx ON items USING GIN (search_ve
 -- available) - every existing product stays that way until Keren sets a number
 -- in Admin. Its own ALTER for the same reason as search_vector above.
 ALTER TABLE items ADD COLUMN IF NOT EXISTS stock INT;
+
+-- Chocolate boxes only: the squares' layout as JSON (see Items.layout).
+ALTER TABLE items ADD COLUMN IF NOT EXISTS layout TEXT;

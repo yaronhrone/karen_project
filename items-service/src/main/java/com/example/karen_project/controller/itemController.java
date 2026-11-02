@@ -68,6 +68,17 @@ public class itemController {
         }
     }
 
+    // All chocolate boxes in one call (the box builder and the home page list
+    // them). Public, like every other catalog read.
+    @GetMapping("/boxes")
+    public ResponseEntity<List<Items>> getBoxes() {
+        try {
+            return new ResponseEntity<>(itemService.getBoxes(), HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
     @GetMapping("/get_by_category/{category}/")
     public ResponseEntity<List<Items>> getItemByCategory(@PathVariable String category,@RequestParam (defaultValue = "1") int page ,@RequestParam (defaultValue = "10") int size){
         try {
@@ -172,11 +183,10 @@ List<Items> items = itemService.getAll(page, size);
     @PreAuthorize("hasAuthority('ADMIN')")
     public ResponseEntity<String> updateItem(@RequestBody Items item){
         try {
-            String result = itemService.updateItem(item);
-            if (result.contains("updated")) {
-                return new ResponseEntity<>(result,HttpStatus.OK);
-            }
-            return new ResponseEntity<>(result,HttpStatus.NOT_FOUND);
+            // Always 200, like createItem: the caller (security's ItemsClient) reads
+            // the text for "updated". A 404 here used to be swallowed by Feign's
+            // fallback, so the admin never saw why an edit was refused.
+            return new ResponseEntity<>(itemService.updateItem(item),HttpStatus.OK);
         } catch (Exception e) {
 
             return new ResponseEntity<>(e.getMessage(),HttpStatus.INTERNAL_SERVER_ERROR);

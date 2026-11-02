@@ -15,6 +15,8 @@ public class ItemUpdateRequest {
     private boolean isVeg;
     // Optional: null = stock is not tracked for this product.
     private Integer stock;
+    // Chocolate boxes only: the squares' layout as a JSON string.
+    private String layout;
 
     public ItemUpdateRequest() {
     }
@@ -25,6 +27,14 @@ public class ItemUpdateRequest {
 
     public void setId(int id) {
         this.id = id;
+    }
+
+    public String getLayout() {
+        return layout;
+    }
+
+    public void setLayout(String layout) {
+        this.layout = layout;
     }
 
     public Integer getStock() {

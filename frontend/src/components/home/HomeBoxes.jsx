@@ -20,7 +20,7 @@ function HomeBoxes() {
       <div key={startIndex} className="cards-wrapper fade">
         <ArrowBackIcon onClick={next} className="arrow" />
         {visible.map((b, index) => (
-          <div key={b.size} className="card-wrapper" style={{ animationDelay: `${index * 0.3}s` }}>
+          <div key={b.itemId} className="card-wrapper" style={{ animationDelay: `${index * 0.3}s` }}>
             <Link to="/chocolates" className="home-box-card">
               {b.image
                 ? <RoundPhoto src={b.image} />

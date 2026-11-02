@@ -5,6 +5,8 @@ package com.example.karen_project.service;
 import com.example.karen_project.model.Items;
 import com.example.karen_project.model.StockLine;
 import com.example.karen_project.repository.ItemRepository;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.support.TransactionTemplate;
@@ -23,6 +25,66 @@ public class ItemService {
     private ItemCacheService itemCacheService;
     @Autowired
     private TransactionTemplate transactionTemplate;
+
+    private static final ObjectMapper JSON = new ObjectMapper();
+    private static final String BOX_CATEGORY_PREFIX = "chocolate-box-";
+    private static final String INVALID_LAYOUT_MESSAGE = "הצורה של המארז לא תואמת את כמות הפרלינים";
+
+    // A box's layout comes from the admin form and is drawn as-is for every
+    // customer, so it is checked here (a direct API call skips the form's
+    // checks): the number of squares must equal the number of chocolates the
+    // category says. Returns the problem to show, or null when fine. Items that
+    // are not boxes, and boxes without a layout (the builder has a default for
+    // those), pass.
+    private static String boxLayoutProblem(Items item) {
+        String category = item.getCategory();
+        if (category == null || !category.startsWith(BOX_CATEGORY_PREFIX)) {
+            return null;
+        }
+        int size;
+        try {
+            size = Integer.parseInt(category.substring(BOX_CATEGORY_PREFIX.length()));
+        } catch (NumberFormatException e) {
+            return "כמות הפרלינים במארז חייבת להיות מספר";
+        }
+        if (size < 1 || size > 100) {
+            return "כמות הפרלינים במארז חייבת להיות בין 1 ל-100";
+        }
+        String layout = item.getLayout();
+        if (layout == null || layout.isBlank()) {
+            return null;
+        }
+        try {
+            JsonNode node = JSON.readTree(layout);
+            int cols = node.path("cols").asInt(0);
+            int layers = node.path("layers").asInt(1);
+            if (cols < 1 || cols > 20 || layers < 1 || layers > 10) {
+                return INVALID_LAYOUT_MESSAGE;
+            }
+            JsonNode shape = node.get("shape");
+            if (shape != null && !shape.isNull()) {
+                if (!shape.isArray() || shape.size() > 30) {
+                    return INVALID_LAYOUT_MESSAGE;
+                }
+                int squares = 0;
+                for (JsonNode row : shape) {
+                    String text = row.asText("");
+                    if (text.length() != cols || !text.matches("[x.]*")) {
+                        return INVALID_LAYOUT_MESSAGE;
+                    }
+                    squares += (int) text.chars().filter(c -> c == 'x').count();
+                }
+                return squares == size ? null : INVALID_LAYOUT_MESSAGE;
+            }
+            return size % layers == 0 ? null : INVALID_LAYOUT_MESSAGE;
+        } catch (Exception e) {
+            return INVALID_LAYOUT_MESSAGE;
+        }
+    }
+
+    public List<Items> getBoxes() {
+        return itemRepository.getBoxes();
+    }
 
     private static final String INVALID_STOCK_MESSAGE = "המלאי חייב להיות מספר שלם, 0 או יותר";
 
@@ -105,6 +167,10 @@ public class ItemService {
         }
         if (!hasValidStock(item)) {
             return INVALID_STOCK_MESSAGE;
+        }
+        String layoutProblem = boxLayoutProblem(item);
+        if (layoutProblem != null) {
+            return layoutProblem;
         }
         // Was inverted: getItemByName never actually returns null in the
         // normal case (it returns an empty List when nothing matches, only
@@ -201,6 +267,10 @@ public class ItemService {
         }
         if (!hasValidStock(item)) {
             return INVALID_STOCK_MESSAGE;
+        }
+        String layoutProblem = boxLayoutProblem(item);
+        if (layoutProblem != null) {
+            return layoutProblem;
         }
         // Deliberately itemRepository.getItemById, not this class's own
         // getItemById - that method is cache-wrapped, and routing this

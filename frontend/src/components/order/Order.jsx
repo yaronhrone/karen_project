@@ -104,12 +104,12 @@ const remove = async (id) => {
     // Reopens a box in the builder, already filled, to change what is inside.
     const editOrderBox = (orderItem) => {
         navigate('/chocolates', {
-            state: { edit: { source: 'order', id: orderItem.id, size: boxSizeFromCategory(orderItem.category), chocolates: orderItem.composition } },
+            state: { edit: { source: 'order', id: orderItem.id, itemId: orderItem.product_id, size: boxSizeFromCategory(orderItem.category), chocolates: orderItem.composition } },
         });
     };
     const editGuestBox = (box) => {
         navigate('/chocolates', {
-            state: { edit: { source: 'guest', key: box.key, size: box.size, chocolates: box.chocolates } },
+            state: { edit: { source: 'guest', key: box.key, itemId: box.boxItemId, size: box.size, chocolates: box.chocolates } },
         });
     };
     const removeBox = async (orderItemId) => {

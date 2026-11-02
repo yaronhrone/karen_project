@@ -23,6 +23,8 @@ public class Item {
         private boolean missing = false;
         // Units left to sell; null = stock is not tracked for this product.
         private Integer stock;
+        // Chocolate boxes only: the layout of the squares as JSON (see items-service).
+        private String layout;
 
         public Item() {
         }
@@ -113,6 +115,14 @@ public class Item {
 
         public void setImage(String image) {
             this.image = image;
+        }
+
+        public String getLayout() {
+            return layout;
+        }
+
+        public void setLayout(String layout) {
+            this.layout = layout;
         }
 
         public Integer getStock() {
