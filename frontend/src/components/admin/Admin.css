@@ -335,6 +335,10 @@
 .form_item .box-form-check input{ width: auto; margin: 0; }
 .box-form-count{ margin: 0; }
 .box-form-preview{ align-self: stretch; display: flex; justify-content: center; }
-.box-form-preview .box-builder-tray{ max-width: 200px; }
+/* Big enough to judge the shape: each square about 64px, up to 420px wide,
+   and never narrower than 180px (a 1-column box would be a thin strip). */
+.box-form-preview .box-builder-tray{ width: min(100%, 420px, max(180px, calc(var(--cols, 4) * 64px + 24px))); max-width: none; padding: 12px; }
+.box-form-preview .box-builder-grid{ gap: 8px; }
+.box-form-preview .box-builder-slot{ border-width: 2px; }
 .box-form-buttons{ display: flex; gap: 10px; justify-content: center; }
 .box-form-done{ color: var(--color-accent-hover); font-weight: 700; margin: 0; }
