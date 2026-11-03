@@ -257,6 +257,9 @@
 /* A box's photo is shown whole, inside a round frame like the other products
    (padding keeps the corners of a wide photo inside the circle). */
 .orderItem .box-photo { width: 96px; flex-shrink: 0; }
+/* `.orderItem img` (60px circle, cover) also matched the photo inside the
+   frame and cropped it; restore the frame's own whole-photo sizing. */
+.orderItem .box-photo img { width: 80%; height: 80%; object-fit: contain; border-radius: 0; box-shadow: none; }
 /* With contents open the whole box has to show, not scroll inside a cap. */
 .orderItemContainer:has(.orderItem-box) { max-height: none; overflow: visible; }
 

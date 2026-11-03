@@ -35,6 +35,7 @@ function AdminProducts() {
     // open; null means closed. Set right before the form resets below, so
     // the confirmation still shows the name that was actually submitted.
     const [addedItemName, setAddedItemName] = useState(null);
+    const [addedKind, setAddedKind] = useState('מוצר');
     const [itemsFrom, setItemsFrom] = useState({
         name: '',
         description: '',
@@ -106,6 +107,7 @@ if (!(file instanceof File)) {
 
 
             await createItem(formData);
+            setAddedKind('מוצר');
             setAddedItemName(itemsFrom.name.trim());
             setItemsFrom({
                 name: '',
@@ -141,8 +143,10 @@ if (!(file instanceof File)) {
         }
     };
     // BoxForm shows the server's error itself, so these only send and refresh.
-    const createBox = async (formData) => {
+    const createBox = async (formData, name) => {
         await createItem(formData);
+        setAddedKind('מארז');
+        setAddedItemName(name);
         reloadItems();
     };
     const saveBox = async (formData) => {
@@ -318,12 +322,12 @@ if (!(file instanceof File)) {
             <Modal
                 isOpen={addedItemName !== null}
                 onClose={() => setAddedItemName(null)}
-                title="המוצר נוסף בהצלחה"
+                title={`ה${addedKind} נוסף בהצלחה`}
                 footer={
                     <button className='btn' type='button' onClick={() => setAddedItemName(null)}>אישור</button>
                 }
             >
-                <p>המוצר "{addedItemName}" נוסף בהצלחה לקטלוג.</p>
+                <p>ה{addedKind} "{addedItemName}" נוסף בהצלחה לקטלוג.</p>
             </Modal>
         </div>
     )

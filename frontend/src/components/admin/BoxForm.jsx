@@ -12,7 +12,6 @@ function BoxForm({ initial = null, onSave, onCancel }) {
   const [form, setForm] = useState(() => (initial ? formFromBox(initial) : emptyBoxForm()));
   const [file, setFile] = useState(null);
   const [error, setError] = useState('');
-  const [done, setDone] = useState('');
   const [saving, setSaving] = useState(false);
   const fileInput = useRef(null);
   const set = (changes) => setForm((prev) => ({ ...prev, ...changes }));
@@ -31,7 +30,6 @@ function BoxForm({ initial = null, onSave, onCancel }) {
   const submit = async (e) => {
     e.preventDefault();
     setError('');
-    setDone('');
     if (!form.name.trim()) return setError('יש למלא שם למארז');
     if (built.problem) return setError(built.problem);
     const price = Number(form.price);
@@ -54,12 +52,11 @@ function BoxForm({ initial = null, onSave, onCancel }) {
     })], { type: 'application/json' }));
     setSaving(true);
     try {
-      await onSave(data);
+      await onSave(data, form.name.trim());
       if (!initial) {
         setForm(emptyBoxForm());
         setFile(null);
         if (fileInput.current) fileInput.current.value = '';
-        setDone('המארז נוסף');
       }
     } catch (err) {
       setError((err.response && typeof err.response.data === 'string' && err.response.data) || 'לא הצלחנו לשמור את המארז. נסו שוב.');
@@ -151,7 +148,6 @@ function BoxForm({ initial = null, onSave, onCancel }) {
       </label>
 
       {error && <p className="admin-error" role="alert">{error}</p>}
-      {done && <p className="box-form-done" role="status">{done}</p>}
       <div className="box-form-buttons">
         <button className="btn" type="submit" disabled={saving}>{initial ? 'שמירה' : 'הוספת מארז'}</button>
         {onCancel && <button className="btn btn-ghost" type="button" onClick={onCancel}>ביטול</button>}
