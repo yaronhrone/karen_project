@@ -1,9 +1,8 @@
 import React from 'react';
 import './RoundPhoto.css';
 
-// A photo shown whole inside a round frame. The padding sits on the frame,
-// not on the image: padding on an <img> with border-radius shrinks the
-// clipping curve too, which cut the corners off wide photos.
+// A photo filling a round frame: scaled to cover the whole circle, so the
+// edges of a rectangular photo are cropped by the curve.
 function RoundPhoto({ src, alt = '', className = '' }) {
     return (
         <span className={`round-photo ${className}`}>
