@@ -159,9 +159,9 @@
     gap: 10px;
 }
 
-/* Phones: the 6-column table is wider than the screen, so each user becomes a
+/* Up to 965px (phones and tablets): the 6-column table is wider than the screen, so each user becomes a
    small card (label on one side, value on the other) instead of a row. */
-@media (max-width: 700px){
+@media (max-width: 965px){
     .users-table-wrapper{ min-width: 0; }
     .users-table,
     .users-table tbody,
