@@ -3,7 +3,7 @@
   background: var(--color-surface);
   box-shadow: var(--shadow-sm);
   /* Wide enough that the row below never has to wrap: the widest row
-     (3 cards, from 1326px up - see utils/useCarouselPageSize.js) needs about
+     (3 cards, above 992px - see utils/useCarouselPageSize.js) needs about
      1010px, 2 cards about 720px, 1 card about 430px. */
   width: min(94%, 1100px);
   height: auto;
@@ -17,7 +17,10 @@
 }
 
 .card-wrapper {
-  flex: 0 0 auto;
+  /* Cards keep their natural width but may shrink when the row is tight
+     (2 cards on a ~576px tablet), so the row never overflows the container. */
+  flex: 0 1 264px;
+  min-width: 0;
   opacity: 0;
   transform: translateY(20px);
   animation: fadeInUp 1.2s ease forwards;
@@ -34,6 +37,17 @@
   width: 100%;
   height: auto;
   gap: 30px;
+}
+
+.cards-wrapper .card-wrapper > .wrapper,
+.cards-wrapper .card-wrapper > .home-box-card {
+  width: 100%;
+}
+
+@media (max-width: 992px) {
+  .cards-wrapper {
+    gap: 16px;
+  }
 }
 
 @keyframes fadeInUp {

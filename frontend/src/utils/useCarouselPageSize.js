@@ -1,11 +1,10 @@
 import { useState, useEffect } from 'react';
 
 // How many product cards a home-page carousel shows at once, by viewport
-// width: one on phones, two on tablets/small laptops (from 761px, so an iPad
-// held upright gets two), three on a full desktop. The 3-card layout needs
-// ~840px inside the carousel container, which only fits from about 1325px up.
-const ONE_CARD_MAX = 760;
-const TWO_CARDS_MAX = 1325;
+// width: one below 576px (phones), two from 576px to 992px (tablets), three
+// above 992px.
+const ONE_CARD_MAX = 575;
+const TWO_CARDS_MAX = 992;
 
 const sizeForWidth = (width) => {
     if (width <= ONE_CARD_MAX) return 1;
