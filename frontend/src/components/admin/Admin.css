@@ -159,6 +159,43 @@
     gap: 10px;
 }
 
+/* Phones: the 6-column table is wider than the screen, so each user becomes a
+   small card (label on one side, value on the other) instead of a row. */
+@media (max-width: 700px){
+    .users-table-wrapper{ min-width: 0; }
+    .users-table,
+    .users-table tbody,
+    .users-table tr,
+    .users-table td{ display: block; width: 100%; box-sizing: border-box; }
+    .users-table{ background: none; box-shadow: none; }
+    .users-table thead{ display: none; }
+    .users-table tr{
+        background: var(--color-surface);
+        box-shadow: var(--shadow-sm);
+        border-radius: var(--radius-md);
+        margin-bottom: 12px;
+        padding: 4px 0;
+    }
+    .users-table td{
+        display: flex;
+        justify-content: space-between;
+        gap: 12px;
+        padding: 8px 14px;
+        white-space: normal;
+        overflow-wrap: anywhere;
+        border-bottom: 1px solid var(--color-bg-alt);
+    }
+    .users-table td::before{
+        content: attr(data-label);
+        font-weight: 700;
+        color: var(--color-heading);
+        flex-shrink: 0;
+    }
+    .users-table tr:last-child td{ border-bottom: 1px solid var(--color-bg-alt); }
+    .users-table td.users-table-actions{ border-bottom: none; flex-wrap: wrap; justify-content: center; }
+    .users-table td.users-table-actions::before{ content: none; }
+}
+
 /* Tab bar between the 3 admin sub-pages (AdminNav) - same dark background as
    the main NavBar's .links so it reads as "still the admin chrome", with
    CustomLink's own .active class doing the highlighting. */

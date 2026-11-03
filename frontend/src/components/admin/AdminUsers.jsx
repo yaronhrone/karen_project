@@ -74,11 +74,11 @@ function AdminUsers() {
                         <tbody>
                             {users.map(user => (
                                 <tr key={user.id}>
-                                    <td>{user.first_name}</td>
-                                    <td>{user.last_name}</td>
-                                    <td>{user.email}</td>
-                                    <td>{ROLE_LABELS[user.role] || user.role}</td>
-                                    <td>{user.id}</td>
+                                    <td data-label='שם פרטי'>{user.first_name}</td>
+                                    <td data-label='שם משפחה'>{user.last_name}</td>
+                                    <td data-label='אימייל'>{user.email}</td>
+                                    <td data-label='תפקיד'>{ROLE_LABELS[user.role] || user.role}</td>
+                                    <td data-label='מזהה'>{user.id}</td>
                                     <td className='users-table-actions'>
                                         <button className='btn' type='button' onClick={() => handelOrderUser(user.email)}>קבל הזמנות</button>
                                         <button className='btn btn-cancel' type='button' onClick={() => deleteUser(user.email)}>מחיקה</button>
