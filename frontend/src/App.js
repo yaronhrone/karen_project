@@ -22,6 +22,7 @@ import AdminUsers from './components/admin/AdminUsers';
 import Footer from './components/layout/Footer';
 import SearchPage from './components/search-page/SearchPage';
 import Header from './components/layout/Header';
+import BackButton from './components/layout/BackButton';
 import { CartProvider } from './contexts/CartContext';
 import { OpenOrderProvider } from './contexts/OpenOrderContext';
 import PhoneNumberPrompt from './components/auth/PhoneNumberPrompt';
@@ -74,6 +75,7 @@ function App() {
               {isRequestToGetCurrentUserDone && currentUser && !currentUser.phone && <PhoneNumberPrompt />}
               <Header />
               <NavBar />
+              <BackButton />
               {/* A render crash anywhere in a routed page used to blank the
                   entire app, nav/header/footer included, with zero
                   indication anything went wrong (found this the hard way -
