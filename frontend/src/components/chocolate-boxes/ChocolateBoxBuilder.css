@@ -1,7 +1,7 @@
 .box-builder-page { max-width: 880px; margin: 0 auto; padding: 8px 16px 48px; text-align: center; }
 .box-builder-sub { color: var(--color-text-muted); margin: 4px 0 20px; }
 .box-builder-demo { display: inline-block; padding: 6px 12px; border-radius: var(--radius-sm); background: var(--color-accent-soft); color: var(--color-accent-hover); font-size: 14px; margin: 0 0 16px; }
-.box-builder-back { background: none; border: none; cursor: pointer; color: var(--color-accent-hover); font-size: 15px; margin-bottom: 8px; }
+.box-builder-back { background: none; border: none; cursor: pointer; color: var(--color-accent-hover); font-size: 19px; font-weight: 600; padding: 8px 14px; margin: 24px 0 14px; }
 
 .box-builder-boxes { display: flex; flex-wrap: wrap; gap: 24px; justify-content: center; }
 .box-builder-box-card { width: 240px; padding: 16px; border: none; border-radius: var(--radius-md); background: var(--color-surface); box-shadow: var(--shadow-sm); cursor: pointer; transition: box-shadow var(--transition), transform var(--transition); }
