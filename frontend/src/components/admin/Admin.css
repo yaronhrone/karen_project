@@ -114,6 +114,12 @@
     width: 30%;
     min-width: 300px;
 }
+/* Phones: the edit form fills the screen width under its card instead of
+   keeping a 300px minimum, and each product takes a full row. */
+@media (max-width: 600px){
+    .items_container > div{ width: 100%; max-width: 100%; }
+    .items_container .form_item{ width: 100%; min-width: 0; box-sizing: border-box; }
+}
 .users_container{
     display: flex;
     flex-direction: column;

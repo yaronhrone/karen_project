@@ -172,7 +172,12 @@ if (!(file instanceof File)) {
         }
         setDeleteTarget(null);
     }
+    // Id of the product whose edit form was already scrolled into view, so the
+    // form is brought on screen once when opened (on a phone it opens below
+    // the fold and looked like "nothing happened"), not on every re-render.
+    const editFormShown = useRef(null);
     const toggleupdate = (id) => {
+        editFormShown.current = null;
         setUpdateId(id === updateId ? null : id);
         // Opening a different edit, or canceling one - either way, any
         // photo picked for a previous edit session must not carry over.
@@ -228,8 +233,22 @@ if (!(file instanceof File)) {
             setPageItem(1);
             handelItems();
         } catch (error) {
-            if (error.response?.status === 400 || error.response?.status === 500) {
-                showError(error.response.data);
+            // Every failure must say something: before, only 400/500 with a
+            // body did, so a too-big phone photo (413), an expired login
+            // (401/403), a dropped connection or an empty error body made the
+            // save button look dead.
+            const status = error.response?.status;
+            const body = error.response?.data;
+            if (error.code === 'ERR_NETWORK') {
+                showError('שגיאת רשת: בדוק/י את החיבור לאינטרנט ונסה/י שוב.');
+            } else if (status === 413) {
+                showError('התמונה גדולה מדי. נסה/י תמונה קטנה יותר.');
+            } else if (status === 401 || status === 403) {
+                showError('ההתחברות פגה. יש להתחבר מחדש ולנסות שוב.');
+            } else if (typeof body === 'string' && body) {
+                showError(body);
+            } else {
+                showError('השמירה נכשלה. נסה/י שוב.');
             }
         };
     }
@@ -282,8 +301,9 @@ if (!(file instanceof File)) {
                             </button>
                         )}
                         {updateId === item.id && !(item.category || '').startsWith('chocolate-box-') && (
-                            <form onSubmit={updateItemId} className='form_item'>
+                            <form onSubmit={updateItemId} className='form_item' ref={(el) => { if (el && editFormShown.current !== item.id) { editFormShown.current = item.id; el.scrollIntoView({ behavior: 'smooth', block: 'center' }); } }}>
 
+                                {error && <p className='admin-error'>{error}</p>}
                                 <input type="text" placeholder="שם המוצר" value={itemsFrom.name} onChange={(e) => setItemsFrom({ ...itemsFrom, name: e.target.value })} />
                                 <textarea placeholder="תיאור" rows={4} maxLength={MAX_DESCRIPTION_LENGTH} value={itemsFrom.description} onChange={(e) => setItemsFrom({ ...itemsFrom, description: e.target.value })} />
                                 <span className="desc-counter">{itemsFrom.description.length}/{MAX_DESCRIPTION_LENGTH}</span>
