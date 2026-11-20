@@ -244,7 +244,11 @@ if (!(file instanceof File)) {
             } else if (status === 413) {
                 showError('התמונה גדולה מדי. נסה/י תמונה קטנה יותר.');
             } else if (status === 401 || status === 403) {
-                showError('ההתחברות פגה. יש להתחבר מחדש ולנסות שוב.');
+                // Status and the server's own words are shown on purpose: this
+                // exact message appeared on an iPhone that was logged in as
+                // admin, so the real reason (expired token vs. no ADMIN role
+                // vs. a proxy) has to be visible to be fixed.
+                showError(`ההתחברות נדחתה (${status}${typeof body === 'string' && body ? `: ${body}` : ''}). נסה/י להתחבר מחדש.`);
             } else if (typeof body === 'string' && body) {
                 showError(body);
             } else {
