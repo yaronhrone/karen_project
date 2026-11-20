@@ -76,6 +76,10 @@ jobs:
             # These packages already pull without auth since the repo is public - login is a
             # nice-to-have (keeps working if that ever changes), not a hard requirement, so a
             # login failure (e.g. an expired/misscoped GHCR_PAT) doesn't block the actual deploy.
+            # A stale ghcr.io login left in ~/.docker/config.json (expired PAT) makes
+            # even public packages fail with "denied", and a failed re-login does not
+            # remove it. Clear it first so a bad PAT can never block the pull.
+            docker logout ghcr.io || true
             echo "${{ secrets.GHCR_PAT }}" | docker login ghcr.io -u yaronhrone --password-stdin || echo "GHCR login failed - continuing, packages are public"
             docker compose -f docker-compose.yml -f docker-compose.prod.yml pull
             docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d --remove-orphans
