@@ -54,10 +54,12 @@ test('a mouse over the carousel pauses it; a touch does not', () => {
     expect(result.current.visible).toEqual([7, 1, 2]);
 });
 
-test('one card per page on a phone', () => {
+test('one card per page on a phone, and it never turns by itself there', () => {
     window.innerWidth = 400;
     const { result } = renderHook(() => useCarousel(list));
     expect(result.current.visible).toEqual([1]);
-    act(() => { jest.advanceTimersByTime(AUTO_ADVANCE_MS); });
+    act(() => { jest.advanceTimersByTime(AUTO_ADVANCE_MS * 3); });
+    expect(result.current.visible).toEqual([1]);
+    act(() => { result.current.next(); });
     expect(result.current.visible).toEqual([2]);
 });

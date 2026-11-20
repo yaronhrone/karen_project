@@ -5,12 +5,18 @@ import { visibleWindow, stepStart } from './carouselWindow';
 // How long a page of the home carousels stays before the next one slides in.
 export const AUTO_ADVANCE_MS = 6000;
 
+const prefersReducedMotion = () => (
+    typeof window !== 'undefined' && typeof window.matchMedia === 'function'
+    && window.matchMedia('(prefers-reduced-motion: reduce)').matches
+);
+
 // State shared by the home carousels (cakes, cookies, boxes): which cards are
 // visible, the arrows' next/previous, and the automatic turn every 6 seconds.
 // The timer starts over after every change, so a click on an arrow gets a full
 // 6 seconds before the next automatic turn. It stops while a mouse is over the
-// carousel (so a card can be read and clicked) and when everything already fits
-// on screen.
+// carousel (so a card can be read and clicked), when everything already fits
+// on screen, on phones, and for visitors who asked their device for reduced
+// motion.
 export default function useCarousel(list) {
     const pageSize = useCarouselPageSize();
     const [startIndex, setStartIndex] = useState(0);
@@ -25,11 +31,9 @@ export default function useCarousel(list) {
 
     const rotates = list.length > pageSize;
     useEffect(() => {
-        // Reduced-motion is deliberately NOT checked: many phones (Android
-        // with animations off, battery saver, iOS "Reduce Motion") report it,
-        // and the carousel then never turned on the phone. The turn is a soft
-        // fade, not a heavy movement.
-        if (!rotates || paused) return undefined;
+        // No automatic turn on a phone (one card per page): it was disturbing
+        // while reading/tapping a card. The arrows still work there.
+        if (!rotates || paused || pageSize === 1 || prefersReducedMotion()) return undefined;
         const timer = setTimeout(next, AUTO_ADVANCE_MS);
         return () => clearTimeout(timer);
         // next only depends on the values listed here
