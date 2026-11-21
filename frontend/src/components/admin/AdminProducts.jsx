@@ -4,6 +4,7 @@ import CardItem from '../card/CardItem';
 import Modal from '../common/Modal';
 import BoxForm from './BoxForm';
 import StockField from './StockField';
+import shrinkImage from '../../utils/shrinkImage';
 import './Admin.css';
 
 // Matches items.description VARCHAR(1255) in items-service (and the check in
@@ -92,7 +93,8 @@ if (!(file instanceof File)) {
     showError('הקובץ לא תקין, יש לבחור תמונה');
     return;
 }
-        const realFile = new File([file], "upload.jpg", { type: file.type || "image/jpeg" });
+        const smaller = await shrinkImage(file);
+        const realFile = new File([smaller], "upload.jpg", { type: smaller.type || "image/jpeg" });
 
         formData.append('file', realFile);
         formData.append('item', new Blob([JSON.stringify({
@@ -207,7 +209,8 @@ if (!(file instanceof File)) {
         }
         const formData = new FormData();
         if (updateFile) {
-            const realFile = new File([updateFile], "upload.jpg", { type: updateFile.type || "image/jpeg" });
+            const smaller = await shrinkImage(updateFile);
+            const realFile = new File([smaller], "upload.jpg", { type: smaller.type || "image/jpeg" });
             formData.append('file', realFile);
         }
         formData.append('item', new Blob([JSON.stringify({

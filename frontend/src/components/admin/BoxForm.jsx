@@ -2,6 +2,7 @@ import React, { useMemo, useRef, useState } from 'react';
 import { BoxPreview } from '../chocolate-boxes/ChocolateBoxBuilder';
 import '../chocolate-boxes/ChocolateBoxBuilder.css';
 import StockField from './StockField';
+import shrinkImage from '../../utils/shrinkImage';
 import { buildBox, emptyBoxForm, formFromBox, heartTemplateForm, resizeCells } from './boxFormModel';
 
 // "הוספת מארז" / editing a box: its name, how many chocolates, price, shape and
@@ -39,7 +40,10 @@ function BoxForm({ initial = null, onSave, onCancel }) {
     if (file && !(file instanceof File)) return setError('הקובץ לא תקין, יש לבחור תמונה');
 
     const data = new FormData();
-    if (file) data.append('file', new File([file], 'upload.jpg', { type: file.type || 'image/jpeg' }));
+    if (file) {
+      const smaller = await shrinkImage(file);
+      data.append('file', new File([smaller], 'upload.jpg', { type: smaller.type || 'image/jpeg' }));
+    }
     data.append('item', new Blob([JSON.stringify({
       ...(initial ? { id: initial.id } : {}),
       name: form.name.trim(),
